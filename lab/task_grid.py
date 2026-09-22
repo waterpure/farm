@@ -1,9 +1,10 @@
 """A coordinate grid of what each tile needs right now.
 
 This does not plan routes. A later planner can scan the grid. Crop tiles carry
-water and harvest. Animal tiles carry feed, care, and harvest. A job is
-completed only when a later world shows it happened. Issuing the command does
-not complete it. SCHEDULED means a worker and an hour are written.
+water, harvest, and fertilize. Animal tiles carry feed, care, harvest, and
+manure collection. A job is completed only when a later world shows it
+happened. Issuing the command does not complete it. SCHEDULED means a worker
+and an hour are written.
 """
 
 from __future__ import annotations
@@ -12,7 +13,16 @@ from dataclasses import dataclass, field
 
 from kaggle_environments.envs.kaggriculture.kaggriculture import CROPS as ENGINE_CROPS
 
-from .route14_state import COMPLETED, PENDING, SCHEDULED, TURNS_PER_DAY, AnimalState, CropState, WorldState
+from .route14_state import (
+    COMPLETED,
+    PENDING,
+    SCHEDULED,
+    SEASON_DAYS,
+    TURNS_PER_DAY,
+    AnimalState,
+    CropState,
+    WorldState,
+)
 
 
 BOARD_SIZE = 10
@@ -20,6 +30,8 @@ WATER = "WATER"
 HARVEST = "HARVEST"
 FEED = "FEED"
 CARE = "CARE"
+COLLECT_FERTILIZER = "COLLECT_FERTILIZER"
+FERTILIZE = "FERTILIZE"
 
 
 @dataclass
@@ -65,6 +77,21 @@ class CareTask(TaskState):
     cared_today: bool = False
     pending_care_bonus: int = 0
     bonus_gain: int = 0
+
+
+@dataclass
+class CollectFertilizerTask(TaskState):
+    """Manure is ready on this animal."""
+
+    fertilizer_ready: bool = False
+
+
+@dataclass
+class FertilizeTask(TaskState):
+    """Fertilizer would raise this crop's later yield, and none is active yet."""
+
+    fertilized_today: bool = False
+    fertilizer_days_left: int = 0
 
 
 @dataclass
@@ -141,6 +168,9 @@ class TaskGridBuilder:
             if animal is not None:
                 bucket.tasks[FEED] = _feed_task(animal, _previous_task(previous, building.position, FEED))
                 bucket.tasks[CARE] = _care_task(animal, _previous_task(previous, building.position, CARE))
+                collect = _collect_task(animal, _previous_task(previous, building.position, COLLECT_FERTILIZER))
+                if collect is not None:
+                    bucket.tasks[COLLECT_FERTILIZER] = collect
             grid.put(bucket)
         return grid
 
@@ -152,6 +182,9 @@ class TaskGridBuilder:
         harvest = _crop_harvest(crop, _previous_task(previous, crop.position, HARVEST))
         if harvest is not None:
             bucket.tasks[HARVEST] = harvest
+        fertilize = _fertilize_task(world, crop, _previous_task(previous, crop.position, FERTILIZE))
+        if fertilize is not None:
+            bucket.tasks[FERTILIZE] = fertilize
         return bucket
 
 
@@ -222,6 +255,123 @@ def _animal_harvest(animal: AnimalState | None, prior: TaskState | None) -> Harv
     if animal.yield_units <= 0:
         return _completed_harvest(prior)
     return None
+
+
+def should_fertilize(crop: CropState, state: WorldState) -> bool:
+    """True only when a fertilizer on hand would raise this crop's later yield."""
+
+    if _fertilizer_on_hand(state) <= 0:
+        return False
+    if crop.remaining_harvests <= 0:
+        return False
+    if crop.fertilizer_days_left > 0 or crop.fertilized_today:
+        return False
+    return fertilizer_yield_gain(crop) > 0
+
+
+def fertilizer_yield_gain(crop: CropState) -> int:
+    """Extra units from fertilizing now, if every useful water still happens.
+
+    Fertilizer covers today and the next two days. One-shot crops gain the
+    extra water point only inside the official window, and only up to max
+    yield. Tomato and strawberry gain one extra fruit on each production
+    night inside those three days; fruit already hanging is unchanged.
+    """
+
+    spec = ENGINE_CROPS[crop.crop]
+    if spec["ongoing"]:
+        return _ongoing_fertilizer_gain(crop, spec)
+    return _oneshot_fertilizer_gain(crop, spec)
+
+
+def _fertilizer_on_hand(state: WorldState) -> int:
+    inventory = state.farm.inventory
+    if inventory is None:
+        return 0
+    return inventory.fertilizer
+
+
+def _collect_task(animal: AnimalState, prior: TaskState | None) -> CollectFertilizerTask | None:
+    if animal.fertilizer_ready:
+        status, worker, hour = _carried(prior)
+        return CollectFertilizerTask(COLLECT_FERTILIZER, status, False, worker, hour, True)
+    if prior is None or prior.status == COMPLETED:
+        return None
+    return CollectFertilizerTask(
+        COLLECT_FERTILIZER,
+        COMPLETED,
+        False,
+        prior.assigned_worker,
+        prior.planned_hour,
+        False,
+    )
+
+
+def _fertilize_task(world: WorldState, crop: CropState, prior: TaskState | None) -> FertilizeTask | None:
+    active = crop.fertilizer_days_left > 0 or crop.fertilized_today
+    if active:
+        if prior is None or prior.status == COMPLETED:
+            return None
+        return FertilizeTask(
+            FERTILIZE,
+            COMPLETED,
+            False,
+            prior.assigned_worker,
+            prior.planned_hour,
+            crop.fertilized_today,
+            crop.fertilizer_days_left,
+        )
+    if not should_fertilize(crop, world):
+        return None
+    status, worker, hour = _carried(prior)
+    return FertilizeTask(FERTILIZE, status, False, worker, hour, False, 0)
+
+
+def _carried(prior: TaskState | None) -> tuple[str, str | None, int | None]:
+    if prior is not None and prior.status == SCHEDULED:
+        return SCHEDULED, prior.assigned_worker, prior.planned_hour
+    return PENDING, None, None
+
+
+def _oneshot_fertilizer_gain(crop: CropState, spec: dict) -> int:
+    cap = int(spec["max_yield"])
+    window_start = (int(spec["max_yield_day"]) + 1) // 2
+    window_end = int(spec["max_yield_day"])
+
+    def run(fertilize: bool) -> int:
+        units = crop.yield_units
+        if not crop.watered_today and window_start <= crop.age_days <= window_end:
+            units = min(cap, units + (2 if fertilize else 1))
+        age = crop.age_days
+        for ahead in range(1, max(0, window_end - age) + 1):
+            if units >= cap:
+                break
+            boosted = fertilize and ahead <= 2
+            units = min(cap, units + (2 if boosted else 1))
+        return units
+
+    return run(True) - run(False)
+
+
+def _ongoing_fertilizer_gain(crop: CropState, spec: dict) -> int:
+    cap = int(spec["max_yield"])
+    first = int(spec["first_yield_day"])
+    interval = max(1, int(spec["interval"]))
+
+    def run(fertilize: bool) -> int:
+        total = 0
+        sitting = crop.yield_units
+        for ahead in range(SEASON_DAYS):
+            days_since_first = crop.age_days + ahead + 1 - first
+            if days_since_first < 0 or days_since_first % interval != 0:
+                continue
+            if days_since_first // interval + 1 > cap:
+                break
+            total += sitting
+            sitting = min(cap, 2 if fertilize and ahead <= 2 else 1)
+        return total + sitting
+
+    return run(True) - run(False)
 
 
 def _feed_task(animal: AnimalState, prior: TaskState | None) -> FeedTask:

@@ -40,7 +40,7 @@
 
 **任务池。** `FarmState.task_pool` 是一张清单，不是三类活。每一格、每一种需要各占一行，行上写坐标、站着的作物或牲畜、要做的事。例如 `(2, 3) STRAWBERRY WATER`、`(2, 4) STRAWBERRY WATER`、`(2, 5) WHEAT HARVEST` 是三行。牲畜收获这一行站着的是羊，带走的货在 `goods`（羊毛）。今晚不浇会变草的是 `DIES_TONIGHT`，今晚不喂会跑的是 `ESCAPES_TONIGHT`，已经有货要赶快收的是 `RIPE`。同一格同一件事只进池一次。排班按行领还没派人的，领走之后变成 `SCHEDULED` 并写上谁。昨天浇过、今天还能活的地，和今天没断粮的牲畜，不进池。
 
-**二维任务池。** `TaskGrid[x][y]` 只读已解析的局面。作物格是浇水和收获。动物格是喂粮、关怀，身上有货再加收获。浇水、收获的规则不变：没浇过才有浇水，熟了才有收获，发出命令是 `SCHEDULED`，下一小时局面证实了才是 `COMPLETED`。喂粮写 `fed_today`、`consecutive_unfed`，还没喂过时 `wheat_cost` 是 1，已经喂过再喂不扣麦所以是 0；今晚会跑则 `mandatory`。关怀写 `cared_today` 和已经攒下的 `pending_care_bonus`。当天喂过并且关怀过，今晚才再攒 1 点，这点还没入账时 `bonus_gain` 是 0；还缺喂或关怀时 `bonus_gain` 是 1。空棚没有这两行。作物格没有喂粮和关怀。没有改第一阶段路线。
+**二维任务池。** `TaskGrid[x][y]` 只读已解析的局面。作物格是浇水、收获，以及 `should_fertilize` 认为值得施的肥。动物格是喂粮、关怀、身上有货时的收获，以及 `fertilizer_ready` 时的拾粪。浇水、收获、喂粮、关怀的完成规则不变。拾粪发出命令后仍是 `SCHEDULED`，下一小时粪肥标记消失才完成。施肥要等 `fertilized_today` 或 `fertilizer_days_left` 显示肥已生效才完成。已经在施肥、手里没有肥、没有后续收获，或按官方窗口算下来不加产，都不生成施肥。同一格的新任务不覆盖原有任务。排班仍不读这张网格。
 
 **这十三件事，格子上有的和没有的。** 浇水、喂粮、收获能从作物和牲畜直接开行，池子里已经有。杂草的 `needs_dig`、空棚的 `can_dig`、牲畜的 `fertilizer_ready`、作物的 `fertilized_today` / `fertilizer_days_left`、牲畜的 `cared_today` / `care_bonus` 都在状态上，但池子不会因为这些字段自动开行。空地的 `plantable`、`can_build_coop`、`can_build_pasture` 只说明能种、能盖，不说明该种什么、该盖哪一种。空棚的 `accepted_animals` 和仓库里的 `unplaced_animals` 能对上“有空棚、手里有羊”，选哪一座棚仍是安排。拿货和放货不在土地、作物、畜身上：仓库和手里的货在 `InventoryState`，人的位置在 `WorkerState`。第一阶段的排班仍然只领浇水、喂粮、收获。
 
