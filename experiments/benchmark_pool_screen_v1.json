@@ -1,0 +1,30 @@
+{
+  "purpose": "Compatibility and diversity screen for public opponent snapshots; not a leaderboard estimate or selection experiment.",
+  "run_date": "2026-09-17",
+  "environment": {
+    "python": "3.12",
+    "kaggle_environments": "1.32.7",
+    "episode_steps": 720
+  },
+  "sources": {
+    "sdy2842": "944aa64c5ae1296a9a17eb7961ed8d5a96d0b80183d41e954389983d73420a56",
+    "v46": "735c370383b70d3bf3aac792f2c147e0afc99166fc9f253ede10e8a030acedb6",
+    "indar_top10": "d39dba50793d9777c990347443bf0c481c78adaea86055f6f6b0600dcfcd9f2e",
+    "kaito_v58": "b041058ec187a8d0a01edc0eab8de068b53deca3e6c1973faf74ace6916ddcb9"
+  },
+  "determinism_smoke_vs_starter_seed_7": {
+    "sdy2842": {"rewards": [170945, 3484], "statuses": ["DONE", "DONE"], "repeat_identical": true, "action_trace_sha256": "0d1f0b494e3cc066f715ead5b6ac355a4b248a31d54b6b8dd19803abe1edd175", "elapsed_seconds": [1.67, 1.651]},
+    "v46": {"rewards": [151814, 3421], "statuses": ["DONE", "DONE"], "repeat_identical": true, "action_trace_sha256": "34f76cd331f8d7900b40eae86ca5014678cb7e8091fd88532e6965395e0031ad", "elapsed_seconds": [1.714, 1.619]},
+    "indar_top10": {"rewards": [164746, 3532], "statuses": ["DONE", "DONE"], "repeat_identical": true, "action_trace_sha256": "b76ce7a39d742bfcf3a1d904e68134d1f7da15950f2f4a09b52de6bc218f461f", "elapsed_seconds": [1.409, 1.43]},
+    "kaito_v58": {"rewards": [154407, 3431], "statuses": ["DONE", "DONE"], "repeat_identical": true, "action_trace_sha256": "75992449baf0930df3300520048bb6acdb7e644ee894b0242cb7da6102dd039c", "elapsed_seconds": [2.881, 2.848]}
+  },
+  "paired_v45_screen": {
+    "seeds": [7, 8],
+    "both_seats": true,
+    "sdy2842": {"margins": [1560, 1560, 2539, 2539], "mean_margin": 2049.5, "all_done": true},
+    "v46": {"margins": [3979, 3979, 517, 517], "mean_margin": 2248.0, "all_done": true},
+    "indar_top10": {"margins": [-38284, -36288, -42222, -42222], "mean_margin": -39754.0, "all_done": true},
+    "kaito_v58": {"margins": [-18982, -18982, -17515, -17515], "mean_margin": -18248.5, "all_done": true}
+  },
+  "interpretation": "All four sources compiled, completed 720 turns, repeated deterministically, and produced distinct seed-7 action-trace hashes. The two-seed screen is too small for a strength claim. It establishes only provisional local-opponent eligibility; a fixed development/holdout league still needs a predeclared protocol."
+}

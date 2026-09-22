@@ -1,0 +1,1362 @@
+{
+  "protocol": "v45-opponent-diagnosis-v1",
+  "source": "experiments/v45_opponent_diagnosis_v1.jsonl",
+  "planned_conditions": 56,
+  "accepted_conditions": 56,
+  "rejected_or_incomplete_conditions": 0,
+  "malformed_accepted_conditions": [],
+  "order_quantity_note": "requested SELL quantities are agent requests, not confirmed fills; interpret phase cash deltas as realised evidence.",
+  "opponents": {
+    "boatlee_v16": {
+      "accepted_conditions": 8,
+      "mean_terminal_cash_margin": 39732.625,
+      "opening_wheat_order_units": {
+        "v45_buy": 70,
+        "v45_sell": 70,
+        "opponent_buy": 14,
+        "opponent_sell": 0.0
+      },
+      "phases": {
+        "opening": {
+          "cash_delta_margin": 196,
+          "cash_margin_end": 196,
+          "assets_at_phase_end": {
+            "hands": {
+              "v45": 0,
+              "opponent": 0,
+              "difference": 0
+            },
+            "crops": {
+              "v45": 19,
+              "opponent": 9,
+              "difference": 10
+            },
+            "animals": {
+              "v45": 5,
+              "opponent": 5,
+              "difference": 0
+            },
+            "yield_units": {
+              "v45": 23,
+              "opponent": 13,
+              "difference": 10
+            },
+            "shed_units": {
+              "v45": 7,
+              "opponent": 16,
+              "difference": -9
+            }
+          },
+          "requested_sell_unit_difference_total": {
+            "WHEAT": 608,
+            "CARROT": 0,
+            "TOMATO": 0,
+            "STRAWBERRY": 0,
+            "MELON": 0,
+            "EGG": 0,
+            "MILK": 0,
+            "WOOL": 0,
+            "FERTILIZER": -16
+          }
+        },
+        "development": {
+          "cash_delta_margin": 11784.25,
+          "cash_margin_end": 11980.25,
+          "assets_at_phase_end": {
+            "hands": {
+              "v45": 10.25,
+              "opponent": 10,
+              "difference": 0.25
+            },
+            "crops": {
+              "v45": 53.625,
+              "opponent": 60.875,
+              "difference": -7.25
+            },
+            "animals": {
+              "v45": 17,
+              "opponent": 12,
+              "difference": 5
+            },
+            "yield_units": {
+              "v45": 25,
+              "opponent": 41,
+              "difference": -16
+            },
+            "shed_units": {
+              "v45": 40.5,
+              "opponent": 6,
+              "difference": 34.5
+            }
+          },
+          "requested_sell_unit_difference_total": {
+            "WHEAT": -96,
+            "CARROT": 0,
+            "TOMATO": 0,
+            "STRAWBERRY": 0,
+            "MELON": 264,
+            "EGG": 8,
+            "MILK": 288,
+            "WOOL": 16,
+            "FERTILIZER": 78
+          }
+        },
+        "market": {
+          "cash_delta_margin": 14823.625,
+          "cash_margin_end": 26803.875,
+          "assets_at_phase_end": {
+            "hands": {
+              "v45": 12.25,
+              "opponent": 12,
+              "difference": 0.25
+            },
+            "crops": {
+              "v45": 60.5,
+              "opponent": 61,
+              "difference": -0.5
+            },
+            "animals": {
+              "v45": 18.5,
+              "opponent": 12,
+              "difference": 6.5
+            },
+            "yield_units": {
+              "v45": 82.25,
+              "opponent": 103,
+              "difference": -20.75
+            },
+            "shed_units": {
+              "v45": 31.25,
+              "opponent": 19,
+              "difference": 12.25
+            }
+          },
+          "requested_sell_unit_difference_total": {
+            "WHEAT": 13906,
+            "CARROT": 2000,
+            "TOMATO": 2024,
+            "STRAWBERRY": 13982,
+            "MELON": 1304,
+            "EGG": 2642,
+            "MILK": 1914,
+            "WOOL": 11501,
+            "FERTILIZER": 16693
+          }
+        },
+        "terminal": {
+          "cash_delta_margin": 12928.75,
+          "cash_margin_end": 39732.625,
+          "assets_at_phase_end": {
+            "hands": {
+              "v45": 12,
+              "opponent": 10,
+              "difference": 2
+            },
+            "crops": {
+              "v45": 2.5,
+              "opponent": 0,
+              "difference": 2.5
+            },
+            "animals": {
+              "v45": 18.5,
+              "opponent": 12,
+              "difference": 6.5
+            },
+            "yield_units": {
+              "v45": 0.25,
+              "opponent": 0,
+              "difference": 0.25
+            },
+            "shed_units": {
+              "v45": 0,
+              "opponent": 0,
+              "difference": 0
+            }
+          },
+          "requested_sell_unit_difference_total": {
+            "WHEAT": 134806,
+            "CARROT": 136386,
+            "TOMATO": 48116,
+            "STRAWBERRY": 48076,
+            "MELON": 48000,
+            "EGG": 64168,
+            "MILK": 63642,
+            "WOOL": 48170,
+            "FERTILIZER": 79850
+          }
+        }
+      },
+      "v45_telemetry_mean": {
+        "race_clone_turns": 0,
+        "race_horizon_turns": 0,
+        "race_escalations": 0,
+        "sale_reserved_units": 292.875,
+        "sale_reservations": 63.625,
+        "replenishment_trim_units": 9.75,
+        "feed_skips": 16.75,
+        "supply_budget_declines": 1,
+        "opening_day1_cash": 32,
+        "warehouse_extra_sales": 6.625,
+        "quote_reordered_turns": 35.625
+      }
+    },
+    "indar_pasture": {
+      "accepted_conditions": 8,
+      "mean_terminal_cash_margin": 42660.125,
+      "opening_wheat_order_units": {
+        "v45_buy": 70,
+        "v45_sell": 70,
+        "opponent_buy": 0.0,
+        "opponent_sell": 0.0
+      },
+      "phases": {
+        "opening": {
+          "cash_delta_margin": 27,
+          "cash_margin_end": 27,
+          "assets_at_phase_end": {
+            "hands": {
+              "v45": 0,
+              "opponent": 0,
+              "difference": 0
+            },
+            "crops": {
+              "v45": 19,
+              "opponent": 19,
+              "difference": 0
+            },
+            "animals": {
+              "v45": 5,
+              "opponent": 5,
+              "difference": 0
+            },
+            "yield_units": {
+              "v45": 23,
+              "opponent": 23,
+              "difference": 0
+            },
+            "shed_units": {
+              "v45": 6,
+              "opponent": 6,
+              "difference": 0
+            }
+          },
+          "requested_sell_unit_difference_total": {
+            "WHEAT": 568,
+            "CARROT": 0,
+            "TOMATO": 0,
+            "STRAWBERRY": 0,
+            "MELON": 0,
+            "EGG": 0,
+            "MILK": 0,
+            "WOOL": 0,
+            "FERTILIZER": 0
+          }
+        },
+        "development": {
+          "cash_delta_margin": 176.875,
+          "cash_margin_end": 203.875,
+          "assets_at_phase_end": {
+            "hands": {
+              "v45": 10.5,
+              "opponent": 11,
+              "difference": -0.5
+            },
+            "crops": {
+              "v45": 53.375,
+              "opponent": 57.25,
+              "difference": -3.875
+            },
+            "animals": {
+              "v45": 17,
+              "opponent": 12,
+              "difference": 5
+            },
+            "yield_units": {
+              "v45": 23,
+              "opponent": 22,
+              "difference": 1
+            },
+            "shed_units": {
+              "v45": 33,
+              "opponent": 57.25,
+              "difference": -24.25
+            }
+          },
+          "requested_sell_unit_difference_total": {
+            "WHEAT": -26,
+            "CARROT": 0,
+            "TOMATO": 0,
+            "STRAWBERRY": 0,
+            "MELON": 0,
+            "EGG": 0,
+            "MILK": 64,
+            "WOOL": 6,
+            "FERTILIZER": -2
+          }
+        },
+        "market": {
+          "cash_delta_margin": 14758.625,
+          "cash_margin_end": 14962.5,
+          "assets_at_phase_end": {
+            "hands": {
+              "v45": 12.625,
+              "opponent": 11,
+              "difference": 1.625
+            },
+            "crops": {
+              "v45": 61.75,
+              "opponent": 61,
+              "difference": 0.75
+            },
+            "animals": {
+              "v45": 18.5,
+              "opponent": 14,
+              "difference": 4.5
+            },
+            "yield_units": {
+              "v45": 80.5,
+              "opponent": 64,
+              "difference": 16.5
+            },
+            "shed_units": {
+              "v45": 29.25,
+              "opponent": 22,
+              "difference": 7.25
+            }
+          },
+          "requested_sell_unit_difference_total": {
+            "WHEAT": 14313,
+            "CARROT": 2000,
+            "TOMATO": 2036,
+            "STRAWBERRY": 14160,
+            "MELON": 2000,
+            "EGG": 2388,
+            "MILK": 2400,
+            "WOOL": 11336,
+            "FERTILIZER": 16464
+          }
+        },
+        "terminal": {
+          "cash_delta_margin": 27697.625,
+          "cash_margin_end": 42660.125,
+          "assets_at_phase_end": {
+            "hands": {
+              "v45": 12.25,
+              "opponent": 11,
+              "difference": 1.25
+            },
+            "crops": {
+              "v45": 3.75,
+              "opponent": 0,
+              "difference": 3.75
+            },
+            "animals": {
+              "v45": 18.5,
+              "opponent": 14,
+              "difference": 4.5
+            },
+            "yield_units": {
+              "v45": 0,
+              "opponent": 1.5,
+              "difference": -1.5
+            },
+            "shed_units": {
+              "v45": 0,
+              "opponent": 0.75,
+              "difference": -0.75
+            }
+          },
+          "requested_sell_unit_difference_total": {
+            "WHEAT": 135476,
+            "CARROT": 136289,
+            "TOMATO": 48174,
+            "STRAWBERRY": 48122,
+            "MELON": 48000,
+            "EGG": 64144,
+            "MILK": 63985,
+            "WOOL": 48182,
+            "FERTILIZER": 79972
+          }
+        }
+      },
+      "v45_telemetry_mean": {
+        "race_clone_turns": 0,
+        "race_horizon_turns": 0,
+        "race_escalations": 0,
+        "sale_reserved_units": 266.75,
+        "sale_reservations": 52.75,
+        "replenishment_trim_units": 10.5,
+        "feed_skips": 45.125,
+        "supply_budget_declines": 1.75,
+        "opening_day1_cash": 18,
+        "warehouse_extra_sales": 2.875,
+        "quote_reordered_turns": 31
+      }
+    },
+    "indar_top10": {
+      "accepted_conditions": 8,
+      "mean_terminal_cash_margin": 38148.625,
+      "opening_wheat_order_units": {
+        "v45_buy": 70,
+        "v45_sell": 70,
+        "opponent_buy": 6,
+        "opponent_sell": 0.0
+      },
+      "phases": {
+        "opening": {
+          "cash_delta_margin": 158,
+          "cash_margin_end": 158,
+          "assets_at_phase_end": {
+            "hands": {
+              "v45": 0,
+              "opponent": 0,
+              "difference": 0
+            },
+            "crops": {
+              "v45": 19,
+              "opponent": 19,
+              "difference": 0
+            },
+            "animals": {
+              "v45": 5,
+              "opponent": 4,
+              "difference": 1
+            },
+            "yield_units": {
+              "v45": 23,
+              "opponent": 26,
+              "difference": -3
+            },
+            "shed_units": {
+              "v45": 7,
+              "opponent": 8,
+              "difference": -1
+            }
+          },
+          "requested_sell_unit_difference_total": {
+            "WHEAT": 656,
+            "CARROT": 0,
+            "TOMATO": 0,
+            "STRAWBERRY": 0,
+            "MELON": 0,
+            "EGG": 0,
+            "MILK": 0,
+            "WOOL": 0,
+            "FERTILIZER": 8
+          }
+        },
+        "development": {
+          "cash_delta_margin": 6874.75,
+          "cash_margin_end": 7032.75,
+          "assets_at_phase_end": {
+            "hands": {
+              "v45": 10.25,
+              "opponent": 12,
+              "difference": -1.75
+            },
+            "crops": {
+              "v45": 53.625,
+              "opponent": 51.875,
+              "difference": 1.75
+            },
+            "animals": {
+              "v45": 17,
+              "opponent": 13.5,
+              "difference": 3.5
+            },
+            "yield_units": {
+              "v45": 23.5,
+              "opponent": 34.5,
+              "difference": -11.0
+            },
+            "shed_units": {
+              "v45": 41,
+              "opponent": 26.25,
+              "difference": 14.75
+            }
+          },
+          "requested_sell_unit_difference_total": {
+            "WHEAT": -144,
+            "CARROT": 0,
+            "TOMATO": 0,
+            "STRAWBERRY": 0,
+            "MELON": 0,
+            "EGG": 0,
+            "MILK": 180,
+            "WOOL": 6,
+            "FERTILIZER": -732
+          }
+        },
+        "market": {
+          "cash_delta_margin": 19110.5,
+          "cash_margin_end": 26143.25,
+          "assets_at_phase_end": {
+            "hands": {
+              "v45": 12.25,
+              "opponent": 11,
+              "difference": 1.25
+            },
+            "crops": {
+              "v45": 60.5,
+              "opponent": 55.75,
+              "difference": 4.75
+            },
+            "animals": {
+              "v45": 18.5,
+              "opponent": 14.25,
+              "difference": 4.25
+            },
+            "yield_units": {
+              "v45": 80,
+              "opponent": 55.25,
+              "difference": 24.75
+            },
+            "shed_units": {
+              "v45": 35.5,
+              "opponent": 0,
+              "difference": 35.5
+            }
+          },
+          "requested_sell_unit_difference_total": {
+            "WHEAT": 8338,
+            "CARROT": 1958,
+            "TOMATO": 2024,
+            "STRAWBERRY": 14547,
+            "MELON": 1616,
+            "EGG": 2532,
+            "MILK": 1892,
+            "WOOL": 11022,
+            "FERTILIZER": 4680
+          }
+        },
+        "terminal": {
+          "cash_delta_margin": 12005.375,
+          "cash_margin_end": 38148.625,
+          "assets_at_phase_end": {
+            "hands": {
+              "v45": 12,
+              "opponent": 8,
+              "difference": 4
+            },
+            "crops": {
+              "v45": 2.5,
+              "opponent": 1,
+              "difference": 1.5
+            },
+            "animals": {
+              "v45": 18.5,
+              "opponent": 13.5,
+              "difference": 5.0
+            },
+            "yield_units": {
+              "v45": 0,
+              "opponent": 1.5,
+              "difference": -1.5
+            },
+            "shed_units": {
+              "v45": 0,
+              "opponent": 0,
+              "difference": 0
+            }
+          },
+          "requested_sell_unit_difference_total": {
+            "WHEAT": 134792,
+            "CARROT": 136330,
+            "TOMATO": 48116,
+            "STRAWBERRY": 47918,
+            "MELON": 48000,
+            "EGG": 64144,
+            "MILK": 63894,
+            "WOOL": 48194,
+            "FERTILIZER": 80156
+          }
+        }
+      },
+      "v45_telemetry_mean": {
+        "race_clone_turns": 0,
+        "race_horizon_turns": 0,
+        "race_escalations": 0,
+        "sale_reserved_units": 240,
+        "sale_reservations": 55.375,
+        "replenishment_trim_units": 16.25,
+        "feed_skips": 59.5,
+        "supply_budget_declines": 2,
+        "opening_day1_cash": 21,
+        "warehouse_extra_sales": 4.5,
+        "quote_reordered_turns": 31.75
+      }
+    },
+    "kaito_v58": {
+      "accepted_conditions": 8,
+      "mean_terminal_cash_margin": 44148.625,
+      "opening_wheat_order_units": {
+        "v45_buy": 70,
+        "v45_sell": 70,
+        "opponent_buy": 0.0,
+        "opponent_sell": 0.0
+      },
+      "phases": {
+        "opening": {
+          "cash_delta_margin": 74,
+          "cash_margin_end": 74,
+          "assets_at_phase_end": {
+            "hands": {
+              "v45": 0,
+              "opponent": 0,
+              "difference": 0
+            },
+            "crops": {
+              "v45": 19,
+              "opponent": 19,
+              "difference": 0
+            },
+            "animals": {
+              "v45": 5,
+              "opponent": 5,
+              "difference": 0
+            },
+            "yield_units": {
+              "v45": 23,
+              "opponent": 23,
+              "difference": 0
+            },
+            "shed_units": {
+              "v45": 6,
+              "opponent": 8,
+              "difference": -2
+            }
+          },
+          "requested_sell_unit_difference_total": {
+            "WHEAT": 592,
+            "CARROT": 0,
+            "TOMATO": 0,
+            "STRAWBERRY": 0,
+            "MELON": 0,
+            "EGG": 0,
+            "MILK": 0,
+            "WOOL": 0,
+            "FERTILIZER": 0
+          }
+        },
+        "development": {
+          "cash_delta_margin": 1005.5,
+          "cash_margin_end": 1079.5,
+          "assets_at_phase_end": {
+            "hands": {
+              "v45": 10.5,
+              "opponent": 11,
+              "difference": -0.5
+            },
+            "crops": {
+              "v45": 53.375,
+              "opponent": 56.5,
+              "difference": -3.125
+            },
+            "animals": {
+              "v45": 17,
+              "opponent": 13.25,
+              "difference": 3.75
+            },
+            "yield_units": {
+              "v45": 23,
+              "opponent": 22,
+              "difference": 1
+            },
+            "shed_units": {
+              "v45": 31.5,
+              "opponent": 55.25,
+              "difference": -23.75
+            }
+          },
+          "requested_sell_unit_difference_total": {
+            "WHEAT": -148,
+            "CARROT": 0,
+            "TOMATO": 0,
+            "STRAWBERRY": 0,
+            "MELON": 0,
+            "EGG": 0,
+            "MILK": 52,
+            "WOOL": 6,
+            "FERTILIZER": -14
+          }
+        },
+        "market": {
+          "cash_delta_margin": 15743.375,
+          "cash_margin_end": 16822.875,
+          "assets_at_phase_end": {
+            "hands": {
+              "v45": 12.75,
+              "opponent": 11,
+              "difference": 1.75
+            },
+            "crops": {
+              "v45": 60.5,
+              "opponent": 60.25,
+              "difference": 0.25
+            },
+            "animals": {
+              "v45": 20,
+              "opponent": 14,
+              "difference": 6
+            },
+            "yield_units": {
+              "v45": 77,
+              "opponent": 65.75,
+              "difference": 11.25
+            },
+            "shed_units": {
+              "v45": 31.625,
+              "opponent": 21.25,
+              "difference": 10.375
+            }
+          },
+          "requested_sell_unit_difference_total": {
+            "WHEAT": 11006,
+            "CARROT": 2000,
+            "TOMATO": 2024,
+            "STRAWBERRY": 14258,
+            "MELON": 2000,
+            "EGG": 2389,
+            "MILK": 2170,
+            "WOOL": 11438,
+            "FERTILIZER": 16514
+          }
+        },
+        "terminal": {
+          "cash_delta_margin": 27325.75,
+          "cash_margin_end": 44148.625,
+          "assets_at_phase_end": {
+            "hands": {
+              "v45": 12.5,
+              "opponent": 11,
+              "difference": 1.5
+            },
+            "crops": {
+              "v45": 2.5,
+              "opponent": 1.5,
+              "difference": 1.0
+            },
+            "animals": {
+              "v45": 20,
+              "opponent": 14,
+              "difference": 6
+            },
+            "yield_units": {
+              "v45": 0,
+              "opponent": 1.5,
+              "difference": -1.5
+            },
+            "shed_units": {
+              "v45": 0,
+              "opponent": 0,
+              "difference": 0
+            }
+          },
+          "requested_sell_unit_difference_total": {
+            "WHEAT": 134826,
+            "CARROT": 136278,
+            "TOMATO": 48116,
+            "STRAWBERRY": 47998,
+            "MELON": 48000,
+            "EGG": 64144,
+            "MILK": 63971,
+            "WOOL": 48301,
+            "FERTILIZER": 79982
+          }
+        }
+      },
+      "v45_telemetry_mean": {
+        "race_clone_turns": 17.5,
+        "race_horizon_turns": 17.5,
+        "race_escalations": 0,
+        "sale_reserved_units": 252.375,
+        "sale_reservations": 50.25,
+        "replenishment_trim_units": 12,
+        "feed_skips": 51.375,
+        "supply_budget_declines": 1.75,
+        "opening_day1_cash": 18,
+        "warehouse_extra_sales": 3.75,
+        "quote_reordered_turns": 28.125
+      }
+    },
+    "nathan_pipe7": {
+      "accepted_conditions": 8,
+      "mean_terminal_cash_margin": -236.5,
+      "opening_wheat_order_units": {
+        "v45_buy": 70,
+        "v45_sell": 70,
+        "opponent_buy": 5,
+        "opponent_sell": 5
+      },
+      "phases": {
+        "opening": {
+          "cash_delta_margin": -12,
+          "cash_margin_end": -12,
+          "assets_at_phase_end": {
+            "hands": {
+              "v45": 0,
+              "opponent": 0,
+              "difference": 0
+            },
+            "crops": {
+              "v45": 17,
+              "opponent": 19,
+              "difference": -2
+            },
+            "animals": {
+              "v45": 5,
+              "opponent": 5,
+              "difference": 0
+            },
+            "yield_units": {
+              "v45": 19,
+              "opponent": 23,
+              "difference": -4
+            },
+            "shed_units": {
+              "v45": 6,
+              "opponent": 7,
+              "difference": -1
+            }
+          },
+          "requested_sell_unit_difference_total": {
+            "WHEAT": 520,
+            "CARROT": 0,
+            "TOMATO": 0,
+            "STRAWBERRY": 0,
+            "MELON": 0,
+            "EGG": 0,
+            "MILK": 0,
+            "WOOL": 0,
+            "FERTILIZER": 0
+          }
+        },
+        "development": {
+          "cash_delta_margin": -224.5,
+          "cash_margin_end": -236.5,
+          "assets_at_phase_end": {
+            "hands": {
+              "v45": 10.25,
+              "opponent": 10.25,
+              "difference": 0.0
+            },
+            "crops": {
+              "v45": 53.625,
+              "opponent": 53.625,
+              "difference": 0.0
+            },
+            "animals": {
+              "v45": 17,
+              "opponent": 17,
+              "difference": 0
+            },
+            "yield_units": {
+              "v45": 23.5,
+              "opponent": 23.5,
+              "difference": 0.0
+            },
+            "shed_units": {
+              "v45": 40.25,
+              "opponent": 40.25,
+              "difference": 0.0
+            }
+          },
+          "requested_sell_unit_difference_total": {
+            "WHEAT": 0,
+            "CARROT": 0,
+            "TOMATO": 0,
+            "STRAWBERRY": 0,
+            "MELON": 0,
+            "EGG": 0,
+            "MILK": 0,
+            "WOOL": 0,
+            "FERTILIZER": 0
+          }
+        },
+        "market": {
+          "cash_delta_margin": 0,
+          "cash_margin_end": -236.5,
+          "assets_at_phase_end": {
+            "hands": {
+              "v45": 12,
+              "opponent": 12,
+              "difference": 0
+            },
+            "crops": {
+              "v45": 60.5,
+              "opponent": 60.5,
+              "difference": 0.0
+            },
+            "animals": {
+              "v45": 17,
+              "opponent": 17,
+              "difference": 0
+            },
+            "yield_units": {
+              "v45": 84.25,
+              "opponent": 84.25,
+              "difference": 0.0
+            },
+            "shed_units": {
+              "v45": 36,
+              "opponent": 36,
+              "difference": 0
+            }
+          },
+          "requested_sell_unit_difference_total": {
+            "WHEAT": 0,
+            "CARROT": 0,
+            "TOMATO": 0,
+            "STRAWBERRY": 0,
+            "MELON": 0,
+            "EGG": 0,
+            "MILK": 0,
+            "WOOL": 0,
+            "FERTILIZER": 0
+          }
+        },
+        "terminal": {
+          "cash_delta_margin": 0,
+          "cash_margin_end": -236.5,
+          "assets_at_phase_end": {
+            "hands": {
+              "v45": 11.5,
+              "opponent": 11.5,
+              "difference": 0.0
+            },
+            "crops": {
+              "v45": 2.5,
+              "opponent": 2.5,
+              "difference": 0.0
+            },
+            "animals": {
+              "v45": 17,
+              "opponent": 17,
+              "difference": 0
+            },
+            "yield_units": {
+              "v45": 0,
+              "opponent": 0,
+              "difference": 0
+            },
+            "shed_units": {
+              "v45": 0,
+              "opponent": 0,
+              "difference": 0
+            }
+          },
+          "requested_sell_unit_difference_total": {
+            "WHEAT": 0,
+            "CARROT": 0,
+            "TOMATO": 0,
+            "STRAWBERRY": 0,
+            "MELON": 0,
+            "EGG": 0,
+            "MILK": 0,
+            "WOOL": 0,
+            "FERTILIZER": 0
+          }
+        }
+      },
+      "v45_telemetry_mean": {
+        "race_clone_turns": 476,
+        "race_horizon_turns": 476,
+        "race_escalations": 0,
+        "sale_reserved_units": 269.5,
+        "sale_reservations": 57.5,
+        "replenishment_trim_units": 9.75,
+        "feed_skips": 44.25,
+        "supply_budget_declines": 1.75,
+        "opening_day1_cash": 12,
+        "warehouse_extra_sales": 4.75,
+        "quote_reordered_turns": 36.75
+      }
+    },
+    "sdy2842": {
+      "accepted_conditions": 8,
+      "mean_terminal_cash_margin": -2001.125,
+      "opening_wheat_order_units": {
+        "v45_buy": 70,
+        "v45_sell": 70,
+        "opponent_buy": 10,
+        "opponent_sell": 10
+      },
+      "phases": {
+        "opening": {
+          "cash_delta_margin": -28,
+          "cash_margin_end": -28,
+          "assets_at_phase_end": {
+            "hands": {
+              "v45": 0,
+              "opponent": 0,
+              "difference": 0
+            },
+            "crops": {
+              "v45": 18,
+              "opponent": 19,
+              "difference": -1
+            },
+            "animals": {
+              "v45": 5,
+              "opponent": 5,
+              "difference": 0
+            },
+            "yield_units": {
+              "v45": 22,
+              "opponent": 23,
+              "difference": -1
+            },
+            "shed_units": {
+              "v45": 7,
+              "opponent": 7,
+              "difference": 0
+            }
+          },
+          "requested_sell_unit_difference_total": {
+            "WHEAT": 480,
+            "CARROT": 0,
+            "TOMATO": 0,
+            "STRAWBERRY": 0,
+            "MELON": 0,
+            "EGG": 0,
+            "MILK": 0,
+            "WOOL": 0,
+            "FERTILIZER": 0
+          }
+        },
+        "development": {
+          "cash_delta_margin": -1262.5,
+          "cash_margin_end": -1290.5,
+          "assets_at_phase_end": {
+            "hands": {
+              "v45": 10,
+              "opponent": 10,
+              "difference": 0
+            },
+            "crops": {
+              "v45": 53.875,
+              "opponent": 53.875,
+              "difference": 0.0
+            },
+            "animals": {
+              "v45": 17,
+              "opponent": 17,
+              "difference": 0
+            },
+            "yield_units": {
+              "v45": 26,
+              "opponent": 26,
+              "difference": 0
+            },
+            "shed_units": {
+              "v45": 44,
+              "opponent": 44,
+              "difference": 0
+            }
+          },
+          "requested_sell_unit_difference_total": {
+            "WHEAT": 0,
+            "CARROT": 0,
+            "TOMATO": 0,
+            "STRAWBERRY": 0,
+            "MELON": 0,
+            "EGG": 0,
+            "MILK": 0,
+            "WOOL": -8,
+            "FERTILIZER": 0
+          }
+        },
+        "market": {
+          "cash_delta_margin": -507.625,
+          "cash_margin_end": -1798.125,
+          "assets_at_phase_end": {
+            "hands": {
+              "v45": 13.25,
+              "opponent": 13.25,
+              "difference": 0.0
+            },
+            "crops": {
+              "v45": 65.5,
+              "opponent": 65.5,
+              "difference": 0.0
+            },
+            "animals": {
+              "v45": 17,
+              "opponent": 17,
+              "difference": 0
+            },
+            "yield_units": {
+              "v45": 83.5,
+              "opponent": 83.5,
+              "difference": 0.0
+            },
+            "shed_units": {
+              "v45": 36,
+              "opponent": 32.25,
+              "difference": 3.75
+            }
+          },
+          "requested_sell_unit_difference_total": {
+            "WHEAT": 0,
+            "CARROT": 0,
+            "TOMATO": 0,
+            "STRAWBERRY": -14,
+            "MELON": 0,
+            "EGG": -18,
+            "MILK": -30,
+            "WOOL": -56,
+            "FERTILIZER": 0
+          }
+        },
+        "terminal": {
+          "cash_delta_margin": -203,
+          "cash_margin_end": -2001.125,
+          "assets_at_phase_end": {
+            "hands": {
+              "v45": 12.5,
+              "opponent": 12.5,
+              "difference": 0.0
+            },
+            "crops": {
+              "v45": 7.5,
+              "opponent": 7.5,
+              "difference": 0.0
+            },
+            "animals": {
+              "v45": 17,
+              "opponent": 17,
+              "difference": 0
+            },
+            "yield_units": {
+              "v45": 0.25,
+              "opponent": 0.25,
+              "difference": 0.0
+            },
+            "shed_units": {
+              "v45": 0,
+              "opponent": 0,
+              "difference": 0
+            }
+          },
+          "requested_sell_unit_difference_total": {
+            "WHEAT": 0,
+            "CARROT": 0,
+            "TOMATO": 0,
+            "STRAWBERRY": -4,
+            "MELON": 0,
+            "EGG": 0,
+            "MILK": 0,
+            "WOOL": 0,
+            "FERTILIZER": 0
+          }
+        }
+      },
+      "v45_telemetry_mean": {
+        "race_clone_turns": 476,
+        "race_horizon_turns": 476,
+        "race_escalations": 1,
+        "sale_reserved_units": 253.25,
+        "sale_reservations": 51.5,
+        "replenishment_trim_units": 14,
+        "feed_skips": 50,
+        "supply_budget_declines": 1.75,
+        "opening_day1_cash": 48,
+        "warehouse_extra_sales": 7,
+        "quote_reordered_turns": 31.625
+      }
+    },
+    "v46": {
+      "accepted_conditions": 8,
+      "mean_terminal_cash_margin": -435.5,
+      "opening_wheat_order_units": {
+        "v45_buy": 70,
+        "v45_sell": 70,
+        "opponent_buy": 7,
+        "opponent_sell": 2
+      },
+      "phases": {
+        "opening": {
+          "cash_delta_margin": -14,
+          "cash_margin_end": -14,
+          "assets_at_phase_end": {
+            "hands": {
+              "v45": 0,
+              "opponent": 0,
+              "difference": 0
+            },
+            "crops": {
+              "v45": 18,
+              "opponent": 19,
+              "difference": -1
+            },
+            "animals": {
+              "v45": 5,
+              "opponent": 5,
+              "difference": 0
+            },
+            "yield_units": {
+              "v45": 21,
+              "opponent": 23,
+              "difference": -2
+            },
+            "shed_units": {
+              "v45": 6,
+              "opponent": 7,
+              "difference": -1
+            }
+          },
+          "requested_sell_unit_difference_total": {
+            "WHEAT": 408,
+            "CARROT": 0,
+            "TOMATO": 0,
+            "STRAWBERRY": 0,
+            "MELON": 0,
+            "EGG": 0,
+            "MILK": 0,
+            "WOOL": 0,
+            "FERTILIZER": 0
+          }
+        },
+        "development": {
+          "cash_delta_margin": -143,
+          "cash_margin_end": -157,
+          "assets_at_phase_end": {
+            "hands": {
+              "v45": 10.25,
+              "opponent": 10.25,
+              "difference": 0.0
+            },
+            "crops": {
+              "v45": 53.625,
+              "opponent": 53.625,
+              "difference": 0.0
+            },
+            "animals": {
+              "v45": 17,
+              "opponent": 17,
+              "difference": 0
+            },
+            "yield_units": {
+              "v45": 23.5,
+              "opponent": 23.5,
+              "difference": 0.0
+            },
+            "shed_units": {
+              "v45": 41,
+              "opponent": 41,
+              "difference": 0
+            }
+          },
+          "requested_sell_unit_difference_total": {
+            "WHEAT": 0,
+            "CARROT": 0,
+            "TOMATO": 0,
+            "STRAWBERRY": 0,
+            "MELON": 0,
+            "EGG": 0,
+            "MILK": 0,
+            "WOOL": -14,
+            "FERTILIZER": 0
+          }
+        },
+        "market": {
+          "cash_delta_margin": -404.75,
+          "cash_margin_end": -561.75,
+          "assets_at_phase_end": {
+            "hands": {
+              "v45": 12,
+              "opponent": 12,
+              "difference": 0
+            },
+            "crops": {
+              "v45": 60.5,
+              "opponent": 60.5,
+              "difference": 0.0
+            },
+            "animals": {
+              "v45": 17,
+              "opponent": 17,
+              "difference": 0
+            },
+            "yield_units": {
+              "v45": 84.25,
+              "opponent": 84.25,
+              "difference": 0.0
+            },
+            "shed_units": {
+              "v45": 37,
+              "opponent": 34,
+              "difference": 3
+            }
+          },
+          "requested_sell_unit_difference_total": {
+            "WHEAT": 0,
+            "CARROT": 0,
+            "TOMATO": 0,
+            "STRAWBERRY": -18,
+            "MELON": 0,
+            "EGG": -30,
+            "MILK": -42,
+            "WOOL": -40,
+            "FERTILIZER": 0
+          }
+        },
+        "terminal": {
+          "cash_delta_margin": 126.25,
+          "cash_margin_end": -435.5,
+          "assets_at_phase_end": {
+            "hands": {
+              "v45": 11.5,
+              "opponent": 11.5,
+              "difference": 0.0
+            },
+            "crops": {
+              "v45": 2.5,
+              "opponent": 2.5,
+              "difference": 0.0
+            },
+            "animals": {
+              "v45": 17,
+              "opponent": 17,
+              "difference": 0
+            },
+            "yield_units": {
+              "v45": 0,
+              "opponent": 0,
+              "difference": 0
+            },
+            "shed_units": {
+              "v45": 0,
+              "opponent": 0,
+              "difference": 0
+            }
+          },
+          "requested_sell_unit_difference_total": {
+            "WHEAT": 0,
+            "CARROT": -8,
+            "TOMATO": 0,
+            "STRAWBERRY": 0,
+            "MELON": 0,
+            "EGG": 0,
+            "MILK": 0,
+            "WOOL": -10,
+            "FERTILIZER": 0
+          }
+        }
+      },
+      "v45_telemetry_mean": {
+        "race_clone_turns": 476,
+        "race_horizon_turns": 476,
+        "race_escalations": 0,
+        "sale_reserved_units": 265.5,
+        "sale_reservations": 58.75,
+        "replenishment_trim_units": 15.5,
+        "feed_skips": 50.5,
+        "supply_budget_declines": 2,
+        "opening_day1_cash": 5,
+        "warehouse_extra_sales": 6.5,
+        "quote_reordered_turns": 36.75
+      }
+    }
+  }
+}

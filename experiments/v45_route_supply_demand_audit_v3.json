@@ -1,0 +1,373 @@
+{
+  "cases": [
+    {
+      "baseline_reward": 158719.0,
+      "candidate_reward": 159325.0,
+      "decision_day": 6,
+      "delta_vs_v45": 606.0,
+      "known_shop_buy_per_day": {
+        "CARROT": 1.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 13.0,
+        "STRAWBERRY": 7.0,
+        "TOMATO": 7.0,
+        "WHEAT": 13.0,
+        "WOOL": 1.0
+      },
+      "known_shop_buy_remaining": {
+        "CARROT": 24,
+        "EGG": 24,
+        "MELON": 24,
+        "MILK": 312,
+        "STRAWBERRY": 168,
+        "TOMATO": 168,
+        "WHEAT": 312,
+        "WOOL": 24
+      },
+      "original_route": 108,
+      "products": [
+        {
+          "baseline_harvested": 551,
+          "baseline_over_known_capacity": 239,
+          "candidate_harvested": 534,
+          "candidate_over_known_capacity": 222,
+          "known_shop_capacity": 312,
+          "product": "WHEAT"
+        },
+        {
+          "baseline_harvested": 79,
+          "baseline_over_known_capacity": 55,
+          "candidate_harvested": 85,
+          "candidate_over_known_capacity": 61,
+          "known_shop_capacity": 24,
+          "product": "CARROT"
+        },
+        {
+          "baseline_harvested": 80,
+          "baseline_over_known_capacity": -88,
+          "candidate_harvested": 80,
+          "candidate_over_known_capacity": -88,
+          "known_shop_capacity": 168,
+          "product": "TOMATO"
+        },
+        {
+          "baseline_harvested": 238,
+          "baseline_over_known_capacity": 70,
+          "candidate_harvested": 240,
+          "candidate_over_known_capacity": 72,
+          "known_shop_capacity": 168,
+          "product": "STRAWBERRY"
+        },
+        {
+          "baseline_harvested": 72,
+          "baseline_over_known_capacity": 48,
+          "candidate_harvested": 72,
+          "candidate_over_known_capacity": 48,
+          "known_shop_capacity": 24,
+          "product": "MELON"
+        },
+        {
+          "baseline_harvested": 81,
+          "baseline_over_known_capacity": 57,
+          "candidate_harvested": 77,
+          "candidate_over_known_capacity": 53,
+          "known_shop_capacity": 24,
+          "product": "EGG"
+        },
+        {
+          "baseline_harvested": 248,
+          "baseline_over_known_capacity": -64,
+          "candidate_harvested": 248,
+          "candidate_over_known_capacity": -64,
+          "known_shop_capacity": 312,
+          "product": "MILK"
+        },
+        {
+          "baseline_harvested": 85,
+          "baseline_over_known_capacity": 61,
+          "candidate_harvested": 85,
+          "candidate_over_known_capacity": 61,
+          "known_shop_capacity": 24,
+          "product": "WOOL"
+        }
+      ],
+      "remaining_days": 24,
+      "seed": 1,
+      "selector_event": {
+        "existing_animals": {
+          "MILK": 4,
+          "WOOL": 2
+        },
+        "original_loss": 0.458824,
+        "original_profile": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "original_route": 108,
+        "primary": "MILK",
+        "reason": "unique lower 70/30 animal-composition loss",
+        "route": 123,
+        "secondary": "WOOL",
+        "selected_loss": 0.352941,
+        "selected_profile": {
+          "EGG": 3,
+          "MILK": 5,
+          "WOOL": 3
+        },
+        "selected_route": 123
+      },
+      "shops": [
+        "ICE_CREAM_SHOP",
+        "PIZZA_SHOP"
+      ]
+    },
+    {
+      "baseline_reward": 127741.0,
+      "candidate_reward": 123169.0,
+      "decision_day": 6,
+      "delta_vs_v45": -4572.0,
+      "known_shop_buy_per_day": {
+        "CARROT": 1.0,
+        "EGG": 7.0,
+        "MELON": 1.0,
+        "MILK": 7.0,
+        "STRAWBERRY": 7.0,
+        "TOMATO": 1.0,
+        "WHEAT": 7.0,
+        "WOOL": 1.0
+      },
+      "known_shop_buy_remaining": {
+        "CARROT": 24,
+        "EGG": 168,
+        "MELON": 24,
+        "MILK": 168,
+        "STRAWBERRY": 168,
+        "TOMATO": 24,
+        "WHEAT": 168,
+        "WOOL": 24
+      },
+      "original_route": 105,
+      "products": [
+        {
+          "baseline_harvested": 532,
+          "baseline_over_known_capacity": 364,
+          "candidate_harvested": 532,
+          "candidate_over_known_capacity": 364,
+          "known_shop_capacity": 168,
+          "product": "WHEAT"
+        },
+        {
+          "baseline_harvested": 85,
+          "baseline_over_known_capacity": 61,
+          "candidate_harvested": 85,
+          "candidate_over_known_capacity": 61,
+          "known_shop_capacity": 24,
+          "product": "CARROT"
+        },
+        {
+          "baseline_harvested": 0,
+          "baseline_over_known_capacity": -24,
+          "candidate_harvested": 0,
+          "candidate_over_known_capacity": -24,
+          "known_shop_capacity": 24,
+          "product": "TOMATO"
+        },
+        {
+          "baseline_harvested": 240,
+          "baseline_over_known_capacity": 72,
+          "candidate_harvested": 240,
+          "candidate_over_known_capacity": 72,
+          "known_shop_capacity": 168,
+          "product": "STRAWBERRY"
+        },
+        {
+          "baseline_harvested": 72,
+          "baseline_over_known_capacity": 48,
+          "candidate_harvested": 72,
+          "candidate_over_known_capacity": 48,
+          "known_shop_capacity": 24,
+          "product": "MELON"
+        },
+        {
+          "baseline_harvested": 77,
+          "baseline_over_known_capacity": -91,
+          "candidate_harvested": 77,
+          "candidate_over_known_capacity": -91,
+          "known_shop_capacity": 168,
+          "product": "EGG"
+        },
+        {
+          "baseline_harvested": 233,
+          "baseline_over_known_capacity": 65,
+          "candidate_harvested": 248,
+          "candidate_over_known_capacity": 80,
+          "known_shop_capacity": 168,
+          "product": "MILK"
+        },
+        {
+          "baseline_harvested": 145,
+          "baseline_over_known_capacity": 121,
+          "candidate_harvested": 127,
+          "candidate_over_known_capacity": 103,
+          "known_shop_capacity": 24,
+          "product": "WOOL"
+        }
+      ],
+      "remaining_days": 24,
+      "seed": 2,
+      "selector_event": {
+        "existing_animals": {
+          "MILK": 4,
+          "WOOL": 2
+        },
+        "original_loss": 0.458824,
+        "original_profile": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "original_route": 105,
+        "primary": "MILK",
+        "reason": "unique lower 70/30 animal-composition loss",
+        "route": 123,
+        "secondary": "WOOL",
+        "selected_loss": 0.352941,
+        "selected_profile": {
+          "EGG": 3,
+          "MILK": 5,
+          "WOOL": 3
+        },
+        "selected_route": 123
+      },
+      "shops": [
+        "SMOOTHIE_SHOP",
+        "BAKERY"
+      ]
+    },
+    {
+      "baseline_reward": 128752.0,
+      "candidate_reward": 105973.0,
+      "decision_day": 6,
+      "delta_vs_v45": -22779.0,
+      "known_shop_buy_per_day": {
+        "CARROT": 1.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 7.0,
+        "STRAWBERRY": 1.0,
+        "TOMATO": 7.0,
+        "WHEAT": 7.0,
+        "WOOL": 13.0
+      },
+      "known_shop_buy_remaining": {
+        "CARROT": 24,
+        "EGG": 24,
+        "MELON": 24,
+        "MILK": 168,
+        "STRAWBERRY": 24,
+        "TOMATO": 168,
+        "WHEAT": 168,
+        "WOOL": 312
+      },
+      "original_route": 7,
+      "products": [
+        {
+          "baseline_harvested": 480,
+          "baseline_over_known_capacity": 312,
+          "candidate_harvested": 520,
+          "candidate_over_known_capacity": 352,
+          "known_shop_capacity": 168,
+          "product": "WHEAT"
+        },
+        {
+          "baseline_harvested": 78,
+          "baseline_over_known_capacity": 54,
+          "candidate_harvested": 85,
+          "candidate_over_known_capacity": 61,
+          "known_shop_capacity": 24,
+          "product": "CARROT"
+        },
+        {
+          "baseline_harvested": 0,
+          "baseline_over_known_capacity": -168,
+          "candidate_harvested": 0,
+          "candidate_over_known_capacity": -168,
+          "known_shop_capacity": 168,
+          "product": "TOMATO"
+        },
+        {
+          "baseline_harvested": 239,
+          "baseline_over_known_capacity": 215,
+          "candidate_harvested": 240,
+          "candidate_over_known_capacity": 216,
+          "known_shop_capacity": 24,
+          "product": "STRAWBERRY"
+        },
+        {
+          "baseline_harvested": 72,
+          "baseline_over_known_capacity": 48,
+          "candidate_harvested": 72,
+          "candidate_over_known_capacity": 48,
+          "known_shop_capacity": 24,
+          "product": "MELON"
+        },
+        {
+          "baseline_harvested": 0,
+          "baseline_over_known_capacity": -24,
+          "candidate_harvested": 77,
+          "candidate_over_known_capacity": 53,
+          "known_shop_capacity": 24,
+          "product": "EGG"
+        },
+        {
+          "baseline_harvested": 179,
+          "baseline_over_known_capacity": 11,
+          "candidate_harvested": 228,
+          "candidate_over_known_capacity": 60,
+          "known_shop_capacity": 168,
+          "product": "MILK"
+        },
+        {
+          "baseline_harvested": 369,
+          "baseline_over_known_capacity": 57,
+          "candidate_harvested": 235,
+          "candidate_over_known_capacity": -77,
+          "known_shop_capacity": 312,
+          "product": "WOOL"
+        }
+      ],
+      "remaining_days": 24,
+      "seed": 3,
+      "selector_event": {
+        "existing_animals": {
+          "MILK": 4,
+          "WOOL": 2
+        },
+        "original_loss": 0.694118,
+        "original_profile": {
+          "MILK": 2,
+          "WOOL": 9
+        },
+        "original_route": 7,
+        "primary": "MILK",
+        "reason": "unique lower 70/30 animal-composition loss",
+        "route": 123,
+        "secondary": "WOOL",
+        "selected_loss": 0.352941,
+        "selected_profile": {
+          "EGG": 3,
+          "MILK": 5,
+          "WOOL": 3
+        },
+        "selected_route": 123
+      },
+      "shops": [
+        "PIZZA_SHOP",
+        "YARN_STORE"
+      ]
+    }
+  ],
+  "protocol": "known-shop-supply-demand-audit-v3-transition-aligned"
+}

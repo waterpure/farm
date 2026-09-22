@@ -1,0 +1,487 @@
+{
+  "cases": [
+    {
+      "day6": {
+        "day": 6,
+        "money_now": 817,
+        "prices_now": {
+          "TOMATO": 61,
+          "WHEAT": 33,
+          "WOOL": 217
+        },
+        "shops_now": [
+          "ICE_CREAM_SHOP",
+          "PIZZA_SHOP"
+        ],
+        "tile_count_now": 10,
+        "unlocked_quadrants_now": [
+          "NW"
+        ]
+      },
+      "policies": {
+        "baseline": {
+          "actual_final_telemetry": {
+            "commitments": 1,
+            "confirmed_harvest_units": 80,
+            "confirmed_plants": 10,
+            "sheep_commit_requests": 0,
+            "sheep_committed": 0,
+            "sheep_wool_harvested": 0
+          },
+          "raw_route": 108,
+          "v219_tomato": {
+            "decision_day": 18,
+            "forecast_treatment": "do_not_count_extra_tomatoes_as_guaranteed_output",
+            "known_at_day6": {
+              "day": 6,
+              "money_now": 817,
+              "prices_now": {
+                "TOMATO": 61,
+                "WHEAT": 33,
+                "WOOL": 217
+              },
+              "shops_now": [
+                "ICE_CREAM_SHOP",
+                "PIZZA_SHOP"
+              ],
+              "tile_count_now": 10,
+              "unlocked_quadrants_now": [
+                "NW"
+              ]
+            },
+            "status": "future_uncertain",
+            "unknown_until_day18": [
+              "whether exactly NW, NE, SW are unlocked and exactly 10 tiles exist",
+              "cash is at least 12000 and tomato price is at least 70",
+              "at least three Pizza/Farmers Market shops are then open",
+              "the SE target cells are still empty and no tomato asset exists",
+              "the dedicated hires, land, seeds, water, fertilizer and harvest actions can all execute"
+            ]
+          },
+          "v233_sheep": {
+            "decision_day": 12,
+            "forecast_treatment": "do_not_count_extra_six_sheep_as_guaranteed_output",
+            "known_at_day6": {
+              "day": 6,
+              "money_now": 817,
+              "prices_now": {
+                "TOMATO": 61,
+                "WHEAT": 33,
+                "WOOL": 217
+              },
+              "shops_now": [
+                "ICE_CREAM_SHOP",
+                "PIZZA_SHOP"
+              ],
+              "tile_count_now": 10,
+              "unlocked_quadrants_now": [
+                "NW"
+              ]
+            },
+            "status": "future_uncertain",
+            "unknown_until_day12": [
+              "whether exactly NW, NE, SW are unlocked and exactly 10 tiles exist",
+              "whether at least two Yarn shops have opened",
+              "then-current wool price is at least 220 and wheat price is at most 45",
+              "cash can cover land, six sheep, wheat, two hires, plus the safety reserve",
+              "shed capacity, market-order slots and native hire timing remain available"
+            ]
+          }
+        },
+        "historical_wrong_selector": {
+          "actual_final_telemetry": {
+            "commitments": 1,
+            "confirmed_harvest_units": 80,
+            "confirmed_plants": 10,
+            "sheep_commit_requests": 0,
+            "sheep_committed": 0,
+            "sheep_wool_harvested": 0
+          },
+          "raw_route": 123,
+          "v219_tomato": {
+            "decision_day": 18,
+            "forecast_treatment": "do_not_count_extra_tomatoes_as_guaranteed_output",
+            "known_at_day6": {
+              "day": 6,
+              "money_now": 817,
+              "prices_now": {
+                "TOMATO": 61,
+                "WHEAT": 33,
+                "WOOL": 217
+              },
+              "shops_now": [
+                "ICE_CREAM_SHOP",
+                "PIZZA_SHOP"
+              ],
+              "tile_count_now": 10,
+              "unlocked_quadrants_now": [
+                "NW"
+              ]
+            },
+            "status": "future_uncertain",
+            "unknown_until_day18": [
+              "whether exactly NW, NE, SW are unlocked and exactly 10 tiles exist",
+              "cash is at least 12000 and tomato price is at least 70",
+              "at least three Pizza/Farmers Market shops are then open",
+              "the SE target cells are still empty and no tomato asset exists",
+              "the dedicated hires, land, seeds, water, fertilizer and harvest actions can all execute"
+            ]
+          },
+          "v233_sheep": {
+            "decision_day": 12,
+            "forecast_treatment": "do_not_count_extra_six_sheep_as_guaranteed_output",
+            "known_at_day6": {
+              "day": 6,
+              "money_now": 817,
+              "prices_now": {
+                "TOMATO": 61,
+                "WHEAT": 33,
+                "WOOL": 217
+              },
+              "shops_now": [
+                "ICE_CREAM_SHOP",
+                "PIZZA_SHOP"
+              ],
+              "tile_count_now": 10,
+              "unlocked_quadrants_now": [
+                "NW"
+              ]
+            },
+            "status": "future_uncertain",
+            "unknown_until_day12": [
+              "whether exactly NW, NE, SW are unlocked and exactly 10 tiles exist",
+              "whether at least two Yarn shops have opened",
+              "then-current wool price is at least 220 and wheat price is at most 45",
+              "cash can cover land, six sheep, wheat, two hires, plus the safety reserve",
+              "shed capacity, market-order slots and native hire timing remain available"
+            ]
+          }
+        }
+      },
+      "seed": 1
+    },
+    {
+      "day6": {
+        "day": 6,
+        "money_now": 817,
+        "prices_now": {
+          "TOMATO": 61,
+          "WHEAT": 32,
+          "WOOL": 217
+        },
+        "shops_now": [
+          "SMOOTHIE_SHOP",
+          "BAKERY"
+        ],
+        "tile_count_now": 10,
+        "unlocked_quadrants_now": [
+          "NW"
+        ]
+      },
+      "policies": {
+        "baseline": {
+          "actual_final_telemetry": {
+            "commitments": 0,
+            "confirmed_harvest_units": 0,
+            "confirmed_plants": 0,
+            "sheep_commit_requests": 0,
+            "sheep_committed": 0,
+            "sheep_wool_harvested": 0
+          },
+          "raw_route": 105,
+          "v219_tomato": {
+            "decision_day": 18,
+            "forecast_treatment": "do_not_count_extra_tomatoes_as_guaranteed_output",
+            "known_at_day6": {
+              "day": 6,
+              "money_now": 817,
+              "prices_now": {
+                "TOMATO": 61,
+                "WHEAT": 32,
+                "WOOL": 217
+              },
+              "shops_now": [
+                "SMOOTHIE_SHOP",
+                "BAKERY"
+              ],
+              "tile_count_now": 10,
+              "unlocked_quadrants_now": [
+                "NW"
+              ]
+            },
+            "status": "future_uncertain",
+            "unknown_until_day18": [
+              "whether exactly NW, NE, SW are unlocked and exactly 10 tiles exist",
+              "cash is at least 12000 and tomato price is at least 70",
+              "at least three Pizza/Farmers Market shops are then open",
+              "the SE target cells are still empty and no tomato asset exists",
+              "the dedicated hires, land, seeds, water, fertilizer and harvest actions can all execute"
+            ]
+          },
+          "v233_sheep": {
+            "decision_day": 12,
+            "forecast_treatment": "do_not_count_extra_six_sheep_as_guaranteed_output",
+            "known_at_day6": {
+              "day": 6,
+              "money_now": 817,
+              "prices_now": {
+                "TOMATO": 61,
+                "WHEAT": 32,
+                "WOOL": 217
+              },
+              "shops_now": [
+                "SMOOTHIE_SHOP",
+                "BAKERY"
+              ],
+              "tile_count_now": 10,
+              "unlocked_quadrants_now": [
+                "NW"
+              ]
+            },
+            "status": "future_uncertain",
+            "unknown_until_day12": [
+              "whether exactly NW, NE, SW are unlocked and exactly 10 tiles exist",
+              "whether at least two Yarn shops have opened",
+              "then-current wool price is at least 220 and wheat price is at most 45",
+              "cash can cover land, six sheep, wheat, two hires, plus the safety reserve",
+              "shed capacity, market-order slots and native hire timing remain available"
+            ]
+          }
+        },
+        "historical_wrong_selector": {
+          "actual_final_telemetry": {
+            "commitments": 0,
+            "confirmed_harvest_units": 0,
+            "confirmed_plants": 0,
+            "sheep_commit_requests": 0,
+            "sheep_committed": 0,
+            "sheep_wool_harvested": 0
+          },
+          "raw_route": 123,
+          "v219_tomato": {
+            "decision_day": 18,
+            "forecast_treatment": "do_not_count_extra_tomatoes_as_guaranteed_output",
+            "known_at_day6": {
+              "day": 6,
+              "money_now": 817,
+              "prices_now": {
+                "TOMATO": 61,
+                "WHEAT": 32,
+                "WOOL": 217
+              },
+              "shops_now": [
+                "SMOOTHIE_SHOP",
+                "BAKERY"
+              ],
+              "tile_count_now": 10,
+              "unlocked_quadrants_now": [
+                "NW"
+              ]
+            },
+            "status": "future_uncertain",
+            "unknown_until_day18": [
+              "whether exactly NW, NE, SW are unlocked and exactly 10 tiles exist",
+              "cash is at least 12000 and tomato price is at least 70",
+              "at least three Pizza/Farmers Market shops are then open",
+              "the SE target cells are still empty and no tomato asset exists",
+              "the dedicated hires, land, seeds, water, fertilizer and harvest actions can all execute"
+            ]
+          },
+          "v233_sheep": {
+            "decision_day": 12,
+            "forecast_treatment": "do_not_count_extra_six_sheep_as_guaranteed_output",
+            "known_at_day6": {
+              "day": 6,
+              "money_now": 817,
+              "prices_now": {
+                "TOMATO": 61,
+                "WHEAT": 32,
+                "WOOL": 217
+              },
+              "shops_now": [
+                "SMOOTHIE_SHOP",
+                "BAKERY"
+              ],
+              "tile_count_now": 10,
+              "unlocked_quadrants_now": [
+                "NW"
+              ]
+            },
+            "status": "future_uncertain",
+            "unknown_until_day12": [
+              "whether exactly NW, NE, SW are unlocked and exactly 10 tiles exist",
+              "whether at least two Yarn shops have opened",
+              "then-current wool price is at least 220 and wheat price is at most 45",
+              "cash can cover land, six sheep, wheat, two hires, plus the safety reserve",
+              "shed capacity, market-order slots and native hire timing remain available"
+            ]
+          }
+        }
+      },
+      "seed": 2
+    },
+    {
+      "day6": {
+        "day": 6,
+        "money_now": 817,
+        "prices_now": {
+          "TOMATO": 63,
+          "WHEAT": 33,
+          "WOOL": 217
+        },
+        "shops_now": [
+          "PIZZA_SHOP",
+          "YARN_STORE"
+        ],
+        "tile_count_now": 10,
+        "unlocked_quadrants_now": [
+          "NW"
+        ]
+      },
+      "policies": {
+        "baseline": {
+          "actual_final_telemetry": {
+            "commitments": 0,
+            "confirmed_harvest_units": 0,
+            "confirmed_plants": 0,
+            "sheep_commit_requests": 1,
+            "sheep_committed": 1,
+            "sheep_wool_harvested": 108
+          },
+          "raw_route": 7,
+          "v219_tomato": {
+            "decision_day": 18,
+            "forecast_treatment": "do_not_count_extra_tomatoes_as_guaranteed_output",
+            "known_at_day6": {
+              "day": 6,
+              "money_now": 817,
+              "prices_now": {
+                "TOMATO": 63,
+                "WHEAT": 33,
+                "WOOL": 217
+              },
+              "shops_now": [
+                "PIZZA_SHOP",
+                "YARN_STORE"
+              ],
+              "tile_count_now": 10,
+              "unlocked_quadrants_now": [
+                "NW"
+              ]
+            },
+            "status": "future_uncertain",
+            "unknown_until_day18": [
+              "whether exactly NW, NE, SW are unlocked and exactly 10 tiles exist",
+              "cash is at least 12000 and tomato price is at least 70",
+              "at least three Pizza/Farmers Market shops are then open",
+              "the SE target cells are still empty and no tomato asset exists",
+              "the dedicated hires, land, seeds, water, fertilizer and harvest actions can all execute"
+            ]
+          },
+          "v233_sheep": {
+            "decision_day": 12,
+            "forecast_treatment": "do_not_count_extra_six_sheep_as_guaranteed_output",
+            "known_at_day6": {
+              "day": 6,
+              "money_now": 817,
+              "prices_now": {
+                "TOMATO": 63,
+                "WHEAT": 33,
+                "WOOL": 217
+              },
+              "shops_now": [
+                "PIZZA_SHOP",
+                "YARN_STORE"
+              ],
+              "tile_count_now": 10,
+              "unlocked_quadrants_now": [
+                "NW"
+              ]
+            },
+            "status": "future_uncertain",
+            "unknown_until_day12": [
+              "whether exactly NW, NE, SW are unlocked and exactly 10 tiles exist",
+              "whether at least two Yarn shops have opened",
+              "then-current wool price is at least 220 and wheat price is at most 45",
+              "cash can cover land, six sheep, wheat, two hires, plus the safety reserve",
+              "shed capacity, market-order slots and native hire timing remain available"
+            ]
+          }
+        },
+        "historical_wrong_selector": {
+          "actual_final_telemetry": {
+            "commitments": 0,
+            "confirmed_harvest_units": 0,
+            "confirmed_plants": 0,
+            "sheep_commit_requests": 1,
+            "sheep_committed": 1,
+            "sheep_wool_harvested": 108
+          },
+          "raw_route": 123,
+          "v219_tomato": {
+            "decision_day": 18,
+            "forecast_treatment": "do_not_count_extra_tomatoes_as_guaranteed_output",
+            "known_at_day6": {
+              "day": 6,
+              "money_now": 817,
+              "prices_now": {
+                "TOMATO": 63,
+                "WHEAT": 33,
+                "WOOL": 217
+              },
+              "shops_now": [
+                "PIZZA_SHOP",
+                "YARN_STORE"
+              ],
+              "tile_count_now": 10,
+              "unlocked_quadrants_now": [
+                "NW"
+              ]
+            },
+            "status": "future_uncertain",
+            "unknown_until_day18": [
+              "whether exactly NW, NE, SW are unlocked and exactly 10 tiles exist",
+              "cash is at least 12000 and tomato price is at least 70",
+              "at least three Pizza/Farmers Market shops are then open",
+              "the SE target cells are still empty and no tomato asset exists",
+              "the dedicated hires, land, seeds, water, fertilizer and harvest actions can all execute"
+            ]
+          },
+          "v233_sheep": {
+            "decision_day": 12,
+            "forecast_treatment": "do_not_count_extra_six_sheep_as_guaranteed_output",
+            "known_at_day6": {
+              "day": 6,
+              "money_now": 817,
+              "prices_now": {
+                "TOMATO": 63,
+                "WHEAT": 33,
+                "WOOL": 217
+              },
+              "shops_now": [
+                "PIZZA_SHOP",
+                "YARN_STORE"
+              ],
+              "tile_count_now": 10,
+              "unlocked_quadrants_now": [
+                "NW"
+              ]
+            },
+            "status": "future_uncertain",
+            "unknown_until_day12": [
+              "whether exactly NW, NE, SW are unlocked and exactly 10 tiles exist",
+              "whether at least two Yarn shops have opened",
+              "then-current wool price is at least 220 and wheat price is at most 45",
+              "cash can cover land, six sheep, wheat, two hires, plus the safety reserve",
+              "shed capacity, market-order slots and native hire timing remain available"
+            ]
+          }
+        }
+      },
+      "seed": 3
+    }
+  ],
+  "protocol": "v45-overlay-classification-audit-v1-day6-known-vs-later-conditions",
+  "rule": "Only certainly-impossible overlays count as zero. Future-uncertain overlays must not be added to a day-6 point forecast as guaranteed supply.",
+  "scope": "Three historical route-selector switch cases against boatlee_v16; audit only."
+}

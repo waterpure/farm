@@ -1,0 +1,2587 @@
+{
+  "limitations": [
+    "A raw PLANT/PLACE command is a route commitment, not a guarantee it will execute or be harvested.",
+    "No future shop, future price, conditional V45 overlay, rival private state or final cash is used.",
+    "This audit describes V45 before proposing any replacement route rule."
+  ],
+  "protocol": "day6-known-demand-route-audit-v1-current-shops-only",
+  "rows": [
+    {
+      "known_demand_per_day": {
+        "CARROT": 1.0,
+        "EGG": 13.0,
+        "MELON": 1.0,
+        "MILK": 1.0,
+        "STRAWBERRY": 1.0,
+        "TOMATO": 1.0,
+        "WHEAT": 13.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 5,
+          "MILK": 2,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 5,
+          "MILK": 2,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 101,
+      "shops": [
+        "BAKERY",
+        "BAKERY"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "EGG"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 1.0,
+        "EGG": 13.0,
+        "MELON": 1.0,
+        "MILK": 1.0,
+        "STRAWBERRY": 7.0,
+        "TOMATO": 1.0,
+        "WHEAT": 13.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 5,
+          "MILK": 2,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 5,
+          "MILK": 2,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 103,
+      "shops": [
+        "BAKERY",
+        "BRUNCH_SPOT"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "STRAWBERRY",
+        "EGG"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 7.0,
+        "EGG": 7.0,
+        "MELON": 1.0,
+        "MILK": 1.0,
+        "STRAWBERRY": 7.0,
+        "TOMATO": 7.0,
+        "WHEAT": 13.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 5,
+          "MILK": 2,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 5,
+          "MILK": 2,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 104,
+      "shops": [
+        "BAKERY",
+        "FARMERS_MARKET"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "CARROT",
+        "TOMATO",
+        "STRAWBERRY",
+        "EGG"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 1.0,
+        "EGG": 7.0,
+        "MELON": 1.0,
+        "MILK": 7.0,
+        "STRAWBERRY": 7.0,
+        "TOMATO": 1.0,
+        "WHEAT": 13.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 105,
+      "shops": [
+        "BAKERY",
+        "ICE_CREAM_SHOP"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "STRAWBERRY",
+        "EGG",
+        "MILK"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 13.0,
+        "EGG": 7.0,
+        "MELON": 1.0,
+        "MILK": 1.0,
+        "STRAWBERRY": 1.0,
+        "TOMATO": 1.0,
+        "WHEAT": 7.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 106,
+      "shops": [
+        "BAKERY",
+        "PET_CAFE"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "CARROT",
+        "EGG"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 1.0,
+        "EGG": 7.0,
+        "MELON": 1.0,
+        "MILK": 7.0,
+        "STRAWBERRY": 1.0,
+        "TOMATO": 7.0,
+        "WHEAT": 13.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 107,
+      "shops": [
+        "BAKERY",
+        "PIZZA_SHOP"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "TOMATO",
+        "EGG",
+        "MILK"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 1.0,
+        "EGG": 7.0,
+        "MELON": 1.0,
+        "MILK": 7.0,
+        "STRAWBERRY": 7.0,
+        "TOMATO": 1.0,
+        "WHEAT": 7.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 108,
+      "shops": [
+        "BAKERY",
+        "SMOOTHIE_SHOP"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "STRAWBERRY",
+        "EGG",
+        "MILK"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 1.0,
+        "EGG": 7.0,
+        "MELON": 1.0,
+        "MILK": 1.0,
+        "STRAWBERRY": 1.0,
+        "TOMATO": 1.0,
+        "WHEAT": 7.0,
+        "WOOL": 13.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "MILK": 2,
+          "WOOL": 9
+        },
+        "raw_animal_place_commands": {
+          "MILK": 2,
+          "WOOL": 9
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "V39/Yarn branch",
+      "selected_route": 3,
+      "shops": [
+        "BAKERY",
+        "YARN_STORE"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "EGG",
+        "WOOL"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 1.0,
+        "EGG": 13.0,
+        "MELON": 1.0,
+        "MILK": 1.0,
+        "STRAWBERRY": 7.0,
+        "TOMATO": 1.0,
+        "WHEAT": 13.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 105,
+      "shops": [
+        "BRUNCH_SPOT",
+        "BAKERY"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "STRAWBERRY",
+        "EGG"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 1.0,
+        "EGG": 13.0,
+        "MELON": 1.0,
+        "MILK": 1.0,
+        "STRAWBERRY": 13.0,
+        "TOMATO": 1.0,
+        "WHEAT": 13.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 5,
+          "MILK": 2,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 5,
+          "MILK": 2,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 103,
+      "shops": [
+        "BRUNCH_SPOT",
+        "BRUNCH_SPOT"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "STRAWBERRY",
+        "EGG"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 7.0,
+        "EGG": 7.0,
+        "MELON": 1.0,
+        "MILK": 1.0,
+        "STRAWBERRY": 13.0,
+        "TOMATO": 7.0,
+        "WHEAT": 13.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 5,
+          "MILK": 4,
+          "WOOL": 2
+        },
+        "raw_animal_place_commands": {
+          "EGG": 5,
+          "MILK": 4,
+          "WOOL": 2
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 110,
+      "shops": [
+        "BRUNCH_SPOT",
+        "FARMERS_MARKET"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "CARROT",
+        "TOMATO",
+        "STRAWBERRY",
+        "EGG"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 1.0,
+        "EGG": 7.0,
+        "MELON": 1.0,
+        "MILK": 7.0,
+        "STRAWBERRY": 13.0,
+        "TOMATO": 1.0,
+        "WHEAT": 13.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 105,
+      "shops": [
+        "BRUNCH_SPOT",
+        "ICE_CREAM_SHOP"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "STRAWBERRY",
+        "EGG",
+        "MILK"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 13.0,
+        "EGG": 7.0,
+        "MELON": 1.0,
+        "MILK": 1.0,
+        "STRAWBERRY": 7.0,
+        "TOMATO": 1.0,
+        "WHEAT": 7.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 5,
+          "MILK": 2,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 5,
+          "MILK": 2,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 101,
+      "shops": [
+        "BRUNCH_SPOT",
+        "PET_CAFE"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "CARROT",
+        "STRAWBERRY",
+        "EGG"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 1.0,
+        "EGG": 7.0,
+        "MELON": 1.0,
+        "MILK": 7.0,
+        "STRAWBERRY": 7.0,
+        "TOMATO": 7.0,
+        "WHEAT": 13.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 107,
+      "shops": [
+        "BRUNCH_SPOT",
+        "PIZZA_SHOP"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "TOMATO",
+        "STRAWBERRY",
+        "EGG",
+        "MILK"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 1.0,
+        "EGG": 7.0,
+        "MELON": 1.0,
+        "MILK": 7.0,
+        "STRAWBERRY": 13.0,
+        "TOMATO": 1.0,
+        "WHEAT": 7.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 105,
+      "shops": [
+        "BRUNCH_SPOT",
+        "SMOOTHIE_SHOP"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "STRAWBERRY",
+        "EGG",
+        "MILK"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 1.0,
+        "EGG": 7.0,
+        "MELON": 1.0,
+        "MILK": 1.0,
+        "STRAWBERRY": 7.0,
+        "TOMATO": 1.0,
+        "WHEAT": 7.0,
+        "WOOL": 13.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "MILK": 2,
+          "WOOL": 8
+        },
+        "raw_animal_place_commands": {
+          "MILK": 2,
+          "WOOL": 9
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "V39/Yarn branch",
+      "selected_route": 4,
+      "shops": [
+        "BRUNCH_SPOT",
+        "YARN_STORE"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "STRAWBERRY",
+        "EGG",
+        "WOOL"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 7.0,
+        "EGG": 7.0,
+        "MELON": 1.0,
+        "MILK": 1.0,
+        "STRAWBERRY": 7.0,
+        "TOMATO": 7.0,
+        "WHEAT": 13.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 4,
+          "MILK": 3,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 4,
+          "MILK": 3,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 111,
+      "shops": [
+        "FARMERS_MARKET",
+        "BAKERY"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "CARROT",
+        "TOMATO",
+        "STRAWBERRY",
+        "EGG"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 7.0,
+        "EGG": 7.0,
+        "MELON": 1.0,
+        "MILK": 1.0,
+        "STRAWBERRY": 13.0,
+        "TOMATO": 7.0,
+        "WHEAT": 13.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 5,
+          "MILK": 2,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 5,
+          "MILK": 2,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 112,
+      "shops": [
+        "FARMERS_MARKET",
+        "BRUNCH_SPOT"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "CARROT",
+        "TOMATO",
+        "STRAWBERRY",
+        "EGG"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 13.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 1.0,
+        "STRAWBERRY": 13.0,
+        "TOMATO": 13.0,
+        "WHEAT": 13.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 5,
+          "MILK": 2,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 5,
+          "MILK": 2,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 104,
+      "shops": [
+        "FARMERS_MARKET",
+        "FARMERS_MARKET"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "CARROT",
+        "TOMATO",
+        "STRAWBERRY"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 7.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 7.0,
+        "STRAWBERRY": 13.0,
+        "TOMATO": 7.0,
+        "WHEAT": 13.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 107,
+      "shops": [
+        "FARMERS_MARKET",
+        "ICE_CREAM_SHOP"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "CARROT",
+        "TOMATO",
+        "STRAWBERRY",
+        "MILK"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 19.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 1.0,
+        "STRAWBERRY": 7.0,
+        "TOMATO": 7.0,
+        "WHEAT": 7.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 5,
+          "MILK": 2,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 5,
+          "MILK": 2,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 113,
+      "shops": [
+        "FARMERS_MARKET",
+        "PET_CAFE"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "CARROT",
+        "TOMATO",
+        "STRAWBERRY"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 7.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 7.0,
+        "STRAWBERRY": 7.0,
+        "TOMATO": 13.0,
+        "WHEAT": 13.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 105,
+      "shops": [
+        "FARMERS_MARKET",
+        "PIZZA_SHOP"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "CARROT",
+        "TOMATO",
+        "STRAWBERRY",
+        "MILK"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 7.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 7.0,
+        "STRAWBERRY": 13.0,
+        "TOMATO": 7.0,
+        "WHEAT": 7.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 105,
+      "shops": [
+        "FARMERS_MARKET",
+        "SMOOTHIE_SHOP"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "CARROT",
+        "TOMATO",
+        "STRAWBERRY",
+        "MILK"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 7.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 1.0,
+        "STRAWBERRY": 7.0,
+        "TOMATO": 7.0,
+        "WHEAT": 7.0,
+        "WOOL": 13.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "MILK": 2,
+          "WOOL": 8
+        },
+        "raw_animal_place_commands": {
+          "MILK": 2,
+          "WOOL": 9
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "V39/Yarn branch",
+      "selected_route": 5,
+      "shops": [
+        "FARMERS_MARKET",
+        "YARN_STORE"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "CARROT",
+        "TOMATO",
+        "STRAWBERRY",
+        "WOOL"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 1.0,
+        "EGG": 7.0,
+        "MELON": 1.0,
+        "MILK": 7.0,
+        "STRAWBERRY": 7.0,
+        "TOMATO": 1.0,
+        "WHEAT": 13.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 105,
+      "shops": [
+        "ICE_CREAM_SHOP",
+        "BAKERY"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "STRAWBERRY",
+        "EGG",
+        "MILK"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 1.0,
+        "EGG": 7.0,
+        "MELON": 1.0,
+        "MILK": 7.0,
+        "STRAWBERRY": 13.0,
+        "TOMATO": 1.0,
+        "WHEAT": 13.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 105,
+      "shops": [
+        "ICE_CREAM_SHOP",
+        "BRUNCH_SPOT"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "STRAWBERRY",
+        "EGG",
+        "MILK"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 7.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 7.0,
+        "STRAWBERRY": 13.0,
+        "TOMATO": 7.0,
+        "WHEAT": 13.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 105,
+      "shops": [
+        "ICE_CREAM_SHOP",
+        "FARMERS_MARKET"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "CARROT",
+        "TOMATO",
+        "STRAWBERRY",
+        "MILK"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 1.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 13.0,
+        "STRAWBERRY": 13.0,
+        "TOMATO": 1.0,
+        "WHEAT": 13.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 105,
+      "shops": [
+        "ICE_CREAM_SHOP",
+        "ICE_CREAM_SHOP"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "STRAWBERRY",
+        "MILK"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 13.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 7.0,
+        "STRAWBERRY": 7.0,
+        "TOMATO": 1.0,
+        "WHEAT": 7.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 105,
+      "shops": [
+        "ICE_CREAM_SHOP",
+        "PET_CAFE"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "CARROT",
+        "STRAWBERRY",
+        "MILK"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 1.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 13.0,
+        "STRAWBERRY": 7.0,
+        "TOMATO": 7.0,
+        "WHEAT": 13.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 108,
+      "shops": [
+        "ICE_CREAM_SHOP",
+        "PIZZA_SHOP"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "TOMATO",
+        "STRAWBERRY",
+        "MILK"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 1.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 13.0,
+        "STRAWBERRY": 13.0,
+        "TOMATO": 1.0,
+        "WHEAT": 7.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 105,
+      "shops": [
+        "ICE_CREAM_SHOP",
+        "SMOOTHIE_SHOP"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "STRAWBERRY",
+        "MILK"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 1.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 7.0,
+        "STRAWBERRY": 7.0,
+        "TOMATO": 1.0,
+        "WHEAT": 7.0,
+        "WOOL": 13.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "MILK": 2,
+          "WOOL": 9
+        },
+        "raw_animal_place_commands": {
+          "MILK": 2,
+          "WOOL": 9
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "V39/Yarn branch",
+      "selected_route": 6,
+      "shops": [
+        "ICE_CREAM_SHOP",
+        "YARN_STORE"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "STRAWBERRY",
+        "MILK",
+        "WOOL"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 13.0,
+        "EGG": 7.0,
+        "MELON": 1.0,
+        "MILK": 1.0,
+        "STRAWBERRY": 1.0,
+        "TOMATO": 1.0,
+        "WHEAT": 7.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 5,
+          "MILK": 2,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 5,
+          "MILK": 2,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 103,
+      "shops": [
+        "PET_CAFE",
+        "BAKERY"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "CARROT",
+        "EGG"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 13.0,
+        "EGG": 7.0,
+        "MELON": 1.0,
+        "MILK": 1.0,
+        "STRAWBERRY": 7.0,
+        "TOMATO": 1.0,
+        "WHEAT": 7.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 5,
+          "MILK": 2,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 5,
+          "MILK": 2,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 116,
+      "shops": [
+        "PET_CAFE",
+        "BRUNCH_SPOT"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "CARROT",
+        "STRAWBERRY",
+        "EGG"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 19.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 1.0,
+        "STRAWBERRY": 7.0,
+        "TOMATO": 7.0,
+        "WHEAT": 7.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 5,
+          "MILK": 2,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 5,
+          "MILK": 2,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 137
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 117,
+      "shops": [
+        "PET_CAFE",
+        "FARMERS_MARKET"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "CARROT",
+        "TOMATO",
+        "STRAWBERRY"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 13.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 7.0,
+        "STRAWBERRY": 7.0,
+        "TOMATO": 1.0,
+        "WHEAT": 7.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 105,
+      "shops": [
+        "PET_CAFE",
+        "ICE_CREAM_SHOP"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "CARROT",
+        "STRAWBERRY",
+        "MILK"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 25.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 1.0,
+        "STRAWBERRY": 1.0,
+        "TOMATO": 1.0,
+        "WHEAT": 1.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 5,
+          "MILK": 2,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 5,
+          "MILK": 2,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 36,
+          "STRAWBERRY": 29,
+          "WHEAT": 131
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 118,
+      "shops": [
+        "PET_CAFE",
+        "PET_CAFE"
+      ],
+      "tight_products": [
+        "CARROT"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 13.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 7.0,
+        "STRAWBERRY": 1.0,
+        "TOMATO": 7.0,
+        "WHEAT": 7.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 107,
+      "shops": [
+        "PET_CAFE",
+        "PIZZA_SHOP"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "CARROT",
+        "TOMATO",
+        "MILK"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 13.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 7.0,
+        "STRAWBERRY": 7.0,
+        "TOMATO": 1.0,
+        "WHEAT": 1.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 105,
+      "shops": [
+        "PET_CAFE",
+        "SMOOTHIE_SHOP"
+      ],
+      "tight_products": [
+        "CARROT",
+        "STRAWBERRY",
+        "MILK"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 13.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 1.0,
+        "STRAWBERRY": 1.0,
+        "TOMATO": 1.0,
+        "WHEAT": 1.0,
+        "WOOL": 13.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "MILK": 2,
+          "WOOL": 8
+        },
+        "raw_animal_place_commands": {
+          "MILK": 2,
+          "WOOL": 9
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "V39/Yarn branch",
+      "selected_route": 5,
+      "shops": [
+        "PET_CAFE",
+        "YARN_STORE"
+      ],
+      "tight_products": [
+        "CARROT",
+        "WOOL"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 1.0,
+        "EGG": 7.0,
+        "MELON": 1.0,
+        "MILK": 7.0,
+        "STRAWBERRY": 1.0,
+        "TOMATO": 7.0,
+        "WHEAT": 13.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 120,
+      "shops": [
+        "PIZZA_SHOP",
+        "BAKERY"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "TOMATO",
+        "EGG",
+        "MILK"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 1.0,
+        "EGG": 7.0,
+        "MELON": 1.0,
+        "MILK": 7.0,
+        "STRAWBERRY": 7.0,
+        "TOMATO": 7.0,
+        "WHEAT": 13.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 105,
+      "shops": [
+        "PIZZA_SHOP",
+        "BRUNCH_SPOT"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "TOMATO",
+        "STRAWBERRY",
+        "EGG",
+        "MILK"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 7.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 7.0,
+        "STRAWBERRY": 7.0,
+        "TOMATO": 13.0,
+        "WHEAT": 13.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 121,
+      "shops": [
+        "PIZZA_SHOP",
+        "FARMERS_MARKET"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "CARROT",
+        "TOMATO",
+        "STRAWBERRY",
+        "MILK"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 1.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 13.0,
+        "STRAWBERRY": 7.0,
+        "TOMATO": 7.0,
+        "WHEAT": 13.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 122,
+      "shops": [
+        "PIZZA_SHOP",
+        "ICE_CREAM_SHOP"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "TOMATO",
+        "STRAWBERRY",
+        "MILK"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 13.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 7.0,
+        "STRAWBERRY": 1.0,
+        "TOMATO": 7.0,
+        "WHEAT": 7.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 105,
+      "shops": [
+        "PIZZA_SHOP",
+        "PET_CAFE"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "CARROT",
+        "TOMATO",
+        "MILK"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 1.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 13.0,
+        "STRAWBERRY": 1.0,
+        "TOMATO": 13.0,
+        "WHEAT": 13.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 3,
+          "MILK": 5,
+          "WOOL": 3
+        },
+        "raw_animal_place_commands": {
+          "EGG": 3,
+          "MILK": 5,
+          "WOOL": 3
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 123,
+      "shops": [
+        "PIZZA_SHOP",
+        "PIZZA_SHOP"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "TOMATO",
+        "MILK"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 1.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 13.0,
+        "STRAWBERRY": 7.0,
+        "TOMATO": 7.0,
+        "WHEAT": 7.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 124,
+      "shops": [
+        "PIZZA_SHOP",
+        "SMOOTHIE_SHOP"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "TOMATO",
+        "STRAWBERRY",
+        "MILK"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 1.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 7.0,
+        "STRAWBERRY": 1.0,
+        "TOMATO": 7.0,
+        "WHEAT": 7.0,
+        "WOOL": 13.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "MILK": 2,
+          "WOOL": 9
+        },
+        "raw_animal_place_commands": {
+          "MILK": 2,
+          "WOOL": 9
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "V39/Yarn branch",
+      "selected_route": 7,
+      "shops": [
+        "PIZZA_SHOP",
+        "YARN_STORE"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "TOMATO",
+        "MILK",
+        "WOOL"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 1.0,
+        "EGG": 7.0,
+        "MELON": 1.0,
+        "MILK": 7.0,
+        "STRAWBERRY": 7.0,
+        "TOMATO": 1.0,
+        "WHEAT": 7.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 105,
+      "shops": [
+        "SMOOTHIE_SHOP",
+        "BAKERY"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "STRAWBERRY",
+        "EGG",
+        "MILK"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 1.0,
+        "EGG": 7.0,
+        "MELON": 1.0,
+        "MILK": 7.0,
+        "STRAWBERRY": 13.0,
+        "TOMATO": 1.0,
+        "WHEAT": 7.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 121,
+      "shops": [
+        "SMOOTHIE_SHOP",
+        "BRUNCH_SPOT"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "STRAWBERRY",
+        "EGG",
+        "MILK"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 7.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 7.0,
+        "STRAWBERRY": 13.0,
+        "TOMATO": 7.0,
+        "WHEAT": 7.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 105,
+      "shops": [
+        "SMOOTHIE_SHOP",
+        "FARMERS_MARKET"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "CARROT",
+        "TOMATO",
+        "STRAWBERRY",
+        "MILK"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 1.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 13.0,
+        "STRAWBERRY": 13.0,
+        "TOMATO": 1.0,
+        "WHEAT": 7.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 105,
+      "shops": [
+        "SMOOTHIE_SHOP",
+        "ICE_CREAM_SHOP"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "STRAWBERRY",
+        "MILK"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 13.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 7.0,
+        "STRAWBERRY": 7.0,
+        "TOMATO": 1.0,
+        "WHEAT": 1.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 105,
+      "shops": [
+        "SMOOTHIE_SHOP",
+        "PET_CAFE"
+      ],
+      "tight_products": [
+        "CARROT",
+        "STRAWBERRY",
+        "MILK"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 1.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 13.0,
+        "STRAWBERRY": 7.0,
+        "TOMATO": 7.0,
+        "WHEAT": 7.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 105,
+      "shops": [
+        "SMOOTHIE_SHOP",
+        "PIZZA_SHOP"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "TOMATO",
+        "STRAWBERRY",
+        "MILK"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 1.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 13.0,
+        "STRAWBERRY": 13.0,
+        "TOMATO": 1.0,
+        "WHEAT": 1.0,
+        "WOOL": 1.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_animal_place_commands": {
+          "EGG": 3,
+          "MILK": 4,
+          "WOOL": 4
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "EXP240/non-Yarn branch",
+      "selected_route": 107,
+      "shops": [
+        "SMOOTHIE_SHOP",
+        "SMOOTHIE_SHOP"
+      ],
+      "tight_products": [
+        "STRAWBERRY",
+        "MILK"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 1.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 7.0,
+        "STRAWBERRY": 7.0,
+        "TOMATO": 1.0,
+        "WHEAT": 1.0,
+        "WOOL": 13.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "MILK": 2,
+          "WOOL": 9
+        },
+        "raw_animal_place_commands": {
+          "MILK": 2,
+          "WOOL": 9
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "V39/Yarn branch",
+      "selected_route": 8,
+      "shops": [
+        "SMOOTHIE_SHOP",
+        "YARN_STORE"
+      ],
+      "tight_products": [
+        "STRAWBERRY",
+        "MILK",
+        "WOOL"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 1.0,
+        "EGG": 7.0,
+        "MELON": 1.0,
+        "MILK": 1.0,
+        "STRAWBERRY": 1.0,
+        "TOMATO": 1.0,
+        "WHEAT": 7.0,
+        "WOOL": 13.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "MILK": 2,
+          "WOOL": 9
+        },
+        "raw_animal_place_commands": {
+          "MILK": 2,
+          "WOOL": 9
+        },
+        "raw_plant_commands": {
+          "CARROT": 26,
+          "STRAWBERRY": 29,
+          "WHEAT": 140
+        }
+      },
+      "router_branch": "V39/Yarn branch",
+      "selected_route": 9,
+      "shops": [
+        "YARN_STORE",
+        "BAKERY"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "EGG",
+        "WOOL"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 1.0,
+        "EGG": 7.0,
+        "MELON": 1.0,
+        "MILK": 1.0,
+        "STRAWBERRY": 7.0,
+        "TOMATO": 1.0,
+        "WHEAT": 7.0,
+        "WOOL": 13.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "MILK": 2,
+          "WOOL": 9
+        },
+        "raw_animal_place_commands": {
+          "MILK": 2,
+          "WOOL": 9
+        },
+        "raw_plant_commands": {
+          "CARROT": 26,
+          "STRAWBERRY": 29,
+          "WHEAT": 140
+        }
+      },
+      "router_branch": "V39/Yarn branch",
+      "selected_route": 9,
+      "shops": [
+        "YARN_STORE",
+        "BRUNCH_SPOT"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "STRAWBERRY",
+        "EGG",
+        "WOOL"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 7.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 1.0,
+        "STRAWBERRY": 7.0,
+        "TOMATO": 7.0,
+        "WHEAT": 7.0,
+        "WOOL": 13.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "MILK": 2,
+          "WOOL": 8
+        },
+        "raw_animal_place_commands": {
+          "MILK": 2,
+          "WOOL": 9
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "V39/Yarn branch",
+      "selected_route": 1,
+      "shops": [
+        "YARN_STORE",
+        "FARMERS_MARKET"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "CARROT",
+        "TOMATO",
+        "STRAWBERRY",
+        "WOOL"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 1.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 7.0,
+        "STRAWBERRY": 7.0,
+        "TOMATO": 1.0,
+        "WHEAT": 7.0,
+        "WOOL": 13.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "MILK": 2,
+          "WOOL": 9
+        },
+        "raw_animal_place_commands": {
+          "MILK": 2,
+          "WOOL": 9
+        },
+        "raw_plant_commands": {
+          "CARROT": 26,
+          "STRAWBERRY": 29,
+          "WHEAT": 140
+        }
+      },
+      "router_branch": "V39/Yarn branch",
+      "selected_route": 9,
+      "shops": [
+        "YARN_STORE",
+        "ICE_CREAM_SHOP"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "STRAWBERRY",
+        "MILK",
+        "WOOL"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 13.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 1.0,
+        "STRAWBERRY": 1.0,
+        "TOMATO": 1.0,
+        "WHEAT": 1.0,
+        "WOOL": 13.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "MILK": 2,
+          "WOOL": 9
+        },
+        "raw_animal_place_commands": {
+          "MILK": 2,
+          "WOOL": 9
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "V39/Yarn branch",
+      "selected_route": 10,
+      "shops": [
+        "YARN_STORE",
+        "PET_CAFE"
+      ],
+      "tight_products": [
+        "CARROT",
+        "WOOL"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 1.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 7.0,
+        "STRAWBERRY": 1.0,
+        "TOMATO": 7.0,
+        "WHEAT": 7.0,
+        "WOOL": 13.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "MILK": 2,
+          "WOOL": 9
+        },
+        "raw_animal_place_commands": {
+          "MILK": 2,
+          "WOOL": 9
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "V39/Yarn branch",
+      "selected_route": 6,
+      "shops": [
+        "YARN_STORE",
+        "PIZZA_SHOP"
+      ],
+      "tight_products": [
+        "WHEAT",
+        "TOMATO",
+        "MILK",
+        "WOOL"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 1.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 7.0,
+        "STRAWBERRY": 7.0,
+        "TOMATO": 1.0,
+        "WHEAT": 1.0,
+        "WOOL": 13.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "MILK": 2,
+          "WOOL": 9
+        },
+        "raw_animal_place_commands": {
+          "MILK": 2,
+          "WOOL": 9
+        },
+        "raw_plant_commands": {
+          "CARROT": 29,
+          "STRAWBERRY": 29,
+          "WHEAT": 138
+        }
+      },
+      "router_branch": "V39/Yarn branch",
+      "selected_route": 11,
+      "shops": [
+        "YARN_STORE",
+        "SMOOTHIE_SHOP"
+      ],
+      "tight_products": [
+        "STRAWBERRY",
+        "MILK",
+        "WOOL"
+      ]
+    },
+    {
+      "known_demand_per_day": {
+        "CARROT": 1.0,
+        "EGG": 1.0,
+        "MELON": 1.0,
+        "MILK": 1.0,
+        "STRAWBERRY": 1.0,
+        "TOMATO": 1.0,
+        "WHEAT": 1.0,
+        "WOOL": 25.0
+      },
+      "route_raw_commitments": {
+        "raw_animal_buy_units": {
+          "WOOL": 12
+        },
+        "raw_animal_place_commands": {
+          "WOOL": 12
+        },
+        "raw_plant_commands": {
+          "CARROT": 26,
+          "STRAWBERRY": 29,
+          "WHEAT": 140
+        }
+      },
+      "router_branch": "V39/Yarn branch",
+      "selected_route": 12,
+      "shops": [
+        "YARN_STORE",
+        "YARN_STORE"
+      ],
+      "tight_products": [
+        "WOOL"
+      ]
+    }
+  ]
+}

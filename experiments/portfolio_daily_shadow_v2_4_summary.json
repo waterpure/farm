@@ -1,0 +1,191 @@
+{
+  "protocol": "portfolio-daily-shadow-v2.4-post-hire-route-witness",
+  "source": "experiments/portfolio_daily_shadow_v2_4.jsonl",
+  "accepted_conditions": 56,
+  "planned_conditions": 56,
+  "daily_plans_recorded": 1680,
+  "primary_line_counts": {
+    "melon": 148,
+    "sheep_wool_cared": 610,
+    "cow_milk_cared": 240,
+    "wheat": 140,
+    "tomato": 64,
+    "carrot": 362,
+    "goose_eggs_cared": 4
+  },
+  "secondary_line_counts": {
+    "sheep_wool_cared": 174,
+    "cow_milk_cared": 373,
+    "melon": 188,
+    "wheat": 419,
+    "carrot": 240,
+    "tomato": 106,
+    "goose_eggs_cared": 50,
+    "strawberry": 18
+  },
+  "mandatory_route_witness": {
+    "witnessed_daily_plans": 724,
+    "greedy_unwitnessed_daily_plans": 956,
+    "unassigned_task_groups": 21252,
+    "mean_remaining_worker_turns_after_witness": 40.12
+  },
+  "first_two_shop_signature_counts": {
+    "no shops": 168,
+    "BAKERY": 84,
+    "BAKERY | PIZZA_SHOP": 144,
+    "BAKERY | ICE_CREAM_SHOP": 48,
+    "ICE_CREAM_SHOP": 30,
+    "ICE_CREAM_SHOP | BAKERY": 144,
+    "BAKERY | BAKERY": 48,
+    "BAKERY | PET_CAFE": 240,
+    "BAKERY | YARN_STORE": 192,
+    "FARMERS_MARKET": 18,
+    "FARMERS_MARKET | PIZZA_SHOP": 96,
+    "YARN_STORE": 12,
+    "YARN_STORE | BAKERY": 96,
+    "PET_CAFE": 6,
+    "PET_CAFE | PIZZA_SHOP": 48,
+    "SMOOTHIE_SHOP": 12,
+    "SMOOTHIE_SHOP | BAKERY": 96,
+    "ICE_CREAM_SHOP | YARN_STORE": 48,
+    "FARMERS_MARKET | PET_CAFE": 48,
+    "ICE_CREAM_SHOP | PIZZA_SHOP": 48,
+    "PIZZA_SHOP": 6,
+    "PIZZA_SHOP | YARN_STORE": 48
+  },
+  "primary_by_first_two_shops": {
+    "no shops": {
+      "melon": 72,
+      "sheep_wool_cared": 96
+    },
+    "BAKERY": {
+      "sheep_wool_cared": 84
+    },
+    "BAKERY | PIZZA_SHOP": {
+      "sheep_wool_cared": 6,
+      "cow_milk_cared": 38,
+      "melon": 6,
+      "wheat": 22,
+      "tomato": 26,
+      "carrot": 34,
+      "none": 12
+    },
+    "BAKERY | ICE_CREAM_SHOP": {
+      "sheep_wool_cared": 2,
+      "cow_milk_cared": 16,
+      "melon": 2,
+      "wheat": 22,
+      "tomato": 2,
+      "none": 4
+    },
+    "ICE_CREAM_SHOP": {
+      "sheep_wool_cared": 6,
+      "cow_milk_cared": 24
+    },
+    "ICE_CREAM_SHOP | BAKERY": {
+      "cow_milk_cared": 42,
+      "tomato": 6,
+      "wheat": 28,
+      "carrot": 18,
+      "none": 12,
+      "sheep_wool_cared": 38
+    },
+    "BAKERY | BAKERY": {
+      "sheep_wool_cared": 26,
+      "melon": 6,
+      "wheat": 12,
+      "none": 4
+    },
+    "BAKERY | PET_CAFE": {
+      "sheep_wool_cared": 18,
+      "melon": 34,
+      "carrot": 164,
+      "none": 20,
+      "cow_milk_cared": 4
+    },
+    "BAKERY | YARN_STORE": {
+      "sheep_wool_cared": 130,
+      "goose_eggs_cared": 4,
+      "wheat": 18,
+      "none": 16,
+      "carrot": 24
+    },
+    "FARMERS_MARKET": {
+      "sheep_wool_cared": 12,
+      "melon": 6
+    },
+    "FARMERS_MARKET | PIZZA_SHOP": {
+      "sheep_wool_cared": 4,
+      "cow_milk_cared": 28,
+      "melon": 4,
+      "tomato": 28,
+      "carrot": 24,
+      "none": 8
+    },
+    "YARN_STORE": {
+      "sheep_wool_cared": 12
+    },
+    "YARN_STORE | BAKERY": {
+      "sheep_wool_cared": 68,
+      "carrot": 14,
+      "wheat": 6,
+      "none": 8
+    },
+    "PET_CAFE": {
+      "sheep_wool_cared": 6
+    },
+    "PET_CAFE | PIZZA_SHOP": {
+      "sheep_wool_cared": 2,
+      "cow_milk_cared": 14,
+      "melon": 2,
+      "carrot": 24,
+      "wheat": 2,
+      "none": 4
+    },
+    "SMOOTHIE_SHOP": {
+      "sheep_wool_cared": 2,
+      "cow_milk_cared": 10
+    },
+    "SMOOTHIE_SHOP | BAKERY": {
+      "cow_milk_cared": 20,
+      "sheep_wool_cared": 44,
+      "carrot": 16,
+      "wheat": 4,
+      "none": 8,
+      "melon": 4
+    },
+    "ICE_CREAM_SHOP | YARN_STORE": {
+      "sheep_wool_cared": 24,
+      "cow_milk_cared": 2,
+      "wheat": 18,
+      "none": 4
+    },
+    "FARMERS_MARKET | PET_CAFE": {
+      "melon": 10,
+      "carrot": 32,
+      "sheep_wool_cared": 2,
+      "none": 4
+    },
+    "ICE_CREAM_SHOP | PIZZA_SHOP": {
+      "cow_milk_cared": 30,
+      "tomato": 2,
+      "carrot": 12,
+      "none": 4
+    },
+    "PIZZA_SHOP": {
+      "cow_milk_cared": 6
+    },
+    "PIZZA_SHOP | YARN_STORE": {
+      "cow_milk_cared": 6,
+      "sheep_wool_cared": 28,
+      "melon": 2,
+      "wheat": 8,
+      "none": 4
+    }
+  },
+  "limits": [
+    "The observer returns V45's action unchanged; no portfolio target becomes a game action.",
+    "Scores are transparent priority heuristics, not a claim of predicted cash or a league improvement.",
+    "Routing, action selection, and 70/30 execution require a separately reviewed next stage."
+  ]
+}

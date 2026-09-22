@@ -1,0 +1,21 @@
+{
+  "protocol": "v45-route-commitment-audit-v1",
+  "source": "experiments/v45_route_commitment_audit_v1.jsonl",
+  "accepted_conditions": 1,
+  "planned_conditions": 56,
+  "static_contracts": 4,
+  "outcomes": {
+    "emitted": 4
+  },
+  "outcomes_by_opponent": {
+    "sdy2842": {
+      "emitted": 4
+    }
+  },
+  "sdy_step18_coordinate_0_4": [],
+  "limits": [
+    "Contracts are guaranteed only across V45 raw route tapes, not across every reactive outer-layer change.",
+    "The audit observes whether outer layers emitted a raw plant; it does not change that decision or prove profit.",
+    "A planned SELL order is a route commitment, not a guarantee of shared-market fill or price."
+  ]
+}

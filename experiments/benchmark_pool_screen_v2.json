@@ -1,0 +1,23 @@
+{
+  "purpose": "Second-batch public-opponent compatibility and diversity screen; not a leaderboard estimate.",
+  "run_date": "2026-09-17",
+  "environment": {"python": "3.12", "kaggle_environments": "1.32.7", "episode_steps": 720},
+  "sources": {
+    "nathan_pipe7": {"notebook_version": 1, "main_sha256": "6150b7f9a953fc54d17a0f762a4c6ba5d2afe25a1851876eeb7681719d34a200"},
+    "boatlee_v16": {"notebook_version": 2, "main_sha256": "f029fa0cb66a9eb509afbe44e3f59b800332d0419db91607183410e4089c4d19"},
+    "indar_pasture": {"notebook_version": 1, "archive_sha256": "fa9e7eb1a0174a1bf292fb4d47bd209defed929758214d3506e050a68ee5f98f", "main_sha256": "0cc2a88594f82b6c8d3cb15fcd4aa2df2bdd2a0a7fb0133d95a3204dd2d6ba38"}
+  },
+  "determinism_smoke_vs_starter_seed_7": {
+    "nathan_pipe7": {"rewards": [172566, 3484], "statuses": ["DONE", "DONE"], "repeat_identical": true, "action_trace_sha256": "1a522acbde873067d7f33a6bc3aaa39b89786a93b45f97b3ccf5141d4f91c867", "elapsed_seconds": [1.59, 1.607]},
+    "boatlee_v16": {"rewards": [125139, 3536], "statuses": ["DONE", "DONE"], "repeat_identical": true, "action_trace_sha256": "cb8a434b05b23af71a0a4fdc7b0c62da51cb7268207f25eb3f3f9e58d0a6877c", "elapsed_seconds": [1.349, 1.304]},
+    "indar_pasture": {"rewards": [132919, 3431], "statuses": ["DONE", "DONE"], "repeat_identical": true, "action_trace_sha256": "eebfa23ce89eea842aa5fd0f322b5554afd6e98f22408492823cc95870eb76f8", "elapsed_seconds": [1.51, 1.419]}
+  },
+  "paired_v45_screen": {
+    "seeds": [7, 8],
+    "both_seats": true,
+    "nathan_pipe7": {"margins": [236, 236, 232, 232], "mean_margin": 234.0, "all_done": true},
+    "boatlee_v16": {"margins": [-57516, -56932, -24039, -24039], "mean_margin": -40631.5, "all_done": true},
+    "indar_pasture": {"margins": [-15043, -15043, -18475, -18475], "mean_margin": -16759.0, "all_done": true}
+  },
+  "interpretation": "All three completed and repeated deterministically. Pipe-7's starter cash equals V45 on seed 7 but its action trace differs from V45 and it leads V45 by 232-236 in this narrow screen; it is a near-family pressure opponent rather than a duplicate. The other two have distinct action traces. Four games per candidate is insufficient for strength claims or promotion into a fixed league."
+}

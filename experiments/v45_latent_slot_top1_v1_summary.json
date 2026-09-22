@@ -1,0 +1,239 @@
+{
+  "protocol": "v45-latent-slot-top1-v1",
+  "source": "experiments/v45_latent_slot_dryrun_v3.jsonl",
+  "source_conditions": 56,
+  "selected_conditions": 52,
+  "no_eligible_candidate_conditions": 4,
+  "selection_rule": {
+    "eligibility": "V3 immediate-service candidate only",
+    "primary_rank": "highest conservative expected sale value minus seed opportunity cost",
+    "tie_break": "earlier scheduled sell step, then stable position ordering",
+    "crop_or_opponent_specific_bonus": false
+  },
+  "selected_crop_counts": {
+    "MELON": 8,
+    "WHEAT": 44
+  },
+  "selected_crop_counts_by_opponent": {
+    "boatlee_v16": {
+      "WHEAT": 8
+    },
+    "indar_pasture": {
+      "WHEAT": 6
+    },
+    "indar_top10": {
+      "WHEAT": 8
+    },
+    "kaito_v58": {
+      "WHEAT": 6
+    },
+    "nathan_pipe7": {
+      "WHEAT": 8
+    },
+    "sdy2842": {
+      "MELON": 8
+    },
+    "v46": {
+      "WHEAT": 8
+    }
+  },
+  "sdy_target_selected": [
+    {
+      "seed": 0,
+      "candidate_seat": "left",
+      "selection": {
+        "step": 18,
+        "day": 0,
+        "actor": 5,
+        "coordinate": [
+          0,
+          4
+        ],
+        "same_actor_immediate_water_steps": [
+          19
+        ],
+        "crop": "MELON",
+        "seed_available": 1,
+        "estimated_yield_units": 6,
+        "conservative_unit_price": 250,
+        "estimated_net_before_labor": 1420,
+        "harvest_step": 246,
+        "sell_step": 249,
+        "qualifying_water_count": 5
+      }
+    },
+    {
+      "seed": 0,
+      "candidate_seat": "right",
+      "selection": {
+        "step": 18,
+        "day": 0,
+        "actor": 5,
+        "coordinate": [
+          0,
+          4
+        ],
+        "same_actor_immediate_water_steps": [
+          19
+        ],
+        "crop": "MELON",
+        "seed_available": 1,
+        "estimated_yield_units": 6,
+        "conservative_unit_price": 250,
+        "estimated_net_before_labor": 1420,
+        "harvest_step": 246,
+        "sell_step": 249,
+        "qualifying_water_count": 5
+      }
+    },
+    {
+      "seed": 1,
+      "candidate_seat": "left",
+      "selection": {
+        "step": 18,
+        "day": 0,
+        "actor": 5,
+        "coordinate": [
+          0,
+          4
+        ],
+        "same_actor_immediate_water_steps": [
+          19
+        ],
+        "crop": "MELON",
+        "seed_available": 1,
+        "estimated_yield_units": 6,
+        "conservative_unit_price": 250,
+        "estimated_net_before_labor": 1420,
+        "harvest_step": 246,
+        "sell_step": 249,
+        "qualifying_water_count": 5
+      }
+    },
+    {
+      "seed": 1,
+      "candidate_seat": "right",
+      "selection": {
+        "step": 18,
+        "day": 0,
+        "actor": 5,
+        "coordinate": [
+          0,
+          4
+        ],
+        "same_actor_immediate_water_steps": [
+          19
+        ],
+        "crop": "MELON",
+        "seed_available": 1,
+        "estimated_yield_units": 6,
+        "conservative_unit_price": 250,
+        "estimated_net_before_labor": 1420,
+        "harvest_step": 246,
+        "sell_step": 249,
+        "qualifying_water_count": 5
+      }
+    },
+    {
+      "seed": 2,
+      "candidate_seat": "left",
+      "selection": {
+        "step": 18,
+        "day": 0,
+        "actor": 5,
+        "coordinate": [
+          0,
+          4
+        ],
+        "same_actor_immediate_water_steps": [
+          19
+        ],
+        "crop": "MELON",
+        "seed_available": 1,
+        "estimated_yield_units": 6,
+        "conservative_unit_price": 250,
+        "estimated_net_before_labor": 1420,
+        "harvest_step": 246,
+        "sell_step": 249,
+        "qualifying_water_count": 5
+      }
+    },
+    {
+      "seed": 2,
+      "candidate_seat": "right",
+      "selection": {
+        "step": 18,
+        "day": 0,
+        "actor": 5,
+        "coordinate": [
+          0,
+          4
+        ],
+        "same_actor_immediate_water_steps": [
+          19
+        ],
+        "crop": "MELON",
+        "seed_available": 1,
+        "estimated_yield_units": 6,
+        "conservative_unit_price": 250,
+        "estimated_net_before_labor": 1420,
+        "harvest_step": 246,
+        "sell_step": 249,
+        "qualifying_water_count": 5
+      }
+    },
+    {
+      "seed": 3,
+      "candidate_seat": "left",
+      "selection": {
+        "step": 18,
+        "day": 0,
+        "actor": 5,
+        "coordinate": [
+          0,
+          4
+        ],
+        "same_actor_immediate_water_steps": [
+          19
+        ],
+        "crop": "MELON",
+        "seed_available": 1,
+        "estimated_yield_units": 6,
+        "conservative_unit_price": 250,
+        "estimated_net_before_labor": 1420,
+        "harvest_step": 246,
+        "sell_step": 249,
+        "qualifying_water_count": 5
+      }
+    },
+    {
+      "seed": 3,
+      "candidate_seat": "right",
+      "selection": {
+        "step": 18,
+        "day": 0,
+        "actor": 5,
+        "coordinate": [
+          0,
+          4
+        ],
+        "same_actor_immediate_water_steps": [
+          19
+        ],
+        "crop": "MELON",
+        "seed_available": 1,
+        "estimated_yield_units": 6,
+        "conservative_unit_price": 250,
+        "estimated_net_before_labor": 1420,
+        "harvest_step": 246,
+        "sell_step": 249,
+        "qualifying_water_count": 5
+      }
+    }
+  ],
+  "limits": [
+    "This ranks the v3 shadow candidates; it does not replay an action or prove counterfactual profit.",
+    "The score has no future market forecast, labor cost, or reinvestment model.",
+    "A future V45 sell request is evidence of a planned sale window, not a guarantee that added output fills at that price."
+  ]
+}

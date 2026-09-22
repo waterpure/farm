@@ -1,0 +1,163 @@
+{
+  "protocol": "portfolio-daily-shadow-v2-recurrent-lines",
+  "source": "experiments/portfolio_daily_shadow_v2.jsonl",
+  "accepted_conditions": 56,
+  "planned_conditions": 56,
+  "daily_plans_recorded": 1680,
+  "primary_line_counts": {
+    "strawberry": 488,
+    "tomato": 684,
+    "carrot": 242,
+    "wheat": 154
+  },
+  "secondary_line_counts": {
+    "tomato": 547,
+    "strawberry": 465,
+    "carrot": 241,
+    "wheat": 315
+  },
+  "first_two_shop_signature_counts": {
+    "no shops": 168,
+    "BAKERY": 84,
+    "BAKERY | PIZZA_SHOP": 144,
+    "BAKERY | ICE_CREAM_SHOP": 48,
+    "ICE_CREAM_SHOP": 30,
+    "ICE_CREAM_SHOP | BAKERY": 144,
+    "BAKERY | BAKERY": 48,
+    "BAKERY | PET_CAFE": 240,
+    "BAKERY | YARN_STORE": 192,
+    "FARMERS_MARKET": 18,
+    "FARMERS_MARKET | PIZZA_SHOP": 96,
+    "YARN_STORE": 12,
+    "YARN_STORE | BAKERY": 96,
+    "PET_CAFE": 6,
+    "PET_CAFE | PIZZA_SHOP": 48,
+    "SMOOTHIE_SHOP": 12,
+    "SMOOTHIE_SHOP | BAKERY": 96,
+    "ICE_CREAM_SHOP | YARN_STORE": 48,
+    "FARMERS_MARKET | PET_CAFE": 48,
+    "ICE_CREAM_SHOP | PIZZA_SHOP": 48,
+    "PIZZA_SHOP": 6,
+    "PIZZA_SHOP | YARN_STORE": 48
+  },
+  "primary_by_first_two_shops": {
+    "no shops": {
+      "strawberry": 168
+    },
+    "BAKERY": {
+      "strawberry": 84
+    },
+    "BAKERY | PIZZA_SHOP": {
+      "strawberry": 6,
+      "tomato": 88,
+      "carrot": 22,
+      "wheat": 16,
+      "none": 12
+    },
+    "BAKERY | ICE_CREAM_SHOP": {
+      "strawberry": 6,
+      "tomato": 24,
+      "wheat": 14,
+      "none": 4
+    },
+    "ICE_CREAM_SHOP": {
+      "strawberry": 30
+    },
+    "ICE_CREAM_SHOP | BAKERY": {
+      "strawberry": 32,
+      "tomato": 64,
+      "wheat": 26,
+      "none": 12,
+      "carrot": 10
+    },
+    "BAKERY | BAKERY": {
+      "strawberry": 2,
+      "tomato": 28,
+      "wheat": 14,
+      "none": 4
+    },
+    "BAKERY | PET_CAFE": {
+      "strawberry": 15,
+      "tomato": 109,
+      "carrot": 96,
+      "none": 20
+    },
+    "BAKERY | YARN_STORE": {
+      "strawberry": 14,
+      "tomato": 110,
+      "wheat": 22,
+      "none": 16,
+      "carrot": 30
+    },
+    "FARMERS_MARKET": {
+      "strawberry": 18
+    },
+    "FARMERS_MARKET | PIZZA_SHOP": {
+      "strawberry": 4,
+      "tomato": 60,
+      "carrot": 24,
+      "none": 8
+    },
+    "YARN_STORE": {
+      "strawberry": 12
+    },
+    "YARN_STORE | BAKERY": {
+      "strawberry": 4,
+      "tomato": 60,
+      "wheat": 14,
+      "carrot": 10,
+      "none": 8
+    },
+    "PET_CAFE": {
+      "strawberry": 6
+    },
+    "PET_CAFE | PIZZA_SHOP": {
+      "strawberry": 2,
+      "tomato": 28,
+      "carrot": 12,
+      "wheat": 2,
+      "none": 4
+    },
+    "SMOOTHIE_SHOP": {
+      "strawberry": 12
+    },
+    "SMOOTHIE_SHOP | BAKERY": {
+      "strawberry": 32,
+      "tomato": 30,
+      "wheat": 20,
+      "carrot": 6,
+      "none": 8
+    },
+    "ICE_CREAM_SHOP | YARN_STORE": {
+      "strawberry": 24,
+      "tomato": 6,
+      "wheat": 14,
+      "none": 4
+    },
+    "FARMERS_MARKET | PET_CAFE": {
+      "strawberry": 7,
+      "tomato": 17,
+      "carrot": 20,
+      "none": 4
+    },
+    "ICE_CREAM_SHOP | PIZZA_SHOP": {
+      "strawberry": 4,
+      "tomato": 28,
+      "carrot": 12,
+      "none": 4
+    },
+    "PIZZA_SHOP": {
+      "strawberry": 6
+    },
+    "PIZZA_SHOP | YARN_STORE": {
+      "tomato": 32,
+      "wheat": 12,
+      "none": 4
+    }
+  },
+  "limits": [
+    "The observer returns V45's action unchanged; no portfolio target becomes a game action.",
+    "Scores are transparent priority heuristics, not a claim of predicted cash or a league improvement.",
+    "Routing, action selection, and 70/30 execution require a separately reviewed next stage."
+  ]
+}

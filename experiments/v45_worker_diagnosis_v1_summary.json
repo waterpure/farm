@@ -1,0 +1,3618 @@
+{
+  "protocol": "v45-worker-diagnosis-v1",
+  "source": "experiments/v45_worker_diagnosis_v1.jsonl",
+  "audit": {
+    "raw_game_records": 52,
+    "unique_condition_records": 32,
+    "duplicate_records": 20,
+    "duplicate_keys": [
+      [
+        "kaito_v58",
+        0,
+        "left"
+      ],
+      [
+        "kaito_v58",
+        0,
+        "right"
+      ],
+      [
+        "kaito_v58",
+        1,
+        "left"
+      ],
+      [
+        "kaito_v58",
+        1,
+        "right"
+      ],
+      [
+        "nathan_pipe7",
+        0,
+        "left"
+      ],
+      [
+        "nathan_pipe7",
+        0,
+        "right"
+      ],
+      [
+        "nathan_pipe7",
+        1,
+        "left"
+      ],
+      [
+        "nathan_pipe7",
+        2,
+        "left"
+      ],
+      [
+        "nathan_pipe7",
+        2,
+        "right"
+      ],
+      [
+        "nathan_pipe7",
+        3,
+        "left"
+      ],
+      [
+        "nathan_pipe7",
+        3,
+        "right"
+      ],
+      [
+        "sdy2842",
+        3,
+        "left"
+      ],
+      [
+        "sdy2842",
+        3,
+        "right"
+      ],
+      [
+        "v46",
+        0,
+        "left"
+      ],
+      [
+        "v46",
+        0,
+        "right"
+      ],
+      [
+        "v46",
+        1,
+        "right"
+      ],
+      [
+        "v46",
+        2,
+        "left"
+      ],
+      [
+        "v46",
+        2,
+        "right"
+      ],
+      [
+        "v46",
+        3,
+        "left"
+      ],
+      [
+        "v46",
+        3,
+        "right"
+      ]
+    ],
+    "conflicting_duplicate_keys": [],
+    "ledger_clean": false
+  },
+  "accepted_conditions": 32,
+  "planned_conditions": 32,
+  "rejected_or_missing_conditions": 0,
+  "focus_aggregate": [
+    {
+      "opponent": "kaito_v58",
+      "action_step": 251,
+      "state_step_after": 252,
+      "item": "MELON",
+      "actor": "rival",
+      "conditions": 8,
+      "place_successes_per_condition": [
+        2,
+        2,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "place_noops_per_condition": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "filled_per_condition": [
+        12,
+        12,
+        24,
+        24,
+        24,
+        24,
+        24,
+        24
+      ]
+    },
+    {
+      "opponent": "kaito_v58",
+      "action_step": 251,
+      "state_step_after": 252,
+      "item": "MELON",
+      "actor": "v45",
+      "conditions": 8,
+      "place_successes_per_condition": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "place_noops_per_condition": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "filled_per_condition": [
+        12,
+        12,
+        12,
+        12,
+        12,
+        12,
+        12,
+        12
+      ]
+    },
+    {
+      "opponent": "nathan_pipe7",
+      "action_step": 80,
+      "state_step_after": 81,
+      "item": "WHEAT",
+      "actor": "rival",
+      "conditions": 8,
+      "place_successes_per_condition": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "place_noops_per_condition": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "filled_per_condition": [
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3
+      ]
+    },
+    {
+      "opponent": "nathan_pipe7",
+      "action_step": 80,
+      "state_step_after": 81,
+      "item": "WHEAT",
+      "actor": "v45",
+      "conditions": 8,
+      "place_successes_per_condition": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "place_noops_per_condition": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "filled_per_condition": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ]
+    },
+    {
+      "opponent": "nathan_pipe7",
+      "action_step": 100,
+      "state_step_after": 101,
+      "item": "WHEAT",
+      "actor": "rival",
+      "conditions": 8,
+      "place_successes_per_condition": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "place_noops_per_condition": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "filled_per_condition": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ]
+    },
+    {
+      "opponent": "nathan_pipe7",
+      "action_step": 100,
+      "state_step_after": 101,
+      "item": "WHEAT",
+      "actor": "v45",
+      "conditions": 8,
+      "place_successes_per_condition": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "place_noops_per_condition": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "filled_per_condition": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "opponent": "sdy2842",
+      "action_step": 251,
+      "state_step_after": 252,
+      "item": "MELON",
+      "actor": "rival",
+      "conditions": 8,
+      "place_successes_per_condition": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "place_noops_per_condition": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "filled_per_condition": [
+        12,
+        12,
+        12,
+        12,
+        12,
+        12,
+        12,
+        12
+      ]
+    },
+    {
+      "opponent": "sdy2842",
+      "action_step": 251,
+      "state_step_after": 252,
+      "item": "MELON",
+      "actor": "v45",
+      "conditions": 8,
+      "place_successes_per_condition": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "place_noops_per_condition": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "filled_per_condition": [
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6,
+        6
+      ]
+    },
+    {
+      "opponent": "v46",
+      "action_step": 2,
+      "state_step_after": 3,
+      "item": "WHEAT",
+      "actor": "rival",
+      "conditions": 8,
+      "place_successes_per_condition": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "place_noops_per_condition": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "filled_per_condition": [
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30,
+        30
+      ]
+    },
+    {
+      "opponent": "v46",
+      "action_step": 2,
+      "state_step_after": 3,
+      "item": "WHEAT",
+      "actor": "v45",
+      "conditions": 8,
+      "place_successes_per_condition": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "place_noops_per_condition": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "filled_per_condition": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "focus_condition_details": [
+    {
+      "opponent": "sdy2842",
+      "seed": 0,
+      "candidate_seat": "left",
+      "v45_player": 0,
+      "action_step": 251,
+      "state_step_after": 252,
+      "item": "MELON",
+      "place_events": [
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_0",
+          "actor_index": 1,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {},
+          "actor_item_after": 0,
+          "actor_item_before": 0,
+          "actor_item_delta": 0,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "no_op",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 0,
+          "shed_item_before": 0,
+          "shed_item_delta": 0
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_4",
+          "actor_index": 5,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 6,
+          "shed_item_before": 0,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_0",
+          "actor_index": 1,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 6,
+          "shed_item_before": 0,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_4",
+          "actor_index": 5,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 12,
+          "shed_item_before": 6,
+          "shed_item_delta": 6
+        }
+      ],
+      "market_sales": [
+        {
+          "action_step": 251,
+          "attempts": 7,
+          "failed_attempts": 1,
+          "filled": 6,
+          "item": "MELON",
+          "operation": "SELL",
+          "player": 0,
+          "revenue_or_cost": 1325
+        },
+        {
+          "action_step": 251,
+          "attempts": 12,
+          "failed_attempts": 0,
+          "filled": 12,
+          "item": "MELON",
+          "operation": "SELL",
+          "player": 1,
+          "revenue_or_cost": 2583
+        }
+      ]
+    },
+    {
+      "opponent": "sdy2842",
+      "seed": 0,
+      "candidate_seat": "right",
+      "v45_player": 1,
+      "action_step": 251,
+      "state_step_after": 252,
+      "item": "MELON",
+      "place_events": [
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_0",
+          "actor_index": 1,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 6,
+          "shed_item_before": 0,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_4",
+          "actor_index": 5,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 12,
+          "shed_item_before": 6,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_0",
+          "actor_index": 1,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {},
+          "actor_item_after": 0,
+          "actor_item_before": 0,
+          "actor_item_delta": 0,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "no_op",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 0,
+          "shed_item_before": 0,
+          "shed_item_delta": 0
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_4",
+          "actor_index": 5,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 6,
+          "shed_item_before": 0,
+          "shed_item_delta": 6
+        }
+      ],
+      "market_sales": [
+        {
+          "action_step": 251,
+          "attempts": 12,
+          "failed_attempts": 0,
+          "filled": 12,
+          "item": "MELON",
+          "operation": "SELL",
+          "player": 0,
+          "revenue_or_cost": 2583
+        },
+        {
+          "action_step": 251,
+          "attempts": 7,
+          "failed_attempts": 1,
+          "filled": 6,
+          "item": "MELON",
+          "operation": "SELL",
+          "player": 1,
+          "revenue_or_cost": 1325
+        }
+      ]
+    },
+    {
+      "opponent": "sdy2842",
+      "seed": 1,
+      "candidate_seat": "left",
+      "v45_player": 0,
+      "action_step": 251,
+      "state_step_after": 252,
+      "item": "MELON",
+      "place_events": [
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_0",
+          "actor_index": 1,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {},
+          "actor_item_after": 0,
+          "actor_item_before": 0,
+          "actor_item_delta": 0,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "no_op",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 0,
+          "shed_item_before": 0,
+          "shed_item_delta": 0
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_4",
+          "actor_index": 5,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 6,
+          "shed_item_before": 0,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_0",
+          "actor_index": 1,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 6,
+          "shed_item_before": 0,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_4",
+          "actor_index": 5,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 12,
+          "shed_item_before": 6,
+          "shed_item_delta": 6
+        }
+      ],
+      "market_sales": [
+        {
+          "action_step": 251,
+          "attempts": 7,
+          "failed_attempts": 1,
+          "filled": 6,
+          "item": "MELON",
+          "operation": "SELL",
+          "player": 0,
+          "revenue_or_cost": 1325
+        },
+        {
+          "action_step": 251,
+          "attempts": 12,
+          "failed_attempts": 0,
+          "filled": 12,
+          "item": "MELON",
+          "operation": "SELL",
+          "player": 1,
+          "revenue_or_cost": 2583
+        }
+      ]
+    },
+    {
+      "opponent": "sdy2842",
+      "seed": 1,
+      "candidate_seat": "right",
+      "v45_player": 1,
+      "action_step": 251,
+      "state_step_after": 252,
+      "item": "MELON",
+      "place_events": [
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_0",
+          "actor_index": 1,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 6,
+          "shed_item_before": 0,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_4",
+          "actor_index": 5,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 12,
+          "shed_item_before": 6,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_0",
+          "actor_index": 1,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {},
+          "actor_item_after": 0,
+          "actor_item_before": 0,
+          "actor_item_delta": 0,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "no_op",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 0,
+          "shed_item_before": 0,
+          "shed_item_delta": 0
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_4",
+          "actor_index": 5,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 6,
+          "shed_item_before": 0,
+          "shed_item_delta": 6
+        }
+      ],
+      "market_sales": [
+        {
+          "action_step": 251,
+          "attempts": 12,
+          "failed_attempts": 0,
+          "filled": 12,
+          "item": "MELON",
+          "operation": "SELL",
+          "player": 0,
+          "revenue_or_cost": 2583
+        },
+        {
+          "action_step": 251,
+          "attempts": 7,
+          "failed_attempts": 1,
+          "filled": 6,
+          "item": "MELON",
+          "operation": "SELL",
+          "player": 1,
+          "revenue_or_cost": 1325
+        }
+      ]
+    },
+    {
+      "opponent": "sdy2842",
+      "seed": 2,
+      "candidate_seat": "left",
+      "v45_player": 0,
+      "action_step": 251,
+      "state_step_after": 252,
+      "item": "MELON",
+      "place_events": [
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_0",
+          "actor_index": 1,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {},
+          "actor_item_after": 0,
+          "actor_item_before": 0,
+          "actor_item_delta": 0,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "no_op",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 0,
+          "shed_item_before": 0,
+          "shed_item_delta": 0
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_4",
+          "actor_index": 5,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 6,
+          "shed_item_before": 0,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_0",
+          "actor_index": 1,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 6,
+          "shed_item_before": 0,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_4",
+          "actor_index": 5,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 12,
+          "shed_item_before": 6,
+          "shed_item_delta": 6
+        }
+      ],
+      "market_sales": [
+        {
+          "action_step": 251,
+          "attempts": 7,
+          "failed_attempts": 1,
+          "filled": 6,
+          "item": "MELON",
+          "operation": "SELL",
+          "player": 0,
+          "revenue_or_cost": 1325
+        },
+        {
+          "action_step": 251,
+          "attempts": 12,
+          "failed_attempts": 0,
+          "filled": 12,
+          "item": "MELON",
+          "operation": "SELL",
+          "player": 1,
+          "revenue_or_cost": 2583
+        }
+      ]
+    },
+    {
+      "opponent": "sdy2842",
+      "seed": 2,
+      "candidate_seat": "right",
+      "v45_player": 1,
+      "action_step": 251,
+      "state_step_after": 252,
+      "item": "MELON",
+      "place_events": [
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_0",
+          "actor_index": 1,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 6,
+          "shed_item_before": 0,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_4",
+          "actor_index": 5,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 12,
+          "shed_item_before": 6,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_0",
+          "actor_index": 1,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {},
+          "actor_item_after": 0,
+          "actor_item_before": 0,
+          "actor_item_delta": 0,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "no_op",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 0,
+          "shed_item_before": 0,
+          "shed_item_delta": 0
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_4",
+          "actor_index": 5,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 6,
+          "shed_item_before": 0,
+          "shed_item_delta": 6
+        }
+      ],
+      "market_sales": [
+        {
+          "action_step": 251,
+          "attempts": 12,
+          "failed_attempts": 0,
+          "filled": 12,
+          "item": "MELON",
+          "operation": "SELL",
+          "player": 0,
+          "revenue_or_cost": 2583
+        },
+        {
+          "action_step": 251,
+          "attempts": 7,
+          "failed_attempts": 1,
+          "filled": 6,
+          "item": "MELON",
+          "operation": "SELL",
+          "player": 1,
+          "revenue_or_cost": 1325
+        }
+      ]
+    },
+    {
+      "opponent": "sdy2842",
+      "seed": 3,
+      "candidate_seat": "left",
+      "v45_player": 0,
+      "action_step": 251,
+      "state_step_after": 252,
+      "item": "MELON",
+      "place_events": [
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_0",
+          "actor_index": 1,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {},
+          "actor_item_after": 0,
+          "actor_item_before": 0,
+          "actor_item_delta": 0,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "no_op",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 0,
+          "shed_item_before": 0,
+          "shed_item_delta": 0
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_4",
+          "actor_index": 5,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 6,
+          "shed_item_before": 0,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_0",
+          "actor_index": 1,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 6,
+          "shed_item_before": 0,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_4",
+          "actor_index": 5,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 12,
+          "shed_item_before": 6,
+          "shed_item_delta": 6
+        }
+      ],
+      "market_sales": [
+        {
+          "action_step": 251,
+          "attempts": 7,
+          "failed_attempts": 1,
+          "filled": 6,
+          "item": "MELON",
+          "operation": "SELL",
+          "player": 0,
+          "revenue_or_cost": 1325
+        },
+        {
+          "action_step": 251,
+          "attempts": 12,
+          "failed_attempts": 0,
+          "filled": 12,
+          "item": "MELON",
+          "operation": "SELL",
+          "player": 1,
+          "revenue_or_cost": 2583
+        }
+      ]
+    },
+    {
+      "opponent": "sdy2842",
+      "seed": 3,
+      "candidate_seat": "right",
+      "v45_player": 1,
+      "action_step": 251,
+      "state_step_after": 252,
+      "item": "MELON",
+      "place_events": [
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_0",
+          "actor_index": 1,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 6,
+          "shed_item_before": 0,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_4",
+          "actor_index": 5,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 12,
+          "shed_item_before": 6,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_0",
+          "actor_index": 1,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {},
+          "actor_item_after": 0,
+          "actor_item_before": 0,
+          "actor_item_delta": 0,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "no_op",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 0,
+          "shed_item_before": 0,
+          "shed_item_delta": 0
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_4",
+          "actor_index": 5,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 6,
+          "shed_item_before": 0,
+          "shed_item_delta": 6
+        }
+      ],
+      "market_sales": [
+        {
+          "action_step": 251,
+          "attempts": 12,
+          "failed_attempts": 0,
+          "filled": 12,
+          "item": "MELON",
+          "operation": "SELL",
+          "player": 0,
+          "revenue_or_cost": 2583
+        },
+        {
+          "action_step": 251,
+          "attempts": 7,
+          "failed_attempts": 1,
+          "filled": 6,
+          "item": "MELON",
+          "operation": "SELL",
+          "player": 1,
+          "revenue_or_cost": 1325
+        }
+      ]
+    },
+    {
+      "opponent": "v46",
+      "seed": 0,
+      "candidate_seat": "left",
+      "v45_player": 0,
+      "action_step": 2,
+      "state_step_after": 3,
+      "item": "WHEAT",
+      "place_events": [],
+      "market_sales": [
+        {
+          "action_step": 2,
+          "attempts": 30,
+          "failed_attempts": 0,
+          "filled": 30,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 1,
+          "revenue_or_cost": 901
+        }
+      ]
+    },
+    {
+      "opponent": "v46",
+      "seed": 0,
+      "candidate_seat": "right",
+      "v45_player": 1,
+      "action_step": 2,
+      "state_step_after": 3,
+      "item": "WHEAT",
+      "place_events": [],
+      "market_sales": [
+        {
+          "action_step": 2,
+          "attempts": 30,
+          "failed_attempts": 0,
+          "filled": 30,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 0,
+          "revenue_or_cost": 901
+        }
+      ]
+    },
+    {
+      "opponent": "v46",
+      "seed": 1,
+      "candidate_seat": "left",
+      "v45_player": 0,
+      "action_step": 2,
+      "state_step_after": 3,
+      "item": "WHEAT",
+      "place_events": [],
+      "market_sales": [
+        {
+          "action_step": 2,
+          "attempts": 30,
+          "failed_attempts": 0,
+          "filled": 30,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 1,
+          "revenue_or_cost": 901
+        }
+      ]
+    },
+    {
+      "opponent": "v46",
+      "seed": 1,
+      "candidate_seat": "right",
+      "v45_player": 1,
+      "action_step": 2,
+      "state_step_after": 3,
+      "item": "WHEAT",
+      "place_events": [],
+      "market_sales": [
+        {
+          "action_step": 2,
+          "attempts": 30,
+          "failed_attempts": 0,
+          "filled": 30,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 0,
+          "revenue_or_cost": 901
+        }
+      ]
+    },
+    {
+      "opponent": "v46",
+      "seed": 2,
+      "candidate_seat": "left",
+      "v45_player": 0,
+      "action_step": 2,
+      "state_step_after": 3,
+      "item": "WHEAT",
+      "place_events": [],
+      "market_sales": [
+        {
+          "action_step": 2,
+          "attempts": 30,
+          "failed_attempts": 0,
+          "filled": 30,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 1,
+          "revenue_or_cost": 901
+        }
+      ]
+    },
+    {
+      "opponent": "v46",
+      "seed": 2,
+      "candidate_seat": "right",
+      "v45_player": 1,
+      "action_step": 2,
+      "state_step_after": 3,
+      "item": "WHEAT",
+      "place_events": [],
+      "market_sales": [
+        {
+          "action_step": 2,
+          "attempts": 30,
+          "failed_attempts": 0,
+          "filled": 30,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 0,
+          "revenue_or_cost": 901
+        }
+      ]
+    },
+    {
+      "opponent": "v46",
+      "seed": 3,
+      "candidate_seat": "left",
+      "v45_player": 0,
+      "action_step": 2,
+      "state_step_after": 3,
+      "item": "WHEAT",
+      "place_events": [],
+      "market_sales": [
+        {
+          "action_step": 2,
+          "attempts": 30,
+          "failed_attempts": 0,
+          "filled": 30,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 1,
+          "revenue_or_cost": 901
+        }
+      ]
+    },
+    {
+      "opponent": "v46",
+      "seed": 3,
+      "candidate_seat": "right",
+      "v45_player": 1,
+      "action_step": 2,
+      "state_step_after": 3,
+      "item": "WHEAT",
+      "place_events": [],
+      "market_sales": [
+        {
+          "action_step": 2,
+          "attempts": 30,
+          "failed_attempts": 0,
+          "filled": 30,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 0,
+          "revenue_or_cost": 901
+        }
+      ]
+    },
+    {
+      "opponent": "nathan_pipe7",
+      "seed": 0,
+      "candidate_seat": "left",
+      "v45_player": 0,
+      "action_step": 80,
+      "state_step_after": 81,
+      "item": "WHEAT",
+      "place_events": [],
+      "market_sales": [
+        {
+          "action_step": 80,
+          "attempts": 3,
+          "failed_attempts": 1,
+          "filled": 2,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 0,
+          "revenue_or_cost": 60
+        },
+        {
+          "action_step": 80,
+          "attempts": 3,
+          "failed_attempts": 0,
+          "filled": 3,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 1,
+          "revenue_or_cost": 90
+        }
+      ]
+    },
+    {
+      "opponent": "nathan_pipe7",
+      "seed": 0,
+      "candidate_seat": "left",
+      "v45_player": 0,
+      "action_step": 100,
+      "state_step_after": 101,
+      "item": "WHEAT",
+      "place_events": [],
+      "market_sales": [
+        {
+          "action_step": 100,
+          "attempts": 1,
+          "failed_attempts": 1,
+          "filled": 0,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 0,
+          "revenue_or_cost": 0
+        },
+        {
+          "action_step": 100,
+          "attempts": 2,
+          "failed_attempts": 0,
+          "filled": 2,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 1,
+          "revenue_or_cost": 60
+        }
+      ]
+    },
+    {
+      "opponent": "nathan_pipe7",
+      "seed": 0,
+      "candidate_seat": "right",
+      "v45_player": 1,
+      "action_step": 80,
+      "state_step_after": 81,
+      "item": "WHEAT",
+      "place_events": [],
+      "market_sales": [
+        {
+          "action_step": 80,
+          "attempts": 3,
+          "failed_attempts": 0,
+          "filled": 3,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 0,
+          "revenue_or_cost": 90
+        },
+        {
+          "action_step": 80,
+          "attempts": 3,
+          "failed_attempts": 1,
+          "filled": 2,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 1,
+          "revenue_or_cost": 60
+        }
+      ]
+    },
+    {
+      "opponent": "nathan_pipe7",
+      "seed": 0,
+      "candidate_seat": "right",
+      "v45_player": 1,
+      "action_step": 100,
+      "state_step_after": 101,
+      "item": "WHEAT",
+      "place_events": [],
+      "market_sales": [
+        {
+          "action_step": 100,
+          "attempts": 2,
+          "failed_attempts": 0,
+          "filled": 2,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 0,
+          "revenue_or_cost": 60
+        },
+        {
+          "action_step": 100,
+          "attempts": 1,
+          "failed_attempts": 1,
+          "filled": 0,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 1,
+          "revenue_or_cost": 0
+        }
+      ]
+    },
+    {
+      "opponent": "nathan_pipe7",
+      "seed": 1,
+      "candidate_seat": "left",
+      "v45_player": 0,
+      "action_step": 80,
+      "state_step_after": 81,
+      "item": "WHEAT",
+      "place_events": [],
+      "market_sales": [
+        {
+          "action_step": 80,
+          "attempts": 3,
+          "failed_attempts": 1,
+          "filled": 2,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 0,
+          "revenue_or_cost": 60
+        },
+        {
+          "action_step": 80,
+          "attempts": 3,
+          "failed_attempts": 0,
+          "filled": 3,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 1,
+          "revenue_or_cost": 89
+        }
+      ]
+    },
+    {
+      "opponent": "nathan_pipe7",
+      "seed": 1,
+      "candidate_seat": "left",
+      "v45_player": 0,
+      "action_step": 100,
+      "state_step_after": 101,
+      "item": "WHEAT",
+      "place_events": [],
+      "market_sales": [
+        {
+          "action_step": 100,
+          "attempts": 1,
+          "failed_attempts": 1,
+          "filled": 0,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 0,
+          "revenue_or_cost": 0
+        },
+        {
+          "action_step": 100,
+          "attempts": 2,
+          "failed_attempts": 0,
+          "filled": 2,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 1,
+          "revenue_or_cost": 58
+        }
+      ]
+    },
+    {
+      "opponent": "nathan_pipe7",
+      "seed": 1,
+      "candidate_seat": "right",
+      "v45_player": 1,
+      "action_step": 80,
+      "state_step_after": 81,
+      "item": "WHEAT",
+      "place_events": [],
+      "market_sales": [
+        {
+          "action_step": 80,
+          "attempts": 3,
+          "failed_attempts": 0,
+          "filled": 3,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 0,
+          "revenue_or_cost": 89
+        },
+        {
+          "action_step": 80,
+          "attempts": 3,
+          "failed_attempts": 1,
+          "filled": 2,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 1,
+          "revenue_or_cost": 60
+        }
+      ]
+    },
+    {
+      "opponent": "nathan_pipe7",
+      "seed": 1,
+      "candidate_seat": "right",
+      "v45_player": 1,
+      "action_step": 100,
+      "state_step_after": 101,
+      "item": "WHEAT",
+      "place_events": [],
+      "market_sales": [
+        {
+          "action_step": 100,
+          "attempts": 2,
+          "failed_attempts": 0,
+          "filled": 2,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 0,
+          "revenue_or_cost": 58
+        },
+        {
+          "action_step": 100,
+          "attempts": 1,
+          "failed_attempts": 1,
+          "filled": 0,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 1,
+          "revenue_or_cost": 0
+        }
+      ]
+    },
+    {
+      "opponent": "nathan_pipe7",
+      "seed": 2,
+      "candidate_seat": "left",
+      "v45_player": 0,
+      "action_step": 80,
+      "state_step_after": 81,
+      "item": "WHEAT",
+      "place_events": [],
+      "market_sales": [
+        {
+          "action_step": 80,
+          "attempts": 3,
+          "failed_attempts": 1,
+          "filled": 2,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 0,
+          "revenue_or_cost": 60
+        },
+        {
+          "action_step": 80,
+          "attempts": 3,
+          "failed_attempts": 0,
+          "filled": 3,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 1,
+          "revenue_or_cost": 89
+        }
+      ]
+    },
+    {
+      "opponent": "nathan_pipe7",
+      "seed": 2,
+      "candidate_seat": "left",
+      "v45_player": 0,
+      "action_step": 100,
+      "state_step_after": 101,
+      "item": "WHEAT",
+      "place_events": [],
+      "market_sales": [
+        {
+          "action_step": 100,
+          "attempts": 1,
+          "failed_attempts": 1,
+          "filled": 0,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 0,
+          "revenue_or_cost": 0
+        },
+        {
+          "action_step": 100,
+          "attempts": 2,
+          "failed_attempts": 0,
+          "filled": 2,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 1,
+          "revenue_or_cost": 58
+        }
+      ]
+    },
+    {
+      "opponent": "nathan_pipe7",
+      "seed": 2,
+      "candidate_seat": "right",
+      "v45_player": 1,
+      "action_step": 80,
+      "state_step_after": 81,
+      "item": "WHEAT",
+      "place_events": [],
+      "market_sales": [
+        {
+          "action_step": 80,
+          "attempts": 3,
+          "failed_attempts": 0,
+          "filled": 3,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 0,
+          "revenue_or_cost": 89
+        },
+        {
+          "action_step": 80,
+          "attempts": 3,
+          "failed_attempts": 1,
+          "filled": 2,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 1,
+          "revenue_or_cost": 60
+        }
+      ]
+    },
+    {
+      "opponent": "nathan_pipe7",
+      "seed": 2,
+      "candidate_seat": "right",
+      "v45_player": 1,
+      "action_step": 100,
+      "state_step_after": 101,
+      "item": "WHEAT",
+      "place_events": [],
+      "market_sales": [
+        {
+          "action_step": 100,
+          "attempts": 2,
+          "failed_attempts": 0,
+          "filled": 2,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 0,
+          "revenue_or_cost": 58
+        },
+        {
+          "action_step": 100,
+          "attempts": 1,
+          "failed_attempts": 1,
+          "filled": 0,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 1,
+          "revenue_or_cost": 0
+        }
+      ]
+    },
+    {
+      "opponent": "nathan_pipe7",
+      "seed": 3,
+      "candidate_seat": "left",
+      "v45_player": 0,
+      "action_step": 80,
+      "state_step_after": 81,
+      "item": "WHEAT",
+      "place_events": [],
+      "market_sales": [
+        {
+          "action_step": 80,
+          "attempts": 3,
+          "failed_attempts": 1,
+          "filled": 2,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 0,
+          "revenue_or_cost": 60
+        },
+        {
+          "action_step": 80,
+          "attempts": 3,
+          "failed_attempts": 0,
+          "filled": 3,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 1,
+          "revenue_or_cost": 90
+        }
+      ]
+    },
+    {
+      "opponent": "nathan_pipe7",
+      "seed": 3,
+      "candidate_seat": "left",
+      "v45_player": 0,
+      "action_step": 100,
+      "state_step_after": 101,
+      "item": "WHEAT",
+      "place_events": [],
+      "market_sales": [
+        {
+          "action_step": 100,
+          "attempts": 1,
+          "failed_attempts": 1,
+          "filled": 0,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 0,
+          "revenue_or_cost": 0
+        },
+        {
+          "action_step": 100,
+          "attempts": 2,
+          "failed_attempts": 0,
+          "filled": 2,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 1,
+          "revenue_or_cost": 60
+        }
+      ]
+    },
+    {
+      "opponent": "nathan_pipe7",
+      "seed": 3,
+      "candidate_seat": "right",
+      "v45_player": 1,
+      "action_step": 80,
+      "state_step_after": 81,
+      "item": "WHEAT",
+      "place_events": [],
+      "market_sales": [
+        {
+          "action_step": 80,
+          "attempts": 3,
+          "failed_attempts": 0,
+          "filled": 3,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 0,
+          "revenue_or_cost": 90
+        },
+        {
+          "action_step": 80,
+          "attempts": 3,
+          "failed_attempts": 1,
+          "filled": 2,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 1,
+          "revenue_or_cost": 60
+        }
+      ]
+    },
+    {
+      "opponent": "nathan_pipe7",
+      "seed": 3,
+      "candidate_seat": "right",
+      "v45_player": 1,
+      "action_step": 100,
+      "state_step_after": 101,
+      "item": "WHEAT",
+      "place_events": [],
+      "market_sales": [
+        {
+          "action_step": 100,
+          "attempts": 2,
+          "failed_attempts": 0,
+          "filled": 2,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 0,
+          "revenue_or_cost": 60
+        },
+        {
+          "action_step": 100,
+          "attempts": 1,
+          "failed_attempts": 1,
+          "filled": 0,
+          "item": "WHEAT",
+          "operation": "SELL",
+          "player": 1,
+          "revenue_or_cost": 0
+        }
+      ]
+    },
+    {
+      "opponent": "kaito_v58",
+      "seed": 0,
+      "candidate_seat": "left",
+      "v45_player": 0,
+      "action_step": 251,
+      "state_step_after": 252,
+      "item": "MELON",
+      "place_events": [
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_0",
+          "actor_index": 1,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 6,
+          "shed_item_before": 0,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_4",
+          "actor_index": 5,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 12,
+          "shed_item_before": 6,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_0",
+          "actor_index": 1,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 6,
+          "shed_item_before": 0,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_1",
+          "actor_index": 2,
+          "actor_inventory_after": {
+            "WHEAT": 5
+          },
+          "actor_inventory_before": {
+            "MELON": 6,
+            "WHEAT": 5
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 12,
+          "shed_item_before": 6,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_4",
+          "actor_index": 5,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 18,
+          "shed_item_before": 12,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_7",
+          "actor_index": 8,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 24,
+          "shed_item_before": 18,
+          "shed_item_delta": 6
+        }
+      ],
+      "market_sales": [
+        {
+          "action_step": 251,
+          "attempts": 12,
+          "failed_attempts": 0,
+          "filled": 12,
+          "item": "MELON",
+          "operation": "SELL",
+          "player": 0,
+          "revenue_or_cost": 2719
+        },
+        {
+          "action_step": 251,
+          "attempts": 24,
+          "failed_attempts": 0,
+          "filled": 24,
+          "item": "MELON",
+          "operation": "SELL",
+          "player": 1,
+          "revenue_or_cost": 5187
+        }
+      ]
+    },
+    {
+      "opponent": "kaito_v58",
+      "seed": 0,
+      "candidate_seat": "right",
+      "v45_player": 1,
+      "action_step": 251,
+      "state_step_after": 252,
+      "item": "MELON",
+      "place_events": [
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_0",
+          "actor_index": 1,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 6,
+          "shed_item_before": 0,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_1",
+          "actor_index": 2,
+          "actor_inventory_after": {
+            "WHEAT": 5
+          },
+          "actor_inventory_before": {
+            "MELON": 6,
+            "WHEAT": 5
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 12,
+          "shed_item_before": 6,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_4",
+          "actor_index": 5,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 18,
+          "shed_item_before": 12,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_7",
+          "actor_index": 8,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 24,
+          "shed_item_before": 18,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_0",
+          "actor_index": 1,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 6,
+          "shed_item_before": 0,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_4",
+          "actor_index": 5,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 12,
+          "shed_item_before": 6,
+          "shed_item_delta": 6
+        }
+      ],
+      "market_sales": [
+        {
+          "action_step": 251,
+          "attempts": 24,
+          "failed_attempts": 0,
+          "filled": 24,
+          "item": "MELON",
+          "operation": "SELL",
+          "player": 0,
+          "revenue_or_cost": 5187
+        },
+        {
+          "action_step": 251,
+          "attempts": 12,
+          "failed_attempts": 0,
+          "filled": 12,
+          "item": "MELON",
+          "operation": "SELL",
+          "player": 1,
+          "revenue_or_cost": 2719
+        }
+      ]
+    },
+    {
+      "opponent": "kaito_v58",
+      "seed": 1,
+      "candidate_seat": "left",
+      "v45_player": 0,
+      "action_step": 251,
+      "state_step_after": 252,
+      "item": "MELON",
+      "place_events": [
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_0",
+          "actor_index": 1,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 6,
+          "shed_item_before": 0,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_4",
+          "actor_index": 5,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 12,
+          "shed_item_before": 6,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_0",
+          "actor_index": 1,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 6,
+          "shed_item_before": 0,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_1",
+          "actor_index": 2,
+          "actor_inventory_after": {
+            "WHEAT": 5
+          },
+          "actor_inventory_before": {
+            "MELON": 6,
+            "WHEAT": 5
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 12,
+          "shed_item_before": 6,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_4",
+          "actor_index": 5,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 18,
+          "shed_item_before": 12,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_7",
+          "actor_index": 8,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 24,
+          "shed_item_before": 18,
+          "shed_item_delta": 6
+        }
+      ],
+      "market_sales": [
+        {
+          "action_step": 251,
+          "attempts": 12,
+          "failed_attempts": 0,
+          "filled": 12,
+          "item": "MELON",
+          "operation": "SELL",
+          "player": 0,
+          "revenue_or_cost": 2719
+        },
+        {
+          "action_step": 251,
+          "attempts": 24,
+          "failed_attempts": 0,
+          "filled": 24,
+          "item": "MELON",
+          "operation": "SELL",
+          "player": 1,
+          "revenue_or_cost": 5187
+        }
+      ]
+    },
+    {
+      "opponent": "kaito_v58",
+      "seed": 1,
+      "candidate_seat": "right",
+      "v45_player": 1,
+      "action_step": 251,
+      "state_step_after": 252,
+      "item": "MELON",
+      "place_events": [
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_0",
+          "actor_index": 1,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 6,
+          "shed_item_before": 0,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_1",
+          "actor_index": 2,
+          "actor_inventory_after": {
+            "WHEAT": 5
+          },
+          "actor_inventory_before": {
+            "MELON": 6,
+            "WHEAT": 5
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 12,
+          "shed_item_before": 6,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_4",
+          "actor_index": 5,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 18,
+          "shed_item_before": 12,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_7",
+          "actor_index": 8,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 24,
+          "shed_item_before": 18,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_0",
+          "actor_index": 1,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 6,
+          "shed_item_before": 0,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_4",
+          "actor_index": 5,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 12,
+          "shed_item_before": 6,
+          "shed_item_delta": 6
+        }
+      ],
+      "market_sales": [
+        {
+          "action_step": 251,
+          "attempts": 24,
+          "failed_attempts": 0,
+          "filled": 24,
+          "item": "MELON",
+          "operation": "SELL",
+          "player": 0,
+          "revenue_or_cost": 5187
+        },
+        {
+          "action_step": 251,
+          "attempts": 12,
+          "failed_attempts": 0,
+          "filled": 12,
+          "item": "MELON",
+          "operation": "SELL",
+          "player": 1,
+          "revenue_or_cost": 2719
+        }
+      ]
+    },
+    {
+      "opponent": "kaito_v58",
+      "seed": 2,
+      "candidate_seat": "left",
+      "v45_player": 0,
+      "action_step": 251,
+      "state_step_after": 252,
+      "item": "MELON",
+      "place_events": [
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_0",
+          "actor_index": 1,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 6,
+          "shed_item_before": 0,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_4",
+          "actor_index": 5,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 12,
+          "shed_item_before": 6,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_0",
+          "actor_index": 1,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 6,
+          "shed_item_before": 0,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_4",
+          "actor_index": 5,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 12,
+          "shed_item_before": 6,
+          "shed_item_delta": 6
+        }
+      ],
+      "market_sales": [
+        {
+          "action_step": 251,
+          "attempts": 12,
+          "failed_attempts": 0,
+          "filled": 12,
+          "item": "MELON",
+          "operation": "SELL",
+          "player": 0,
+          "revenue_or_cost": 2719
+        },
+        {
+          "action_step": 251,
+          "attempts": 12,
+          "failed_attempts": 0,
+          "filled": 12,
+          "item": "MELON",
+          "operation": "SELL",
+          "player": 1,
+          "revenue_or_cost": 2719
+        }
+      ]
+    },
+    {
+      "opponent": "kaito_v58",
+      "seed": 2,
+      "candidate_seat": "right",
+      "v45_player": 1,
+      "action_step": 251,
+      "state_step_after": 252,
+      "item": "MELON",
+      "place_events": [
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_0",
+          "actor_index": 1,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 6,
+          "shed_item_before": 0,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_4",
+          "actor_index": 5,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 12,
+          "shed_item_before": 6,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_0",
+          "actor_index": 1,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 6,
+          "shed_item_before": 0,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_4",
+          "actor_index": 5,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 12,
+          "shed_item_before": 6,
+          "shed_item_delta": 6
+        }
+      ],
+      "market_sales": [
+        {
+          "action_step": 251,
+          "attempts": 12,
+          "failed_attempts": 0,
+          "filled": 12,
+          "item": "MELON",
+          "operation": "SELL",
+          "player": 0,
+          "revenue_or_cost": 2719
+        },
+        {
+          "action_step": 251,
+          "attempts": 12,
+          "failed_attempts": 0,
+          "filled": 12,
+          "item": "MELON",
+          "operation": "SELL",
+          "player": 1,
+          "revenue_or_cost": 2719
+        }
+      ]
+    },
+    {
+      "opponent": "kaito_v58",
+      "seed": 3,
+      "candidate_seat": "left",
+      "v45_player": 0,
+      "action_step": 251,
+      "state_step_after": 252,
+      "item": "MELON",
+      "place_events": [
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_0",
+          "actor_index": 1,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 6,
+          "shed_item_before": 0,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_4",
+          "actor_index": 5,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 12,
+          "shed_item_before": 6,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_0",
+          "actor_index": 1,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 6,
+          "shed_item_before": 0,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_1",
+          "actor_index": 2,
+          "actor_inventory_after": {
+            "WHEAT": 5
+          },
+          "actor_inventory_before": {
+            "MELON": 6,
+            "WHEAT": 5
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 12,
+          "shed_item_before": 6,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_4",
+          "actor_index": 5,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 18,
+          "shed_item_before": 12,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_7",
+          "actor_index": 8,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 24,
+          "shed_item_before": 18,
+          "shed_item_delta": 6
+        }
+      ],
+      "market_sales": [
+        {
+          "action_step": 251,
+          "attempts": 12,
+          "failed_attempts": 0,
+          "filled": 12,
+          "item": "MELON",
+          "operation": "SELL",
+          "player": 0,
+          "revenue_or_cost": 2719
+        },
+        {
+          "action_step": 251,
+          "attempts": 24,
+          "failed_attempts": 0,
+          "filled": 24,
+          "item": "MELON",
+          "operation": "SELL",
+          "player": 1,
+          "revenue_or_cost": 5187
+        }
+      ]
+    },
+    {
+      "opponent": "kaito_v58",
+      "seed": 3,
+      "candidate_seat": "right",
+      "v45_player": 1,
+      "action_step": 251,
+      "state_step_after": 252,
+      "item": "MELON",
+      "place_events": [
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_0",
+          "actor_index": 1,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 6,
+          "shed_item_before": 0,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_1",
+          "actor_index": 2,
+          "actor_inventory_after": {
+            "WHEAT": 5
+          },
+          "actor_inventory_before": {
+            "MELON": 6,
+            "WHEAT": 5
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 12,
+          "shed_item_before": 6,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_4",
+          "actor_index": 5,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 18,
+          "shed_item_before": 12,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_7",
+          "actor_index": 8,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 0,
+          "requested_amount": 6,
+          "shed_item_after": 24,
+          "shed_item_before": 18,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_0",
+          "actor_index": 1,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 6,
+          "shed_item_before": 0,
+          "shed_item_delta": 6
+        },
+        {
+          "action": [
+            "PLACE",
+            "MELON",
+            6
+          ],
+          "action_step": 251,
+          "actor": "hand_4",
+          "actor_index": 5,
+          "actor_inventory_after": {},
+          "actor_inventory_before": {
+            "MELON": 6
+          },
+          "actor_item_after": 0,
+          "actor_item_before": 6,
+          "actor_item_delta": -6,
+          "item": "MELON",
+          "operation": "PLACE",
+          "outcome": "success",
+          "player": 1,
+          "requested_amount": 6,
+          "shed_item_after": 12,
+          "shed_item_before": 6,
+          "shed_item_delta": 6
+        }
+      ],
+      "market_sales": [
+        {
+          "action_step": 251,
+          "attempts": 24,
+          "failed_attempts": 0,
+          "filled": 24,
+          "item": "MELON",
+          "operation": "SELL",
+          "player": 0,
+          "revenue_or_cost": 5187
+        },
+        {
+          "action_step": 251,
+          "attempts": 12,
+          "failed_attempts": 0,
+          "filled": 12,
+          "item": "MELON",
+          "operation": "SELL",
+          "player": 1,
+          "revenue_or_cost": 2719
+        }
+      ]
+    }
+  ]
+}

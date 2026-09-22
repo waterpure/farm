@@ -1,0 +1,592 @@
+{
+  "protocol": "v45-seed-conflict-shadow-v1",
+  "source": "experiments/v45_seed_conflict_shadow_v1.jsonl",
+  "accepted_conditions": 56,
+  "planned_conditions": 56,
+  "recommendation_counts": {
+    "abstain_tie": 16
+  },
+  "sdy_step18_melon_conflicts": [
+    {
+      "seed": 0,
+      "candidate_seat": "left",
+      "conflict": {
+        "candidate_count": 2,
+        "candidates": [
+          {
+            "actor": 1,
+            "coordinate": [
+              1,
+              2
+            ],
+            "emitted_command": [
+              "PLANT",
+              "MELON"
+            ],
+            "emitted_raw_plant": true,
+            "raw_command": [
+              "PLANT",
+              "MELON"
+            ],
+            "service": {
+              "immediate_same_actor_water": true,
+              "same_day_water_steps": [
+                19
+              ],
+              "score": [
+                1,
+                1
+              ]
+            }
+          },
+          {
+            "actor": 5,
+            "coordinate": [
+              0,
+              4
+            ],
+            "emitted_command": [
+              "PASS"
+            ],
+            "emitted_raw_plant": false,
+            "raw_command": [
+              "PLANT",
+              "MELON"
+            ],
+            "service": {
+              "immediate_same_actor_water": true,
+              "same_day_water_steps": [
+                19
+              ],
+              "score": [
+                1,
+                1
+              ]
+            }
+          }
+        ],
+        "crop": "MELON",
+        "day": 0,
+        "recommendation": {
+          "actors": [
+            1,
+            5
+          ],
+          "kind": "abstain_tie"
+        },
+        "route_at_decision": 0,
+        "seed_available": 1,
+        "step": 18
+      }
+    },
+    {
+      "seed": 0,
+      "candidate_seat": "right",
+      "conflict": {
+        "candidate_count": 2,
+        "candidates": [
+          {
+            "actor": 1,
+            "coordinate": [
+              1,
+              2
+            ],
+            "emitted_command": [
+              "PLANT",
+              "MELON"
+            ],
+            "emitted_raw_plant": true,
+            "raw_command": [
+              "PLANT",
+              "MELON"
+            ],
+            "service": {
+              "immediate_same_actor_water": true,
+              "same_day_water_steps": [
+                19
+              ],
+              "score": [
+                1,
+                1
+              ]
+            }
+          },
+          {
+            "actor": 5,
+            "coordinate": [
+              0,
+              4
+            ],
+            "emitted_command": [
+              "PASS"
+            ],
+            "emitted_raw_plant": false,
+            "raw_command": [
+              "PLANT",
+              "MELON"
+            ],
+            "service": {
+              "immediate_same_actor_water": true,
+              "same_day_water_steps": [
+                19
+              ],
+              "score": [
+                1,
+                1
+              ]
+            }
+          }
+        ],
+        "crop": "MELON",
+        "day": 0,
+        "recommendation": {
+          "actors": [
+            1,
+            5
+          ],
+          "kind": "abstain_tie"
+        },
+        "route_at_decision": 0,
+        "seed_available": 1,
+        "step": 18
+      }
+    },
+    {
+      "seed": 1,
+      "candidate_seat": "left",
+      "conflict": {
+        "candidate_count": 2,
+        "candidates": [
+          {
+            "actor": 1,
+            "coordinate": [
+              1,
+              2
+            ],
+            "emitted_command": [
+              "PLANT",
+              "MELON"
+            ],
+            "emitted_raw_plant": true,
+            "raw_command": [
+              "PLANT",
+              "MELON"
+            ],
+            "service": {
+              "immediate_same_actor_water": true,
+              "same_day_water_steps": [
+                19
+              ],
+              "score": [
+                1,
+                1
+              ]
+            }
+          },
+          {
+            "actor": 5,
+            "coordinate": [
+              0,
+              4
+            ],
+            "emitted_command": [
+              "PASS"
+            ],
+            "emitted_raw_plant": false,
+            "raw_command": [
+              "PLANT",
+              "MELON"
+            ],
+            "service": {
+              "immediate_same_actor_water": true,
+              "same_day_water_steps": [
+                19
+              ],
+              "score": [
+                1,
+                1
+              ]
+            }
+          }
+        ],
+        "crop": "MELON",
+        "day": 0,
+        "recommendation": {
+          "actors": [
+            1,
+            5
+          ],
+          "kind": "abstain_tie"
+        },
+        "route_at_decision": 0,
+        "seed_available": 1,
+        "step": 18
+      }
+    },
+    {
+      "seed": 1,
+      "candidate_seat": "right",
+      "conflict": {
+        "candidate_count": 2,
+        "candidates": [
+          {
+            "actor": 1,
+            "coordinate": [
+              1,
+              2
+            ],
+            "emitted_command": [
+              "PLANT",
+              "MELON"
+            ],
+            "emitted_raw_plant": true,
+            "raw_command": [
+              "PLANT",
+              "MELON"
+            ],
+            "service": {
+              "immediate_same_actor_water": true,
+              "same_day_water_steps": [
+                19
+              ],
+              "score": [
+                1,
+                1
+              ]
+            }
+          },
+          {
+            "actor": 5,
+            "coordinate": [
+              0,
+              4
+            ],
+            "emitted_command": [
+              "PASS"
+            ],
+            "emitted_raw_plant": false,
+            "raw_command": [
+              "PLANT",
+              "MELON"
+            ],
+            "service": {
+              "immediate_same_actor_water": true,
+              "same_day_water_steps": [
+                19
+              ],
+              "score": [
+                1,
+                1
+              ]
+            }
+          }
+        ],
+        "crop": "MELON",
+        "day": 0,
+        "recommendation": {
+          "actors": [
+            1,
+            5
+          ],
+          "kind": "abstain_tie"
+        },
+        "route_at_decision": 0,
+        "seed_available": 1,
+        "step": 18
+      }
+    },
+    {
+      "seed": 2,
+      "candidate_seat": "left",
+      "conflict": {
+        "candidate_count": 2,
+        "candidates": [
+          {
+            "actor": 1,
+            "coordinate": [
+              1,
+              2
+            ],
+            "emitted_command": [
+              "PLANT",
+              "MELON"
+            ],
+            "emitted_raw_plant": true,
+            "raw_command": [
+              "PLANT",
+              "MELON"
+            ],
+            "service": {
+              "immediate_same_actor_water": true,
+              "same_day_water_steps": [
+                19
+              ],
+              "score": [
+                1,
+                1
+              ]
+            }
+          },
+          {
+            "actor": 5,
+            "coordinate": [
+              0,
+              4
+            ],
+            "emitted_command": [
+              "PASS"
+            ],
+            "emitted_raw_plant": false,
+            "raw_command": [
+              "PLANT",
+              "MELON"
+            ],
+            "service": {
+              "immediate_same_actor_water": true,
+              "same_day_water_steps": [
+                19
+              ],
+              "score": [
+                1,
+                1
+              ]
+            }
+          }
+        ],
+        "crop": "MELON",
+        "day": 0,
+        "recommendation": {
+          "actors": [
+            1,
+            5
+          ],
+          "kind": "abstain_tie"
+        },
+        "route_at_decision": 0,
+        "seed_available": 1,
+        "step": 18
+      }
+    },
+    {
+      "seed": 2,
+      "candidate_seat": "right",
+      "conflict": {
+        "candidate_count": 2,
+        "candidates": [
+          {
+            "actor": 1,
+            "coordinate": [
+              1,
+              2
+            ],
+            "emitted_command": [
+              "PLANT",
+              "MELON"
+            ],
+            "emitted_raw_plant": true,
+            "raw_command": [
+              "PLANT",
+              "MELON"
+            ],
+            "service": {
+              "immediate_same_actor_water": true,
+              "same_day_water_steps": [
+                19
+              ],
+              "score": [
+                1,
+                1
+              ]
+            }
+          },
+          {
+            "actor": 5,
+            "coordinate": [
+              0,
+              4
+            ],
+            "emitted_command": [
+              "PASS"
+            ],
+            "emitted_raw_plant": false,
+            "raw_command": [
+              "PLANT",
+              "MELON"
+            ],
+            "service": {
+              "immediate_same_actor_water": true,
+              "same_day_water_steps": [
+                19
+              ],
+              "score": [
+                1,
+                1
+              ]
+            }
+          }
+        ],
+        "crop": "MELON",
+        "day": 0,
+        "recommendation": {
+          "actors": [
+            1,
+            5
+          ],
+          "kind": "abstain_tie"
+        },
+        "route_at_decision": 0,
+        "seed_available": 1,
+        "step": 18
+      }
+    },
+    {
+      "seed": 3,
+      "candidate_seat": "left",
+      "conflict": {
+        "candidate_count": 2,
+        "candidates": [
+          {
+            "actor": 1,
+            "coordinate": [
+              1,
+              2
+            ],
+            "emitted_command": [
+              "PLANT",
+              "MELON"
+            ],
+            "emitted_raw_plant": true,
+            "raw_command": [
+              "PLANT",
+              "MELON"
+            ],
+            "service": {
+              "immediate_same_actor_water": true,
+              "same_day_water_steps": [
+                19
+              ],
+              "score": [
+                1,
+                1
+              ]
+            }
+          },
+          {
+            "actor": 5,
+            "coordinate": [
+              0,
+              4
+            ],
+            "emitted_command": [
+              "PASS"
+            ],
+            "emitted_raw_plant": false,
+            "raw_command": [
+              "PLANT",
+              "MELON"
+            ],
+            "service": {
+              "immediate_same_actor_water": true,
+              "same_day_water_steps": [
+                19
+              ],
+              "score": [
+                1,
+                1
+              ]
+            }
+          }
+        ],
+        "crop": "MELON",
+        "day": 0,
+        "recommendation": {
+          "actors": [
+            1,
+            5
+          ],
+          "kind": "abstain_tie"
+        },
+        "route_at_decision": 0,
+        "seed_available": 1,
+        "step": 18
+      }
+    },
+    {
+      "seed": 3,
+      "candidate_seat": "right",
+      "conflict": {
+        "candidate_count": 2,
+        "candidates": [
+          {
+            "actor": 1,
+            "coordinate": [
+              1,
+              2
+            ],
+            "emitted_command": [
+              "PLANT",
+              "MELON"
+            ],
+            "emitted_raw_plant": true,
+            "raw_command": [
+              "PLANT",
+              "MELON"
+            ],
+            "service": {
+              "immediate_same_actor_water": true,
+              "same_day_water_steps": [
+                19
+              ],
+              "score": [
+                1,
+                1
+              ]
+            }
+          },
+          {
+            "actor": 5,
+            "coordinate": [
+              0,
+              4
+            ],
+            "emitted_command": [
+              "PASS"
+            ],
+            "emitted_raw_plant": false,
+            "raw_command": [
+              "PLANT",
+              "MELON"
+            ],
+            "service": {
+              "immediate_same_actor_water": true,
+              "same_day_water_steps": [
+                19
+              ],
+              "score": [
+                1,
+                1
+              ]
+            }
+          }
+        ],
+        "crop": "MELON",
+        "day": 0,
+        "recommendation": {
+          "actors": [
+            1,
+            5
+          ],
+          "kind": "abstain_tie"
+        },
+        "route_at_decision": 0,
+        "seed_available": 1,
+        "step": 18
+      }
+    }
+  ],
+  "limits": [
+    "Scores use only current route commands through the current day; they intentionally do not predict later coordinates, market fills, or opponent actions.",
+    "A tie abstains, so this observer cannot create a coordinate-specific choice by construction.",
+    "This never modifies V45 actions and does not establish a score improvement."
+  ]
+}

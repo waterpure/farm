@@ -1,0 +1,1451 @@
+{
+  "protocol": "v45-portfolio-route-audit-v1",
+  "route_switch_step": 144,
+  "terminal_route_step": 648,
+  "all_route_ids": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    100,
+    101,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109,
+    110,
+    111,
+    112,
+    113,
+    114,
+    115,
+    116,
+    117,
+    118,
+    119,
+    120,
+    121,
+    122,
+    123,
+    124,
+    125,
+    126,
+    127,
+    128
+  ],
+  "actual_first_144_route": 0,
+  "prefix_compatible_route_ids": [
+    0,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    100,
+    101,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109,
+    110,
+    111,
+    112,
+    113,
+    114,
+    115,
+    116,
+    117,
+    118,
+    119,
+    120,
+    121,
+    122,
+    123,
+    124,
+    125,
+    126,
+    127,
+    128
+  ],
+  "prefix_compatible_alternatives": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    100,
+    101,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109,
+    110,
+    111,
+    112,
+    113,
+    114,
+    115,
+    116,
+    117,
+    118,
+    119,
+    120,
+    121,
+    122,
+    123,
+    124,
+    125,
+    126,
+    127,
+    128
+  ],
+  "shop_router_new_map": {
+    "BAKERY | BAKERY": 101,
+    "BAKERY | BRUNCH_SPOT": 103,
+    "BAKERY | FARMERS_MARKET": 104,
+    "BAKERY | ICE_CREAM_SHOP": 105,
+    "BAKERY | PET_CAFE": 106,
+    "BAKERY | PIZZA_SHOP": 107,
+    "BAKERY | SMOOTHIE_SHOP": 108,
+    "BAKERY | YARN_STORE": 109,
+    "BRUNCH_SPOT | BAKERY": 105,
+    "BRUNCH_SPOT | BRUNCH_SPOT": 103,
+    "BRUNCH_SPOT | FARMERS_MARKET": 110,
+    "BRUNCH_SPOT | ICE_CREAM_SHOP": 105,
+    "BRUNCH_SPOT | PET_CAFE": 101,
+    "BRUNCH_SPOT | PIZZA_SHOP": 107,
+    "BRUNCH_SPOT | SMOOTHIE_SHOP": 105,
+    "BRUNCH_SPOT | YARN_STORE": 109,
+    "FARMERS_MARKET | BAKERY": 111,
+    "FARMERS_MARKET | BRUNCH_SPOT": 112,
+    "FARMERS_MARKET | FARMERS_MARKET": 104,
+    "FARMERS_MARKET | ICE_CREAM_SHOP": 107,
+    "FARMERS_MARKET | PET_CAFE": 113,
+    "FARMERS_MARKET | PIZZA_SHOP": 105,
+    "FARMERS_MARKET | SMOOTHIE_SHOP": 105,
+    "FARMERS_MARKET | YARN_STORE": 114,
+    "ICE_CREAM_SHOP | BAKERY": 105,
+    "ICE_CREAM_SHOP | BRUNCH_SPOT": 105,
+    "ICE_CREAM_SHOP | FARMERS_MARKET": 105,
+    "ICE_CREAM_SHOP | ICE_CREAM_SHOP": 105,
+    "ICE_CREAM_SHOP | PET_CAFE": 105,
+    "ICE_CREAM_SHOP | PIZZA_SHOP": 108,
+    "ICE_CREAM_SHOP | SMOOTHIE_SHOP": 105,
+    "ICE_CREAM_SHOP | YARN_STORE": 115,
+    "PET_CAFE | BAKERY": 103,
+    "PET_CAFE | BRUNCH_SPOT": 116,
+    "PET_CAFE | FARMERS_MARKET": 117,
+    "PET_CAFE | ICE_CREAM_SHOP": 105,
+    "PET_CAFE | PET_CAFE": 118,
+    "PET_CAFE | PIZZA_SHOP": 107,
+    "PET_CAFE | SMOOTHIE_SHOP": 105,
+    "PET_CAFE | YARN_STORE": 119,
+    "PIZZA_SHOP | BAKERY": 120,
+    "PIZZA_SHOP | BRUNCH_SPOT": 105,
+    "PIZZA_SHOP | FARMERS_MARKET": 121,
+    "PIZZA_SHOP | ICE_CREAM_SHOP": 122,
+    "PIZZA_SHOP | PET_CAFE": 105,
+    "PIZZA_SHOP | PIZZA_SHOP": 123,
+    "PIZZA_SHOP | SMOOTHIE_SHOP": 124,
+    "PIZZA_SHOP | YARN_STORE": 125,
+    "SMOOTHIE_SHOP | BAKERY": 105,
+    "SMOOTHIE_SHOP | BRUNCH_SPOT": 121,
+    "SMOOTHIE_SHOP | FARMERS_MARKET": 105,
+    "SMOOTHIE_SHOP | ICE_CREAM_SHOP": 105,
+    "SMOOTHIE_SHOP | PET_CAFE": 105,
+    "SMOOTHIE_SHOP | PIZZA_SHOP": 105,
+    "SMOOTHIE_SHOP | SMOOTHIE_SHOP": 107,
+    "SMOOTHIE_SHOP | YARN_STORE": 126,
+    "YARN_STORE | BAKERY": 119,
+    "YARN_STORE | BRUNCH_SPOT": 126,
+    "YARN_STORE | FARMERS_MARKET": 127,
+    "YARN_STORE | ICE_CREAM_SHOP": 126,
+    "YARN_STORE | PET_CAFE": 126,
+    "YARN_STORE | PIZZA_SHOP": 128,
+    "YARN_STORE | SMOOTHIE_SHOP": 126,
+    "YARN_STORE | YARN_STORE": 125
+  },
+  "shop_router_old_map": {
+    "BAKERY | BAKERY": 0,
+    "BAKERY | BRUNCH_SPOT": 0,
+    "BAKERY | FARMERS_MARKET": 0,
+    "BAKERY | ICE_CREAM_SHOP": 0,
+    "BAKERY | PET_CAFE": 0,
+    "BAKERY | PIZZA_SHOP": 0,
+    "BAKERY | SMOOTHIE_SHOP": 0,
+    "BAKERY | YARN_STORE": 3,
+    "BRUNCH_SPOT | BAKERY": 0,
+    "BRUNCH_SPOT | BRUNCH_SPOT": 0,
+    "BRUNCH_SPOT | FARMERS_MARKET": 0,
+    "BRUNCH_SPOT | ICE_CREAM_SHOP": 0,
+    "BRUNCH_SPOT | PET_CAFE": 0,
+    "BRUNCH_SPOT | PIZZA_SHOP": 0,
+    "BRUNCH_SPOT | SMOOTHIE_SHOP": 0,
+    "BRUNCH_SPOT | YARN_STORE": 4,
+    "FARMERS_MARKET | BAKERY": 0,
+    "FARMERS_MARKET | BRUNCH_SPOT": 0,
+    "FARMERS_MARKET | FARMERS_MARKET": 0,
+    "FARMERS_MARKET | ICE_CREAM_SHOP": 0,
+    "FARMERS_MARKET | PET_CAFE": 0,
+    "FARMERS_MARKET | PIZZA_SHOP": 0,
+    "FARMERS_MARKET | SMOOTHIE_SHOP": 0,
+    "FARMERS_MARKET | YARN_STORE": 5,
+    "ICE_CREAM_SHOP | BAKERY": 0,
+    "ICE_CREAM_SHOP | BRUNCH_SPOT": 0,
+    "ICE_CREAM_SHOP | FARMERS_MARKET": 0,
+    "ICE_CREAM_SHOP | ICE_CREAM_SHOP": 0,
+    "ICE_CREAM_SHOP | PET_CAFE": 0,
+    "ICE_CREAM_SHOP | PIZZA_SHOP": 0,
+    "ICE_CREAM_SHOP | SMOOTHIE_SHOP": 0,
+    "ICE_CREAM_SHOP | YARN_STORE": 6,
+    "PET_CAFE | BAKERY": 0,
+    "PET_CAFE | BRUNCH_SPOT": 0,
+    "PET_CAFE | FARMERS_MARKET": 0,
+    "PET_CAFE | ICE_CREAM_SHOP": 0,
+    "PET_CAFE | PET_CAFE": 0,
+    "PET_CAFE | PIZZA_SHOP": 0,
+    "PET_CAFE | SMOOTHIE_SHOP": 0,
+    "PET_CAFE | YARN_STORE": 5,
+    "PIZZA_SHOP | BAKERY": 0,
+    "PIZZA_SHOP | BRUNCH_SPOT": 0,
+    "PIZZA_SHOP | FARMERS_MARKET": 0,
+    "PIZZA_SHOP | ICE_CREAM_SHOP": 0,
+    "PIZZA_SHOP | PET_CAFE": 0,
+    "PIZZA_SHOP | PIZZA_SHOP": 0,
+    "PIZZA_SHOP | SMOOTHIE_SHOP": 0,
+    "PIZZA_SHOP | YARN_STORE": 7,
+    "SMOOTHIE_SHOP | BAKERY": 0,
+    "SMOOTHIE_SHOP | BRUNCH_SPOT": 0,
+    "SMOOTHIE_SHOP | FARMERS_MARKET": 0,
+    "SMOOTHIE_SHOP | ICE_CREAM_SHOP": 0,
+    "SMOOTHIE_SHOP | PET_CAFE": 0,
+    "SMOOTHIE_SHOP | PIZZA_SHOP": 0,
+    "SMOOTHIE_SHOP | SMOOTHIE_SHOP": 0,
+    "SMOOTHIE_SHOP | YARN_STORE": 8,
+    "YARN_STORE | BAKERY": 9,
+    "YARN_STORE | BRUNCH_SPOT": 9,
+    "YARN_STORE | FARMERS_MARKET": 1,
+    "YARN_STORE | ICE_CREAM_SHOP": 9,
+    "YARN_STORE | PET_CAFE": 10,
+    "YARN_STORE | PIZZA_SHOP": 6,
+    "YARN_STORE | SMOOTHIE_SHOP": 11,
+    "YARN_STORE | YARN_STORE": 12
+  },
+  "profiles": {
+    "0": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "EGG": 3,
+        "MILK": 4,
+        "WOOL": 4
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "EGG": 3,
+        "MILK": 4,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 4
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 4,
+        "BUY_ANIMAL GOOSE": 3,
+        "BUY_ANIMAL SHEEP": 4,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 138,
+        "HIRE": 203
+      }
+    },
+    "1": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "MILK": 2,
+        "WOOL": 9
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "MILK": 2,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 9
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 2,
+        "BUY_ANIMAL SHEEP": 8,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 138,
+        "HIRE": 219
+      }
+    },
+    "2": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "EGG": 3,
+        "MILK": 4,
+        "WOOL": 4
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "EGG": 3,
+        "MILK": 4,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 4
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 4,
+        "BUY_ANIMAL GOOSE": 3,
+        "BUY_ANIMAL SHEEP": 4,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 138,
+        "HIRE": 203
+      }
+    },
+    "3": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "MILK": 2,
+        "WOOL": 9
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "MILK": 2,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 9
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 2,
+        "BUY_ANIMAL SHEEP": 9,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 138,
+        "HIRE": 219
+      }
+    },
+    "4": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "MILK": 2,
+        "WOOL": 9
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "MILK": 2,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 9
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 2,
+        "BUY_ANIMAL SHEEP": 8,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 138,
+        "HIRE": 219
+      }
+    },
+    "5": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "MILK": 2,
+        "WOOL": 9
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "MILK": 2,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 9
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 2,
+        "BUY_ANIMAL SHEEP": 8,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 138,
+        "HIRE": 219
+      }
+    },
+    "6": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "MILK": 2,
+        "WOOL": 9
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "MILK": 2,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 9
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 2,
+        "BUY_ANIMAL SHEEP": 9,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 138,
+        "HIRE": 219
+      }
+    },
+    "7": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "MILK": 2,
+        "WOOL": 9
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "MILK": 2,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 9
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 2,
+        "BUY_ANIMAL SHEEP": 9,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 138,
+        "HIRE": 218
+      }
+    },
+    "8": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "MILK": 2,
+        "WOOL": 9
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "MILK": 2,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 9
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 2,
+        "BUY_ANIMAL SHEEP": 9,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 138,
+        "HIRE": 218
+      }
+    },
+    "9": {
+      "planned_plants": {
+        "CARROT": 26,
+        "STRAWBERRY": 29,
+        "WHEAT": 140
+      },
+      "planned_animal_outputs": {
+        "MILK": 2,
+        "WOOL": 9
+      },
+      "planned_output_births": {
+        "CARROT": 26,
+        "MILK": 2,
+        "STRAWBERRY": 29,
+        "WHEAT": 140,
+        "WOOL": 9
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 2,
+        "BUY_ANIMAL SHEEP": 9,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 26,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 140,
+        "HIRE": 219
+      }
+    },
+    "10": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "MILK": 2,
+        "WOOL": 9
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "MILK": 2,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 9
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 2,
+        "BUY_ANIMAL SHEEP": 9,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 30,
+        "BUY_SEED WHEAT": 136,
+        "HIRE": 220
+      }
+    },
+    "11": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "MILK": 2,
+        "WOOL": 9
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "MILK": 2,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 9
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 2,
+        "BUY_ANIMAL SHEEP": 9,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 142,
+        "HIRE": 219
+      }
+    },
+    "12": {
+      "planned_plants": {
+        "CARROT": 26,
+        "STRAWBERRY": 29,
+        "WHEAT": 140
+      },
+      "planned_animal_outputs": {
+        "WOOL": 12
+      },
+      "planned_output_births": {
+        "CARROT": 26,
+        "STRAWBERRY": 29,
+        "WHEAT": 140,
+        "WOOL": 12
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL SHEEP": 12,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 22,
+        "BUY_SEED MELON": 1,
+        "BUY_SEED STRAWBERRY": 40,
+        "BUY_SEED WHEAT": 144,
+        "HIRE": 220
+      }
+    },
+    "100": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "EGG": 3,
+        "MILK": 4,
+        "WOOL": 4
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "EGG": 3,
+        "MILK": 4,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 4
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 4,
+        "BUY_ANIMAL GOOSE": 3,
+        "BUY_ANIMAL SHEEP": 4,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 141,
+        "HIRE": 205
+      }
+    },
+    "101": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "EGG": 5,
+        "MILK": 2,
+        "WOOL": 4
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "EGG": 5,
+        "MILK": 2,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 4
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 2,
+        "BUY_ANIMAL GOOSE": 5,
+        "BUY_ANIMAL SHEEP": 4,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 138,
+        "HIRE": 206
+      }
+    },
+    "103": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "EGG": 5,
+        "MILK": 2,
+        "WOOL": 4
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "EGG": 5,
+        "MILK": 2,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 4
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 2,
+        "BUY_ANIMAL GOOSE": 5,
+        "BUY_ANIMAL SHEEP": 4,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 138,
+        "HIRE": 207
+      }
+    },
+    "104": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "EGG": 5,
+        "MILK": 2,
+        "WOOL": 4
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "EGG": 5,
+        "MILK": 2,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 4
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 2,
+        "BUY_ANIMAL GOOSE": 5,
+        "BUY_ANIMAL SHEEP": 4,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 138,
+        "HIRE": 209
+      }
+    },
+    "105": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "EGG": 3,
+        "MILK": 4,
+        "WOOL": 4
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "EGG": 3,
+        "MILK": 4,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 4
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 4,
+        "BUY_ANIMAL GOOSE": 3,
+        "BUY_ANIMAL SHEEP": 4,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 138,
+        "HIRE": 206
+      }
+    },
+    "106": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "EGG": 3,
+        "MILK": 4,
+        "WOOL": 4
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "EGG": 3,
+        "MILK": 4,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 4
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 4,
+        "BUY_ANIMAL GOOSE": 3,
+        "BUY_ANIMAL SHEEP": 4,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 138,
+        "HIRE": 206
+      }
+    },
+    "107": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "EGG": 3,
+        "MILK": 4,
+        "WOOL": 4
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "EGG": 3,
+        "MILK": 4,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 4
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 4,
+        "BUY_ANIMAL GOOSE": 3,
+        "BUY_ANIMAL SHEEP": 4,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 138,
+        "HIRE": 206
+      }
+    },
+    "108": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "EGG": 3,
+        "MILK": 4,
+        "WOOL": 4
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "EGG": 3,
+        "MILK": 4,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 4
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 4,
+        "BUY_ANIMAL GOOSE": 3,
+        "BUY_ANIMAL SHEEP": 4,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 138,
+        "HIRE": 208
+      }
+    },
+    "109": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "MILK": 2,
+        "WOOL": 9
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "MILK": 2,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 9
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 2,
+        "BUY_ANIMAL SHEEP": 9,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 138,
+        "HIRE": 225
+      }
+    },
+    "110": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "EGG": 5,
+        "MILK": 4,
+        "WOOL": 2
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "EGG": 5,
+        "MILK": 4,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 2
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 4,
+        "BUY_ANIMAL GOOSE": 5,
+        "BUY_ANIMAL SHEEP": 2,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 138,
+        "HIRE": 215
+      }
+    },
+    "111": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "EGG": 4,
+        "MILK": 3,
+        "WOOL": 4
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "EGG": 4,
+        "MILK": 3,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 4
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 3,
+        "BUY_ANIMAL GOOSE": 4,
+        "BUY_ANIMAL SHEEP": 4,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 138,
+        "HIRE": 209
+      }
+    },
+    "112": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "EGG": 5,
+        "MILK": 2,
+        "WOOL": 4
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "EGG": 5,
+        "MILK": 2,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 4
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 2,
+        "BUY_ANIMAL GOOSE": 5,
+        "BUY_ANIMAL SHEEP": 4,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 138,
+        "HIRE": 206
+      }
+    },
+    "113": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "EGG": 5,
+        "MILK": 2,
+        "WOOL": 4
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "EGG": 5,
+        "MILK": 2,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 4
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 2,
+        "BUY_ANIMAL GOOSE": 5,
+        "BUY_ANIMAL SHEEP": 4,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 138,
+        "HIRE": 206
+      }
+    },
+    "114": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "EGG": 2,
+        "MILK": 3,
+        "WOOL": 6
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "EGG": 2,
+        "MILK": 3,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 6
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 3,
+        "BUY_ANIMAL GOOSE": 2,
+        "BUY_ANIMAL SHEEP": 6,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 138,
+        "HIRE": 207
+      }
+    },
+    "115": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "MILK": 4,
+        "WOOL": 7
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "MILK": 4,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 7
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 4,
+        "BUY_ANIMAL SHEEP": 7,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 138,
+        "HIRE": 207
+      }
+    },
+    "116": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "EGG": 5,
+        "MILK": 2,
+        "WOOL": 4
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "EGG": 5,
+        "MILK": 2,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 4
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 2,
+        "BUY_ANIMAL GOOSE": 5,
+        "BUY_ANIMAL SHEEP": 4,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 138,
+        "HIRE": 206
+      }
+    },
+    "117": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 137
+      },
+      "planned_animal_outputs": {
+        "EGG": 5,
+        "MILK": 2,
+        "WOOL": 4
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "EGG": 5,
+        "MILK": 2,
+        "STRAWBERRY": 29,
+        "WHEAT": 137,
+        "WOOL": 4
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 2,
+        "BUY_ANIMAL GOOSE": 5,
+        "BUY_ANIMAL SHEEP": 4,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 138,
+        "HIRE": 207
+      }
+    },
+    "118": {
+      "planned_plants": {
+        "CARROT": 36,
+        "STRAWBERRY": 29,
+        "WHEAT": 131
+      },
+      "planned_animal_outputs": {
+        "EGG": 5,
+        "MILK": 2,
+        "WOOL": 4
+      },
+      "planned_output_births": {
+        "CARROT": 36,
+        "EGG": 5,
+        "MILK": 2,
+        "STRAWBERRY": 29,
+        "WHEAT": 131,
+        "WOOL": 4
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 2,
+        "BUY_ANIMAL GOOSE": 5,
+        "BUY_ANIMAL SHEEP": 4,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 36,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 138,
+        "HIRE": 207
+      }
+    },
+    "119": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "EGG": 5,
+        "MILK": 2,
+        "WOOL": 4
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "EGG": 5,
+        "MILK": 2,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 4
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 2,
+        "BUY_ANIMAL GOOSE": 5,
+        "BUY_ANIMAL SHEEP": 4,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 138,
+        "HIRE": 206
+      }
+    },
+    "120": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "EGG": 3,
+        "MILK": 4,
+        "WOOL": 4
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "EGG": 3,
+        "MILK": 4,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 4
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 4,
+        "BUY_ANIMAL GOOSE": 3,
+        "BUY_ANIMAL SHEEP": 4,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 138,
+        "HIRE": 207
+      }
+    },
+    "121": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "EGG": 3,
+        "MILK": 4,
+        "WOOL": 4
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "EGG": 3,
+        "MILK": 4,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 4
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 4,
+        "BUY_ANIMAL GOOSE": 3,
+        "BUY_ANIMAL SHEEP": 4,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 138,
+        "HIRE": 206
+      }
+    },
+    "122": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "EGG": 3,
+        "MILK": 4,
+        "WOOL": 4
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "EGG": 3,
+        "MILK": 4,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 4
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 4,
+        "BUY_ANIMAL GOOSE": 3,
+        "BUY_ANIMAL SHEEP": 4,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 138,
+        "HIRE": 208
+      }
+    },
+    "123": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "EGG": 3,
+        "MILK": 5,
+        "WOOL": 3
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "EGG": 3,
+        "MILK": 5,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 3
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 5,
+        "BUY_ANIMAL GOOSE": 3,
+        "BUY_ANIMAL SHEEP": 3,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 138,
+        "HIRE": 206
+      }
+    },
+    "124": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "EGG": 3,
+        "MILK": 4,
+        "WOOL": 4
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "EGG": 3,
+        "MILK": 4,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 4
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 4,
+        "BUY_ANIMAL GOOSE": 3,
+        "BUY_ANIMAL SHEEP": 4,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 138,
+        "HIRE": 208
+      }
+    },
+    "125": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "EGG": 3,
+        "MILK": 4,
+        "WOOL": 4
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "EGG": 3,
+        "MILK": 4,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 4
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 4,
+        "BUY_ANIMAL GOOSE": 3,
+        "BUY_ANIMAL SHEEP": 4,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 138,
+        "HIRE": 206
+      }
+    },
+    "126": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "MILK": 2,
+        "WOOL": 9
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "MILK": 2,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 9
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 2,
+        "BUY_ANIMAL SHEEP": 9,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 138,
+        "HIRE": 210
+      }
+    },
+    "127": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "MILK": 2,
+        "WOOL": 9
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "MILK": 2,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 9
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 2,
+        "BUY_ANIMAL SHEEP": 9,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 138,
+        "HIRE": 225
+      }
+    },
+    "128": {
+      "planned_plants": {
+        "CARROT": 29,
+        "STRAWBERRY": 29,
+        "WHEAT": 138
+      },
+      "planned_animal_outputs": {
+        "MILK": 2,
+        "WOOL": 9
+      },
+      "planned_output_births": {
+        "CARROT": 29,
+        "MILK": 2,
+        "STRAWBERRY": 29,
+        "WHEAT": 138,
+        "WOOL": 9
+      },
+      "planned_investment_order_units": {
+        "BUY_ANIMAL COW": 2,
+        "BUY_ANIMAL SHEEP": 9,
+        "BUY_LAND": 2,
+        "BUY_SEED CARROT": 29,
+        "BUY_SEED STRAWBERRY": 29,
+        "BUY_SEED WHEAT": 138,
+        "HIRE": 223
+      }
+    }
+  },
+  "limits": [
+    "Exact prefix equality is only a necessary state-compatibility condition; it is not an economic proof.",
+    "The profile counts planned PLANT/PLACE births, not actual successful output or terminal cash.",
+    "No route selection or agent action is changed by this audit."
+  ]
+}

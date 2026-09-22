@@ -1,0 +1,438 @@
+{
+  "cases": [
+    {
+      "baseline": {
+        "actual_harvested": {
+          "EGG": 81,
+          "MILK": 248,
+          "WOOL": 85
+        },
+        "error": {
+          "EGG": 19,
+          "MILK": -2,
+          "WOOL": 81
+        },
+        "existing_animals_by_output": {
+          "MILK": 4,
+          "WOOL": 2
+        },
+        "forecast_units": {
+          "EGG": 100,
+          "MILK": 246,
+          "WOOL": 166
+        },
+        "raw_route_places": [
+          [
+            "COW",
+            6
+          ],
+          [
+            "COW",
+            6
+          ],
+          [
+            "COW",
+            7
+          ],
+          [
+            "COW",
+            7
+          ],
+          [
+            "SHEEP",
+            8
+          ],
+          [
+            "SHEEP",
+            8
+          ],
+          [
+            "SHEEP",
+            9
+          ],
+          [
+            "SHEEP",
+            10
+          ],
+          [
+            "GOOSE",
+            10
+          ],
+          [
+            "GOOSE",
+            10
+          ],
+          [
+            "GOOSE",
+            11
+          ]
+        ]
+      },
+      "candidate": {
+        "actual_harvested": {
+          "EGG": 77,
+          "MILK": 248,
+          "WOOL": 85
+        },
+        "error": {
+          "EGG": 23,
+          "MILK": 22,
+          "WOOL": 59
+        },
+        "existing_animals_by_output": {
+          "MILK": 4,
+          "WOOL": 2
+        },
+        "forecast_units": {
+          "EGG": 100,
+          "MILK": 270,
+          "WOOL": 144
+        },
+        "raw_route_places": [
+          [
+            "COW",
+            6
+          ],
+          [
+            "COW",
+            6
+          ],
+          [
+            "COW",
+            7
+          ],
+          [
+            "COW",
+            7
+          ],
+          [
+            "SHEEP",
+            8
+          ],
+          [
+            "SHEEP",
+            8
+          ],
+          [
+            "COW",
+            9
+          ],
+          [
+            "SHEEP",
+            10
+          ],
+          [
+            "GOOSE",
+            10
+          ],
+          [
+            "GOOSE",
+            10
+          ],
+          [
+            "GOOSE",
+            11
+          ]
+        ]
+      },
+      "candidate_route": 123,
+      "original_route": 108,
+      "seed": 1,
+      "shops": [
+        "ICE_CREAM_SHOP",
+        "PIZZA_SHOP"
+      ]
+    },
+    {
+      "baseline": {
+        "actual_harvested": {
+          "EGG": 77,
+          "MILK": 233,
+          "WOOL": 145
+        },
+        "error": {
+          "EGG": 23,
+          "MILK": 13,
+          "WOOL": 21
+        },
+        "existing_animals_by_output": {
+          "MILK": 4,
+          "WOOL": 2
+        },
+        "forecast_units": {
+          "EGG": 100,
+          "MILK": 246,
+          "WOOL": 166
+        },
+        "raw_route_places": [
+          [
+            "COW",
+            6
+          ],
+          [
+            "COW",
+            6
+          ],
+          [
+            "COW",
+            7
+          ],
+          [
+            "COW",
+            7
+          ],
+          [
+            "SHEEP",
+            8
+          ],
+          [
+            "SHEEP",
+            8
+          ],
+          [
+            "SHEEP",
+            9
+          ],
+          [
+            "SHEEP",
+            10
+          ],
+          [
+            "GOOSE",
+            10
+          ],
+          [
+            "GOOSE",
+            10
+          ],
+          [
+            "GOOSE",
+            11
+          ]
+        ]
+      },
+      "candidate": {
+        "actual_harvested": {
+          "EGG": 77,
+          "MILK": 248,
+          "WOOL": 127
+        },
+        "error": {
+          "EGG": 23,
+          "MILK": 22,
+          "WOOL": 17
+        },
+        "existing_animals_by_output": {
+          "MILK": 4,
+          "WOOL": 2
+        },
+        "forecast_units": {
+          "EGG": 100,
+          "MILK": 270,
+          "WOOL": 144
+        },
+        "raw_route_places": [
+          [
+            "COW",
+            6
+          ],
+          [
+            "COW",
+            6
+          ],
+          [
+            "COW",
+            7
+          ],
+          [
+            "COW",
+            7
+          ],
+          [
+            "SHEEP",
+            8
+          ],
+          [
+            "SHEEP",
+            8
+          ],
+          [
+            "COW",
+            9
+          ],
+          [
+            "SHEEP",
+            10
+          ],
+          [
+            "GOOSE",
+            10
+          ],
+          [
+            "GOOSE",
+            10
+          ],
+          [
+            "GOOSE",
+            11
+          ]
+        ]
+      },
+      "candidate_route": 123,
+      "original_route": 105,
+      "seed": 2,
+      "shops": [
+        "SMOOTHIE_SHOP",
+        "BAKERY"
+      ]
+    },
+    {
+      "baseline": {
+        "actual_harvested": {
+          "EGG": 0,
+          "MILK": 179,
+          "WOOL": 369
+        },
+        "error": {
+          "EGG": 0,
+          "MILK": 13,
+          "WOOL": -85
+        },
+        "existing_animals_by_output": {
+          "MILK": 4,
+          "WOOL": 2
+        },
+        "forecast_units": {
+          "MILK": 192,
+          "WOOL": 284
+        },
+        "raw_route_places": [
+          [
+            "COW",
+            6
+          ],
+          [
+            "COW",
+            6
+          ],
+          [
+            "SHEEP",
+            7
+          ],
+          [
+            "SHEEP",
+            7
+          ],
+          [
+            "SHEEP",
+            8
+          ],
+          [
+            "SHEEP",
+            8
+          ],
+          [
+            "SHEEP",
+            9
+          ],
+          [
+            "SHEEP",
+            10
+          ],
+          [
+            "SHEEP",
+            10
+          ],
+          [
+            "SHEEP",
+            10
+          ],
+          [
+            "SHEEP",
+            11
+          ]
+        ]
+      },
+      "candidate": {
+        "actual_harvested": {
+          "EGG": 77,
+          "MILK": 228,
+          "WOOL": 235
+        },
+        "error": {
+          "EGG": 23,
+          "MILK": 42,
+          "WOOL": -91
+        },
+        "existing_animals_by_output": {
+          "MILK": 4,
+          "WOOL": 2
+        },
+        "forecast_units": {
+          "EGG": 100,
+          "MILK": 270,
+          "WOOL": 144
+        },
+        "raw_route_places": [
+          [
+            "COW",
+            6
+          ],
+          [
+            "COW",
+            6
+          ],
+          [
+            "COW",
+            7
+          ],
+          [
+            "COW",
+            7
+          ],
+          [
+            "SHEEP",
+            8
+          ],
+          [
+            "SHEEP",
+            8
+          ],
+          [
+            "COW",
+            9
+          ],
+          [
+            "SHEEP",
+            10
+          ],
+          [
+            "GOOSE",
+            10
+          ],
+          [
+            "GOOSE",
+            10
+          ],
+          [
+            "GOOSE",
+            11
+          ]
+        ]
+      },
+      "candidate_route": 123,
+      "original_route": 7,
+      "seed": 3,
+      "shops": [
+        "PIZZA_SHOP",
+        "YARN_STORE"
+      ]
+    }
+  ],
+  "limitations": [
+    "Forecasts only animals, not crops or fertilizer.",
+    "Raw PLACE commands may fail; V45 overlays may add animals not in raw routes.",
+    "Assumes daily feed/care and prompt harvest, so it is an upper-bound rather than live policy output."
+  ],
+  "protocol": "day6-animal-forecast-audit-v1-optimistic-raw-place"
+}

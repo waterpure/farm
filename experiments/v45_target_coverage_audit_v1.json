@@ -1,0 +1,402 @@
+{
+  "cases": [
+    {
+      "actual_cash_delta_vs_v45": 606.0,
+      "candidate_route": 123,
+      "coverage_gain_total": 0.0,
+      "original_route": 108,
+      "products": [
+        {
+          "baseline_covered_toward_target": 218.39999999999998,
+          "baseline_excess_over_target": 332.6,
+          "baseline_harvested": 551.0,
+          "candidate_covered_toward_target": 218.39999999999998,
+          "candidate_excess_over_target": 315.6,
+          "candidate_harvested": 534.0,
+          "coverage_gain_vs_baseline": 0.0,
+          "excess_change_vs_baseline": -17.0,
+          "known_buy_per_day": 13.0,
+          "product": "WHEAT",
+          "target_70_percent": 218.39999999999998,
+          "tight_from_open_shops": true
+        },
+        {
+          "baseline_covered_toward_target": 0.0,
+          "baseline_excess_over_target": 0.0,
+          "baseline_harvested": 79.0,
+          "candidate_covered_toward_target": 0.0,
+          "candidate_excess_over_target": 0.0,
+          "candidate_harvested": 85.0,
+          "coverage_gain_vs_baseline": 0.0,
+          "excess_change_vs_baseline": 0.0,
+          "known_buy_per_day": 1.0,
+          "product": "CARROT",
+          "target_70_percent": 16.799999999999997,
+          "tight_from_open_shops": false
+        },
+        {
+          "baseline_covered_toward_target": 80.0,
+          "baseline_excess_over_target": 0.0,
+          "baseline_harvested": 80.0,
+          "candidate_covered_toward_target": 80.0,
+          "candidate_excess_over_target": 0.0,
+          "candidate_harvested": 80.0,
+          "coverage_gain_vs_baseline": 0.0,
+          "excess_change_vs_baseline": 0.0,
+          "known_buy_per_day": 7.0,
+          "product": "TOMATO",
+          "target_70_percent": 117.6,
+          "tight_from_open_shops": true
+        },
+        {
+          "baseline_covered_toward_target": 117.6,
+          "baseline_excess_over_target": 120.4,
+          "baseline_harvested": 238.0,
+          "candidate_covered_toward_target": 117.6,
+          "candidate_excess_over_target": 122.4,
+          "candidate_harvested": 240.0,
+          "coverage_gain_vs_baseline": 0.0,
+          "excess_change_vs_baseline": 2.0,
+          "known_buy_per_day": 7.0,
+          "product": "STRAWBERRY",
+          "target_70_percent": 117.6,
+          "tight_from_open_shops": true
+        },
+        {
+          "baseline_covered_toward_target": 0.0,
+          "baseline_excess_over_target": 0.0,
+          "baseline_harvested": 72.0,
+          "candidate_covered_toward_target": 0.0,
+          "candidate_excess_over_target": 0.0,
+          "candidate_harvested": 72.0,
+          "coverage_gain_vs_baseline": 0.0,
+          "excess_change_vs_baseline": 0.0,
+          "known_buy_per_day": 1.0,
+          "product": "MELON",
+          "target_70_percent": 16.799999999999997,
+          "tight_from_open_shops": false
+        },
+        {
+          "baseline_covered_toward_target": 0.0,
+          "baseline_excess_over_target": 0.0,
+          "baseline_harvested": 81.0,
+          "candidate_covered_toward_target": 0.0,
+          "candidate_excess_over_target": 0.0,
+          "candidate_harvested": 77.0,
+          "coverage_gain_vs_baseline": 0.0,
+          "excess_change_vs_baseline": 0.0,
+          "known_buy_per_day": 1.0,
+          "product": "EGG",
+          "target_70_percent": 16.799999999999997,
+          "tight_from_open_shops": false
+        },
+        {
+          "baseline_covered_toward_target": 218.39999999999998,
+          "baseline_excess_over_target": 29.600000000000023,
+          "baseline_harvested": 248.0,
+          "candidate_covered_toward_target": 218.39999999999998,
+          "candidate_excess_over_target": 29.600000000000023,
+          "candidate_harvested": 248.0,
+          "coverage_gain_vs_baseline": 0.0,
+          "excess_change_vs_baseline": 0.0,
+          "known_buy_per_day": 13.0,
+          "product": "MILK",
+          "target_70_percent": 218.39999999999998,
+          "tight_from_open_shops": true
+        },
+        {
+          "baseline_covered_toward_target": 0.0,
+          "baseline_excess_over_target": 0.0,
+          "baseline_harvested": 85.0,
+          "candidate_covered_toward_target": 0.0,
+          "candidate_excess_over_target": 0.0,
+          "candidate_harvested": 85.0,
+          "coverage_gain_vs_baseline": 0.0,
+          "excess_change_vs_baseline": 0.0,
+          "known_buy_per_day": 1.0,
+          "product": "WOOL",
+          "target_70_percent": 16.799999999999997,
+          "tight_from_open_shops": false
+        }
+      ],
+      "reason": "adds excess to already-covered tight product(s): STRAWBERRY",
+      "screen_decision": "reject_candidate",
+      "seed": 1,
+      "shops": [
+        "ICE_CREAM_SHOP",
+        "PIZZA_SHOP"
+      ],
+      "worsened_tight_product_excess": [
+        "STRAWBERRY"
+      ]
+    },
+    {
+      "actual_cash_delta_vs_v45": -4572.0,
+      "candidate_route": 123,
+      "coverage_gain_total": 0.0,
+      "original_route": 105,
+      "products": [
+        {
+          "baseline_covered_toward_target": 117.6,
+          "baseline_excess_over_target": 414.4,
+          "baseline_harvested": 532.0,
+          "candidate_covered_toward_target": 117.6,
+          "candidate_excess_over_target": 414.4,
+          "candidate_harvested": 532.0,
+          "coverage_gain_vs_baseline": 0.0,
+          "excess_change_vs_baseline": 0.0,
+          "known_buy_per_day": 7.0,
+          "product": "WHEAT",
+          "target_70_percent": 117.6,
+          "tight_from_open_shops": true
+        },
+        {
+          "baseline_covered_toward_target": 0.0,
+          "baseline_excess_over_target": 0.0,
+          "baseline_harvested": 85.0,
+          "candidate_covered_toward_target": 0.0,
+          "candidate_excess_over_target": 0.0,
+          "candidate_harvested": 85.0,
+          "coverage_gain_vs_baseline": 0.0,
+          "excess_change_vs_baseline": 0.0,
+          "known_buy_per_day": 1.0,
+          "product": "CARROT",
+          "target_70_percent": 16.799999999999997,
+          "tight_from_open_shops": false
+        },
+        {
+          "baseline_covered_toward_target": 0.0,
+          "baseline_excess_over_target": 0.0,
+          "baseline_harvested": 0.0,
+          "candidate_covered_toward_target": 0.0,
+          "candidate_excess_over_target": 0.0,
+          "candidate_harvested": 0.0,
+          "coverage_gain_vs_baseline": 0.0,
+          "excess_change_vs_baseline": 0.0,
+          "known_buy_per_day": 1.0,
+          "product": "TOMATO",
+          "target_70_percent": 16.799999999999997,
+          "tight_from_open_shops": false
+        },
+        {
+          "baseline_covered_toward_target": 117.6,
+          "baseline_excess_over_target": 122.4,
+          "baseline_harvested": 240.0,
+          "candidate_covered_toward_target": 117.6,
+          "candidate_excess_over_target": 122.4,
+          "candidate_harvested": 240.0,
+          "coverage_gain_vs_baseline": 0.0,
+          "excess_change_vs_baseline": 0.0,
+          "known_buy_per_day": 7.0,
+          "product": "STRAWBERRY",
+          "target_70_percent": 117.6,
+          "tight_from_open_shops": true
+        },
+        {
+          "baseline_covered_toward_target": 0.0,
+          "baseline_excess_over_target": 0.0,
+          "baseline_harvested": 72.0,
+          "candidate_covered_toward_target": 0.0,
+          "candidate_excess_over_target": 0.0,
+          "candidate_harvested": 72.0,
+          "coverage_gain_vs_baseline": 0.0,
+          "excess_change_vs_baseline": 0.0,
+          "known_buy_per_day": 1.0,
+          "product": "MELON",
+          "target_70_percent": 16.799999999999997,
+          "tight_from_open_shops": false
+        },
+        {
+          "baseline_covered_toward_target": 77.0,
+          "baseline_excess_over_target": 0.0,
+          "baseline_harvested": 77.0,
+          "candidate_covered_toward_target": 77.0,
+          "candidate_excess_over_target": 0.0,
+          "candidate_harvested": 77.0,
+          "coverage_gain_vs_baseline": 0.0,
+          "excess_change_vs_baseline": 0.0,
+          "known_buy_per_day": 7.0,
+          "product": "EGG",
+          "target_70_percent": 117.6,
+          "tight_from_open_shops": true
+        },
+        {
+          "baseline_covered_toward_target": 117.6,
+          "baseline_excess_over_target": 115.4,
+          "baseline_harvested": 233.0,
+          "candidate_covered_toward_target": 117.6,
+          "candidate_excess_over_target": 130.4,
+          "candidate_harvested": 248.0,
+          "coverage_gain_vs_baseline": 0.0,
+          "excess_change_vs_baseline": 15.0,
+          "known_buy_per_day": 7.0,
+          "product": "MILK",
+          "target_70_percent": 117.6,
+          "tight_from_open_shops": true
+        },
+        {
+          "baseline_covered_toward_target": 0.0,
+          "baseline_excess_over_target": 0.0,
+          "baseline_harvested": 145.0,
+          "candidate_covered_toward_target": 0.0,
+          "candidate_excess_over_target": 0.0,
+          "candidate_harvested": 127.0,
+          "coverage_gain_vs_baseline": 0.0,
+          "excess_change_vs_baseline": 0.0,
+          "known_buy_per_day": 1.0,
+          "product": "WOOL",
+          "target_70_percent": 16.799999999999997,
+          "tight_from_open_shops": false
+        }
+      ],
+      "reason": "adds excess to already-covered tight product(s): MILK",
+      "screen_decision": "reject_candidate",
+      "seed": 2,
+      "shops": [
+        "SMOOTHIE_SHOP",
+        "BAKERY"
+      ],
+      "worsened_tight_product_excess": [
+        "MILK"
+      ]
+    },
+    {
+      "actual_cash_delta_vs_v45": -22779.0,
+      "candidate_route": 123,
+      "coverage_gain_total": 0.0,
+      "original_route": 7,
+      "products": [
+        {
+          "baseline_covered_toward_target": 117.6,
+          "baseline_excess_over_target": 362.4,
+          "baseline_harvested": 480.0,
+          "candidate_covered_toward_target": 117.6,
+          "candidate_excess_over_target": 402.4,
+          "candidate_harvested": 520.0,
+          "coverage_gain_vs_baseline": 0.0,
+          "excess_change_vs_baseline": 40.0,
+          "known_buy_per_day": 7.0,
+          "product": "WHEAT",
+          "target_70_percent": 117.6,
+          "tight_from_open_shops": true
+        },
+        {
+          "baseline_covered_toward_target": 0.0,
+          "baseline_excess_over_target": 0.0,
+          "baseline_harvested": 78.0,
+          "candidate_covered_toward_target": 0.0,
+          "candidate_excess_over_target": 0.0,
+          "candidate_harvested": 85.0,
+          "coverage_gain_vs_baseline": 0.0,
+          "excess_change_vs_baseline": 0.0,
+          "known_buy_per_day": 1.0,
+          "product": "CARROT",
+          "target_70_percent": 16.799999999999997,
+          "tight_from_open_shops": false
+        },
+        {
+          "baseline_covered_toward_target": 0.0,
+          "baseline_excess_over_target": 0.0,
+          "baseline_harvested": 0.0,
+          "candidate_covered_toward_target": 0.0,
+          "candidate_excess_over_target": 0.0,
+          "candidate_harvested": 0.0,
+          "coverage_gain_vs_baseline": 0.0,
+          "excess_change_vs_baseline": 0.0,
+          "known_buy_per_day": 7.0,
+          "product": "TOMATO",
+          "target_70_percent": 117.6,
+          "tight_from_open_shops": true
+        },
+        {
+          "baseline_covered_toward_target": 0.0,
+          "baseline_excess_over_target": 0.0,
+          "baseline_harvested": 239.0,
+          "candidate_covered_toward_target": 0.0,
+          "candidate_excess_over_target": 0.0,
+          "candidate_harvested": 240.0,
+          "coverage_gain_vs_baseline": 0.0,
+          "excess_change_vs_baseline": 0.0,
+          "known_buy_per_day": 1.0,
+          "product": "STRAWBERRY",
+          "target_70_percent": 16.799999999999997,
+          "tight_from_open_shops": false
+        },
+        {
+          "baseline_covered_toward_target": 0.0,
+          "baseline_excess_over_target": 0.0,
+          "baseline_harvested": 72.0,
+          "candidate_covered_toward_target": 0.0,
+          "candidate_excess_over_target": 0.0,
+          "candidate_harvested": 72.0,
+          "coverage_gain_vs_baseline": 0.0,
+          "excess_change_vs_baseline": 0.0,
+          "known_buy_per_day": 1.0,
+          "product": "MELON",
+          "target_70_percent": 16.799999999999997,
+          "tight_from_open_shops": false
+        },
+        {
+          "baseline_covered_toward_target": 0.0,
+          "baseline_excess_over_target": 0.0,
+          "baseline_harvested": 0.0,
+          "candidate_covered_toward_target": 0.0,
+          "candidate_excess_over_target": 0.0,
+          "candidate_harvested": 77.0,
+          "coverage_gain_vs_baseline": 0.0,
+          "excess_change_vs_baseline": 0.0,
+          "known_buy_per_day": 1.0,
+          "product": "EGG",
+          "target_70_percent": 16.799999999999997,
+          "tight_from_open_shops": false
+        },
+        {
+          "baseline_covered_toward_target": 117.6,
+          "baseline_excess_over_target": 61.400000000000006,
+          "baseline_harvested": 179.0,
+          "candidate_covered_toward_target": 117.6,
+          "candidate_excess_over_target": 110.4,
+          "candidate_harvested": 228.0,
+          "coverage_gain_vs_baseline": 0.0,
+          "excess_change_vs_baseline": 49.0,
+          "known_buy_per_day": 7.0,
+          "product": "MILK",
+          "target_70_percent": 117.6,
+          "tight_from_open_shops": true
+        },
+        {
+          "baseline_covered_toward_target": 218.39999999999998,
+          "baseline_excess_over_target": 150.60000000000002,
+          "baseline_harvested": 369.0,
+          "candidate_covered_toward_target": 218.39999999999998,
+          "candidate_excess_over_target": 16.600000000000023,
+          "candidate_harvested": 235.0,
+          "coverage_gain_vs_baseline": 0.0,
+          "excess_change_vs_baseline": -134.0,
+          "known_buy_per_day": 13.0,
+          "product": "WOOL",
+          "target_70_percent": 218.39999999999998,
+          "tight_from_open_shops": true
+        }
+      ],
+      "reason": "adds excess to already-covered tight product(s): WHEAT, MILK",
+      "screen_decision": "reject_candidate",
+      "seed": 3,
+      "shops": [
+        "PIZZA_SHOP",
+        "YARN_STORE"
+      ],
+      "worsened_tight_product_excess": [
+        "WHEAT",
+        "MILK"
+      ]
+    }
+  ],
+  "limitations": [
+    "Uses realized replay harvest after day 6; it is an offline rule check, not live route selection.",
+    "Future shop openings and opponent private state are intentionally excluded.",
+    "A live selector would need a separately validated day-6 production forecast before using this screen."
+  ],
+  "protocol": "v45-target-coverage-audit-v1-retrospective",
+  "target_share": 0.7
+}
