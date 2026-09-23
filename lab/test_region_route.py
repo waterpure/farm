@@ -4,7 +4,17 @@ from __future__ import annotations
 
 import unittest
 
-from lab.region_route import RegionWorker, plan_region_routes
+from lab.region_route import (
+    RegionWorker,
+    TileVisit,
+    _best_insertion,
+    _extract_visits,
+    _insertion_extra,
+    _path_moves,
+    _reorder,
+    _visit_sort,
+    plan_region_routes,
+)
 from lab.route14_state import PENDING, SCHEDULED
 from lab.task_grid import (
     CARE,
@@ -69,25 +79,28 @@ class RegionRouteTests(unittest.TestCase):
         self.assertNotIn("GO_TO", [action.operation for action in route.actions_by_hour])
         self.assertEqual(route.finish_hour, 5)
 
-    def test_water_then_harvest_on_a_one_shot_crop(self) -> None:
+    def test_ripe_wheat_is_harvested_without_watering(self) -> None:
         bucket = TaskBucket((2, 3), "WHEAT")
         bucket.tasks[WATER] = WaterTask(WATER, PENDING, True, needed=True, turns_until_weed=0, yield_gain=1)
         bucket.tasks[HARVEST] = HarvestTask(HARVEST, PENDING, True, yield_amount=2)
-        plan = plan_region_routes(_grid(bucket), [RegionWorker("Farmer", (2, 2))])
+        thirsty = TaskBucket((0, 0), "WHEAT")
+        thirsty.tasks[WATER] = WaterTask(WATER, PENDING, True, needed=True, turns_until_weed=0, yield_gain=1)
+        plan = plan_region_routes(_grid(bucket, thirsty), [RegionWorker("Farmer", (2, 2))])
 
-        self.assertTrue(plan.feasible)
-        route = plan.worker_routes[0]
-        self.assertEqual(len(route.visits), 1)
-        self.assertEqual(route.visits[0].tasks, (WATER, HARVEST))
-        self.assertEqual(route.visits[0].action_count, 2)
-        self.assertEqual(route.move_count, 1)
-        self.assertEqual(
-            [(action.hour, action.operation, action.coord) for action in route.actions_by_hour],
-            [
-                (1, "SOUTH", None),
-                (2, "WATER", (2, 3)),
-                (3, "HARVEST", (2, 3)),
-            ],
+        ripe = next(visit for visit in plan.worker_routes[0].visits if visit.coord == (2, 3))
+        young = next(visit for visit in plan.worker_routes[0].visits if visit.coord == (0, 0))
+        self.assertEqual(ripe.tasks, (HARVEST,))
+        self.assertEqual(ripe.action_count, 1)
+        self.assertEqual(young.tasks, (WATER,))
+        ripe_actions = [
+            (action.operation, action.coord)
+            for action in plan.worker_routes[0].actions_by_hour
+            if action.coord == (2, 3)
+        ]
+        self.assertEqual(ripe_actions, [("HARVEST", (2, 3))])
+        self.assertNotIn(
+            ("WATER", (2, 3)),
+            [(action.operation, action.coord) for action in plan.worker_routes[0].actions_by_hour],
         )
 
     def test_one_tile_has_one_owner(self) -> None:
@@ -264,6 +277,60 @@ class RegionRouteTests(unittest.TestCase):
 
         self.assertEqual(set(_owners(plan)), {(5, 0)})
         self.assertEqual(plan.total_move_count, 0)
+
+    def test_a_dropped_tile_is_picked_up_after_another_plot_moves(self) -> None:
+        coords = [(0, 0), (1, 0), (2, 0), (3, 0), (0, 1), (0, 2)]
+        workers = [RegionWorker("A", (0, 0)), RegionWorker("B", (4, 0))]
+        grid = _grid(*[_harvest(x, y) for x, y in coords])
+        routes: list[list] = [[], []]
+        dropped: list[tuple[int, int]] = []
+        for visit in sorted(_extract_visits(grid, 5, (0, 0)), key=_visit_sort):
+            placed = _best_insertion(workers, routes, visit, 1, 6)
+            if placed is None:
+                dropped.append(visit.coord)
+            else:
+                routes[placed[0]] = placed[1]
+
+        self.assertIn((0, 1), dropped)
+        self.assertIn((0, 2), dropped)
+        plan = plan_region_routes(grid, workers, end_hour=6)
+        self.assertTrue(plan.feasible)
+        self.assertEqual(plan.unfinished_visits, ())
+        self.assertEqual(set(_owners(plan)), set(coords))
+
+    def test_insertion_score_follows_the_reordered_route(self) -> None:
+        def standing(coord: tuple[int, int]) -> TileVisit:
+            return TileVisit(coord, (HARVEST,), 1, "WHEAT")
+
+        workers = [RegionWorker("A", (0, 0)), RegionWorker("B", (0, 4))]
+        routes = [
+            [standing((2, 0)), standing((3, 0))],
+            [standing((0, 0)), standing((1, 0))],
+        ]
+        added = standing((2, 3))
+        splice_winner: tuple[tuple[int, int, int], int] | None = None
+        for worker_index, worker in enumerate(workers):
+            coords = [visit.coord for visit in routes[worker_index]]
+            for index in range(len(coords) + 1):
+                extra = _insertion_extra(worker.coord, coords, index, added.coord)
+                key = (extra + added.action_count, worker_index, index)
+                if splice_winner is None or key < splice_winner[0]:
+                    splice_winner = (key, worker_index)
+        assert splice_winner is not None
+        true_extra: list[int] = []
+        for worker, route in zip(workers, routes):
+            old_order = _reorder(worker.coord, route)
+            new_order = _reorder(worker.coord, route + [added])
+            old_cost = _path_moves(worker.coord, [visit.coord for visit in old_order])
+            new_cost = _path_moves(worker.coord, [visit.coord for visit in new_order])
+            true_extra.append(new_cost - old_cost)
+
+        placed = _best_insertion(workers, routes, added, 1, 23)
+        assert placed is not None
+        self.assertEqual(splice_winner[1], 0)
+        self.assertLess(true_extra[1], true_extra[0])
+        self.assertEqual(placed[0], 1)
+        self.assertEqual([visit.coord for visit in placed[1]], [visit.coord for visit in _reorder(workers[1].coord, routes[1] + [added])])
 
     def test_worker_count_outside_one_to_four_is_rejected(self) -> None:
         grid = _grid(_harvest(0, 0))

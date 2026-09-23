@@ -158,15 +158,16 @@ def _is_must(task: object, kind: str) -> bool:
 
 
 def _task_order(tile_type: str, kinds: list[str]) -> tuple[str, ...]:
-    """Legal order inside one visit. One-shot crops are watered before harvest."""
+    """Legal order inside one visit.
 
-    ordered = tuple(sorted(kinds, key=lambda kind: _KIND_RANK[kind]))
+    A one-shot crop is gone after harvest, so watering it on the same day does
+    nothing. Ongoing crops stay in the ground, and water still comes first.
+    """
+
     spec = ENGINE_CROPS.get(tile_type)
     one_shot = spec is not None and not spec["ongoing"]
-    if one_shot and WATER in ordered and HARVEST in ordered:
-        watered = tuple(kind for kind in ordered if kind != HARVEST) + (HARVEST,)
-        return watered
-    return ordered
+    kept = [kind for kind in kinds if not (one_shot and kind == WATER and HARVEST in kinds)]
+    return tuple(sorted(kept, key=lambda kind: _KIND_RANK[kind]))
 
 
 def _best_insertion(
@@ -176,20 +177,21 @@ def _best_insertion(
     start_hour: int,
     end_hour: int,
 ) -> tuple[int, list[TileVisit]] | None:
-    """Cheapest feasible slot across workers and positions, not the nearest start."""
+    """Cheapest worker after the route is reordered, not a splice into the old order."""
 
-    best: tuple[tuple[int, int, int], int, list[TileVisit]] | None = None
+    best: tuple[tuple[int, int], int, list[TileVisit]] | None = None
     for worker_index, worker in enumerate(workers):
         current = routes[worker_index]
-        ordered = _reorder(worker.coord, current + [visit])
-        if not _fits(worker.coord, ordered, start_hour, end_hour):
+        old_order = _reorder(worker.coord, current)
+        new_order = _reorder(worker.coord, current + [visit])
+        if not _fits(worker.coord, new_order, start_hour, end_hour):
             continue
-        coords = [item.coord for item in current]
-        for index in range(len(current) + 1):
-            extra = _insertion_extra(worker.coord, coords, index, visit.coord)
-            key = (extra + visit.action_count, worker_index, index)
-            if best is None or key < best[0]:
-                best = (key, worker_index, ordered)
+        old_cost = _path_moves(worker.coord, [item.coord for item in old_order])
+        new_cost = _path_moves(worker.coord, [item.coord for item in new_order])
+        extra_move = new_cost - old_cost
+        key = (extra_move + visit.action_count, worker_index)
+        if best is None or key < best[0]:
+            best = (key, worker_index, new_order)
     if best is None:
         return None
     return best[1], best[2]
@@ -234,7 +236,20 @@ def _improve_once(
     start_hour: int,
     end_hour: int,
 ) -> "_Score | None":
+    """Put a dropped tile back before moving or swapping work between people.
+
+    A tile that did not fit on the first pass can fit after someone else's plot
+    moves. Fewer unfinished tiles beat a shorter walk.
+    """
+
     routes = current.routes
+    for visit in current.leftover:
+        for target in range(len(workers)):
+            trial = _place(routes, target, visit)
+            remaining = [item for item in current.leftover if item.coord != visit.coord]
+            scored = _score(workers, trial, remaining, start_hour, end_hour)
+            if len(scored.leftover) < len(current.leftover):
+                return scored
     for source, worker_route in enumerate(routes):
         for visit in sorted(worker_route, key=_visit_sort):
             for target in range(len(workers)):
@@ -253,6 +268,16 @@ def _improve_once(
                     if scored.key < current.key:
                         return scored
     return None
+
+
+def _place(
+    routes: Sequence[Sequence[TileVisit]],
+    target: int,
+    visit: TileVisit,
+) -> list[list[TileVisit]]:
+    trial = [list(route) for route in routes]
+    trial[target] = trial[target] + [visit]
+    return trial
 
 
 def _move(
