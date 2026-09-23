@@ -20,6 +20,7 @@ from .agents import (
 )
 from .portfolio_agent import make_portfolio_agent
 from .route14_agent import make_route14_agent
+from .region_phase1 import make_region_phase1_agent
 from .route14_phase1 import make_route14_phase1_agent
 
 Agent = str | Callable[[dict[str, Any]], dict[str, Any]]
@@ -39,6 +40,7 @@ AGENTS: dict[str, Agent] = {
     "portfolio_executor": "__fresh_portfolio_executor__",
     "route14": "__fresh_route14__",
     "route14_phase1": "__fresh_route14_phase1__",
+    "region_phase1": "__fresh_region_phase1__",
     **{name: f"__fresh_{name}__" for name in EXTERNAL_BASELINES},
 }
 
@@ -58,6 +60,8 @@ def _resolve_agent(candidate: AgentSpec) -> Agent:
         return make_route14_agent()
     if candidate == "route14_phase1":
         return make_route14_phase1_agent()
+    if candidate == "region_phase1":
+        return make_region_phase1_agent()
     if candidate in EXTERNAL_BASELINES:
         return load_external_agent(candidate)
     return AGENTS[candidate]
