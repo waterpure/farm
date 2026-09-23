@@ -81,6 +81,7 @@ def make_region_phase1_agent():
                 shed_wheat=_shed_wheat(world),
                 shed_coords=shed_doors(grid.width),
                 shed_animals=_shed_animals(world),
+                shed_total=_shed_total(world),
             )
             apply_assignments(grid, world, _assignments(plan))
             state["plan"] = plan
@@ -350,6 +351,15 @@ def _shed_animals(world: Any) -> dict[str, int]:
     if inventory is None:
         return {}
     return {name: int(inventory.shed.get(name, 0) or 0) for name in ANIMAL_NAMES}
+
+
+def _shed_total(world: Any) -> int:
+    """Every item in the shed, not only wheat and animals. The cap is on the sum."""
+
+    inventory = getattr(world.farm, "inventory", None)
+    if inventory is None:
+        return 0
+    return sum(int(value or 0) for value in inventory.shed.values())
 
 
 def _shed_wheat(world: Any) -> int:

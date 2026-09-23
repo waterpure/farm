@@ -15,7 +15,7 @@ from functools import lru_cache
 from kaggle_environments.envs.kaggriculture.kaggriculture import ANIMALS as ENGINE_ANIMALS
 from kaggle_environments.envs.kaggriculture.kaggriculture import CROPS as ENGINE_CROPS
 
-from .route14_state import ANIMAL_NAMES, PENDING, shed_doors
+from .route14_state import ANIMAL_NAMES, PENDING, SHED_CAPACITY, shed_doors
 from .task_grid import CARE, FEED, HARVEST, PLACE_ANIMAL, PLANT, WATER, TaskGrid
 
 
@@ -100,6 +100,7 @@ def plan_region_routes(
     shed_coords: Sequence[tuple[int, int]] | None = None,
     include_optional: bool = True,
     shed_animals: dict[str, int] | None = None,
+    shed_total: int = 0,
 ) -> RegionRoutePlan:
     """Assign every must-do tile in one square to the given workers.
 
@@ -120,9 +121,11 @@ def plan_region_routes(
         raise ValueError("start_hour must be at or before end_hour")
     if shed_wheat < 0:
         raise ValueError("shed_wheat cannot be negative")
+    if shed_total < 0:
+        raise ValueError("shed_total cannot be negative")
     animal_stock = _animal_stock(shed_animals)
     doors = tuple(shed_coords) if shed_coords is not None else shed_doors(task_grid.width)
-    pantry = _Pantry(shed_wheat, doors, animal_stock)
+    pantry = _Pantry(shed_wheat, doors, animal_stock, shed_total)
     visits = _extract_visits(task_grid, region_size, origin)
     if visits:
         routes: list[list[TileVisit]] = [[] for _ in crew]
@@ -181,7 +184,7 @@ def _extract_visits(
 def _is_must(task: object, kind: str) -> bool:
     if task is None or getattr(task, "status", None) != PENDING:
         return False
-    if kind in {WATER, FEED} and not getattr(task, "mandatory", False):
+    if kind in {WATER, FEED, HARVEST} and not getattr(task, "mandatory", False):
         return False
     return True
 
@@ -208,11 +211,12 @@ class _Pantry:
     wheat: int
     doors: tuple[tuple[int, int], ...]
     animals: tuple[tuple[str, int], ...] = ()
+    shed_total: int = 0
 
 
 @dataclass(frozen=True)
 class _Leg:
-    """Field walk, then one return to the shed when the worker is carrying a harvest."""
+    """Field walk, plus one shed return when that walk still finishes today."""
 
     door: tuple[int, int] | None
     pickup: int
@@ -299,6 +303,64 @@ def _with_return(
         deliveries,
         item_pickups,
     )
+
+
+def _without_return(leg: _Leg) -> _Leg:
+    """Same field walk, with no trip back and no unload.
+
+    The harvest is still on the visit. It stays in the worker's hands until
+    the day ends and the shed takes whatever still fits.
+    """
+
+    return _Leg(
+        door=leg.door,
+        pickup=leg.pickup,
+        visits=leg.visits,
+        travel=leg.travel,
+        item_pickups=leg.item_pickups,
+    )
+
+
+def _placed_animals(visit: TileVisit) -> tuple[str, ...]:
+    subjects: list[str] = []
+    for index, kind in enumerate(visit.tasks):
+        if kind != PLACE_ANIMAL:
+            continue
+        args = visit.task_args[index] if index < len(visit.task_args) else ()
+        subject = str(args[0]) if args else (visit.production_name or "")
+        if subject:
+            subjects.append(subject)
+    return tuple(subjects)
+
+
+def _end_inventory(worker: RegionWorker, leg: _Leg) -> dict[str, int]:
+    """What this person is still holding after the route, before the day-end drop.
+
+    This is a forecast. It does not change the worker or the shed.
+    """
+
+    held: dict[str, int] = {}
+
+    def add(name: str, amount: int) -> None:
+        if not name or amount == 0:
+            return
+        held[name] = held.get(name, 0) + amount
+
+    add("WHEAT", worker.carrying_wheat)
+    for name, amount in worker.carrying_items:
+        add(name, amount)
+    add("WHEAT", leg.pickup)
+    for name, amount in leg.item_pickups:
+        add(name, amount)
+    for visit in leg.visits:
+        add("WHEAT", -visit.tasks.count(FEED))
+        if visit.harvest_product and visit.harvest_units > 0 and HARVEST in visit.tasks:
+            add(visit.harvest_product, visit.harvest_units)
+        for subject in _placed_animals(visit):
+            add(subject, -1)
+    for product, units in leg.deliveries:
+        add(product, -units)
+    return {name: amount for name, amount in held.items() if amount > 0}
 
 
 def _feed_count(visits: Sequence[TileVisit]) -> int:
@@ -419,6 +481,90 @@ def _leg_fits(leg: _Leg, start_hour: int, end_hour: int) -> bool:
     return start_hour + leg.action_total - 1 <= end_hour
 
 
+def _added_cost(old: _Leg | None, new: _Leg) -> int:
+    """Extra hours for the route that will actually be walked.
+
+    Dropping a return that no longer fits is not a saving. Otherwise the person
+    who cancels a long walk back looks cheaper than the person already standing
+    on the tile.
+    """
+
+    if old is not None and old.deliveries and not new.deliveries:
+        previous = old.action_total - old.return_travel - len(old.deliveries)
+        return new.action_total - previous
+    return new.action_total - (old.action_total if old is not None else 0)
+
+
+def _fit_leg(
+    worker: RegionWorker,
+    visits: Sequence[TileVisit],
+    doors: Sequence[tuple[int, int]],
+    start_hour: int,
+    end_hour: int,
+) -> _Leg | None:
+    """Return the walk that unloads today, or the same field walk with no unload.
+
+    A return that would pass the last hour is dropped. The field jobs stay.
+    If those jobs themselves do not fit, there is no route.
+    """
+
+    full = _layout(worker, visits, doors)
+    if _leg_fits(full, start_hour, end_hour):
+        return full
+    field_only = _without_return(full)
+    if _leg_fits(field_only, start_hour, end_hour):
+        return field_only
+    return None
+
+
+def _shed_delta(worker: RegionWorker, leg: _Leg) -> int:
+    """How this route changes what the shed holds after the day-end drop.
+
+    A pickup leaves the shed. An unload enters it. Goods still in the hands
+    enter at the end of the day. An unload is not also counted in the hands.
+    """
+
+    removed = leg.pickup + sum(amount for _, amount in leg.item_pickups)
+    placed = sum(units for _, units in leg.deliveries)
+    carried = sum(_end_inventory(worker, leg).values())
+    return placed + carried - removed
+
+
+def _project_end_shed(
+    workers: Sequence[RegionWorker],
+    routes: Sequence[Sequence[TileVisit]],
+    pantry: _Pantry,
+    shed_total: int,
+    start_hour: int,
+    end_hour: int,
+) -> int:
+    """Shed contents after every planned route and the day-end drop.
+
+    A route that does not fit is treated as over the cap, so it cannot be kept.
+    """
+
+    shed = shed_total
+    for worker, route in zip(workers, routes):
+        leg = _fit_leg(worker, route, pantry.doors, start_hour, end_hour)
+        if leg is None:
+            return SHED_CAPACITY + 1
+        shed += _shed_delta(worker, leg)
+    return shed
+
+
+def _end_day_capacity_safe(
+    workers: Sequence[RegionWorker],
+    routes: Sequence[Sequence[TileVisit]],
+    pantry: _Pantry,
+    shed_total: int,
+    start_hour: int,
+    end_hour: int,
+) -> bool:
+    """True when the whole crew's day-end drop still fits in the shed."""
+
+    return _project_end_shed(workers, routes, pantry, shed_total, start_hour, end_hour) <= SHED_CAPACITY
+
+
 def _prepare(
     worker: RegionWorker,
     visits: Sequence[TileVisit],
@@ -426,21 +572,25 @@ def _prepare(
     start_hour: int,
     end_hour: int,
 ) -> tuple[_Leg, tuple[TileVisit, ...]]:
-    """Keep the longest prefix that still fits once the pickup is counted."""
+    """Keep every visit that fits, unloading only when the return also fits.
+
+    A harvest is not dropped just because the walk back would pass the last hour.
+    Visits are shortened only when the field jobs themselves do not fit.
+    """
 
     items = list(visits)
     if not items:
         return _Leg(None, 0, (), 0), ()
-    full = _layout(worker, items, doors)
-    if _leg_fits(full, start_hour, end_hour):
-        return full, ()
-    ordered = list(full.visits)
+    chosen = _fit_leg(worker, items, doors, start_hour, end_hour)
+    if chosen is not None:
+        return chosen, ()
+    ordered = list(_layout(worker, items, doors).visits)
     for length in range(len(ordered) - 1, -1, -1):
-        leg = _layout(worker, ordered[:length], doors)
-        if _leg_fits(leg, start_hour, end_hour):
-            kept = {visit.coord for visit in leg.visits}
+        chosen = _fit_leg(worker, ordered[:length], doors, start_hour, end_hour)
+        if chosen is not None:
+            kept = {visit.coord for visit in chosen.visits}
             pending = tuple(visit for visit in ordered if visit.coord not in kept)
-            return leg, pending
+            return chosen, pending
     return _Leg(None, 0, (), 0), tuple(ordered)
 
 
@@ -463,11 +613,19 @@ def _best_insertion(
         trial = current + [visit]
         if drawn - _pickup_needed(worker, current) + _pickup_needed(worker, trial) > pantry.wheat:
             continue
-        old = _layout(worker, current, pantry.doors)
-        new = _layout(worker, trial, pantry.doors)
-        if not _fits(worker, trial, pantry.doors, start_hour, end_hour):
+        new = _fit_leg(worker, trial, pantry.doors, start_hour, end_hour)
+        if new is None:
             continue
-        extra = new.action_total - old.action_total
+        trial_routes = [list(route) for route in routes]
+        trial_routes[worker_index] = trial
+        if not _within_animals(workers, trial_routes, pantry):
+            continue
+        if not _end_day_capacity_safe(
+            workers, trial_routes, pantry, pantry.shed_total, start_hour, end_hour
+        ):
+            continue
+        old = _fit_leg(worker, current, pantry.doors, start_hour, end_hour)
+        extra = _added_cost(old, new)
         key = (extra, worker_index)
         if best is None or key < best[0]:
             best = (key, worker_index, list(new.visits))
@@ -527,10 +685,14 @@ def _improve_once(
     for visit in current.leftover:
         for target in range(len(workers)):
             trial = _place(routes, target, visit)
-            if not _within_wheat(workers, trial, pantry):
+            if not _crew_can_carry(workers, trial, pantry, start_hour, end_hour):
                 continue
             remaining = [item for item in current.leftover if item.coord != visit.coord]
             scored = _score(workers, trial, remaining, start_hour, end_hour, pantry)
+            if not _end_day_capacity_safe(
+                workers, scored.routes, pantry, pantry.shed_total, start_hour, end_hour
+            ):
+                continue
             if len(scored.leftover) < len(current.leftover):
                 return scored
     for source, worker_route in enumerate(routes):
@@ -539,7 +701,7 @@ def _improve_once(
                 if target == source:
                     continue
                 trial = _move(routes, source, target, visit)
-                if not _within_wheat(workers, trial, pantry):
+                if not _crew_can_carry(workers, trial, pantry, start_hour, end_hour):
                     continue
                 scored = _score(workers, trial, list(current.leftover), start_hour, end_hour, pantry)
                 if scored.key < current.key:
@@ -549,12 +711,26 @@ def _improve_once(
             for first in routes[left]:
                 for second in routes[right]:
                     trial = _swap(routes, left, right, first, second)
-                    if not _within_wheat(workers, trial, pantry):
+                    if not _crew_can_carry(workers, trial, pantry, start_hour, end_hour):
                         continue
                     scored = _score(workers, trial, list(current.leftover), start_hour, end_hour, pantry)
                     if scored.key < current.key:
                         return scored
     return None
+
+
+def _crew_can_carry(
+    workers: Sequence[RegionWorker],
+    routes: Sequence[Sequence[TileVisit]],
+    pantry: _Pantry,
+    start_hour: int,
+    end_hour: int,
+) -> bool:
+    """Wheat, animals, and the day-end shed all still fit."""
+
+    if not _within_wheat(workers, routes, pantry) or not _within_animals(workers, routes, pantry):
+        return False
+    return _end_day_capacity_safe(workers, routes, pantry, pantry.shed_total, start_hour, end_hour)
 
 
 def _place(
@@ -660,9 +836,9 @@ def _fits(
     start_hour: int,
     end_hour: int,
 ) -> bool:
-    """True when the shed stop, the walk, and the jobs all finish by end_hour."""
+    """True when the field jobs finish by end_hour, unloading only if that also fits."""
 
-    return _leg_fits(_layout(worker, visits, doors), start_hour, end_hour)
+    return _fit_leg(worker, visits, doors, start_hour, end_hour) is not None
 
 
 def _add_same_tile_optional_tasks(
@@ -675,9 +851,9 @@ def _add_same_tile_optional_tasks(
 ) -> _Score:
     """Add care or extra-yield water only on tiles this route already visits.
 
-    Each added action costs one hour and is kept only when the worker's whole
-    walk, including the trip back to the shed, still finishes by end_hour.
-    A tile that is not already on the mandatory route is left alone.
+    Each added action costs one hour and is kept only when the field jobs still
+    finish by end_hour. The walk back is kept when it fits, and dropped when it
+    does not. A tile that is not already on the mandatory route is left alone.
     """
 
     routes = [list(route) for route in scored.routes]
@@ -697,8 +873,14 @@ def _add_same_tile_optional_tasks(
             end_hour,
         ):
             continue
+        if not _end_day_capacity_safe(workers, trial, pantry, pantry.shed_total, start_hour, end_hour):
+            continue
         updated = _score(workers, trial, list(current.leftover), start_hour, end_hour, pantry)
         if {visit.coord for visit in updated.leftover} != {visit.coord for visit in current.leftover}:
+            continue
+        if not _end_day_capacity_safe(
+            workers, updated.routes, pantry, pantry.shed_total, start_hour, end_hour
+        ):
             continue
         routes = [list(route) for route in updated.routes]
         current = updated
@@ -855,11 +1037,15 @@ def _add_production_plans(
                 trial[worker_index] = trial[worker_index] + [visit]
                 if not _within_wheat(workers, trial, pantry) or not _within_animals(workers, trial, pantry):
                     continue
-                old = _layout(worker, routes[worker_index], pantry.doors)
-                new = _layout(worker, trial[worker_index], pantry.doors)
-                if not _production_fits(worker, new, start_hour, end_hour):
+                old = _fit_leg(worker, routes[worker_index], pantry.doors, start_hour, end_hour)
+                new = _fit_leg(worker, trial[worker_index], pantry.doors, start_hour, end_hour)
+                if new is None or not _production_fits(worker, new, start_hour, end_hour):
                     continue
-                extra = new.action_total - old.action_total
+                if not _end_day_capacity_safe(
+                    workers, trial, pantry, pantry.shed_total, start_hour, end_hour
+                ):
+                    continue
+                extra = _added_cost(old, new)
                 key = (extra, -money, visit.coord[1], visit.coord[0], worker.id)
                 if choice is None or key < choice[0]:
                     choice = (key, worker_index, index, list(new.visits))
@@ -880,6 +1066,8 @@ def _production_money(grid: TaskGrid, visit: TileVisit) -> float:
 
 
 def _production_fits(worker: RegionWorker, leg: _Leg, start_hour: int, end_hour: int) -> bool:
+    """The chosen leg, return or not, still plays every task in each visit."""
+
     if not _leg_fits(leg, start_hour, end_hour):
         return False
     _, _, _, blocked = _expand(worker.coord, leg, start_hour, end_hour)
@@ -896,7 +1084,9 @@ def _route_totals(
     moves = 0
     finish: int | None = None
     for worker, route in zip(workers, routes):
-        leg = _layout(worker, route, pantry.doors)
+        leg = _fit_leg(worker, route, pantry.doors, start_hour, end_hour)
+        if leg is None:
+            raise RuntimeError("a stored route does not fit in the day")
         _, route_moves, route_finish, blocked = _expand(worker.coord, leg, start_hour, end_hour)
         if blocked:
             raise RuntimeError("a stored route does not fit in the day")
@@ -1015,6 +1205,8 @@ def _materialize(
                 finish,
             )
         )
+    if not _end_day_capacity_safe(workers, scored.routes, pantry, pantry.shed_total, start_hour, end_hour):
+        raise RuntimeError("a stored route would overflow the shed")
     feasible = not scored.leftover
     return RegionRoutePlan(
         feasible,
