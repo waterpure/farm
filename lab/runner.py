@@ -73,22 +73,39 @@ def _agent_label(candidate: AgentSpec) -> str:
     return str(getattr(candidate, "label", getattr(candidate, "__name__", "custom")))
 
 
-def run_match(left: AgentSpec, right: AgentSpec, steps: int, seed: int) -> dict[str, Any]:
-    """Run one reproducible episode without rendering or writing a replay."""
+def run_match(
+    left: AgentSpec,
+    right: AgentSpec,
+    steps: int,
+    seed: int,
+    *,
+    prepare: Callable[[Any], Callable[[], None] | None] | None = None,
+    configuration: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Run one reproducible episode without rendering or writing a replay.
+
+    ``prepare`` receives the environment after it is built and before the
+    episode starts.  It may install a temporary recorder and return a restore
+    callable.  The restore callable runs even when the episode raises.
+    """
 
     if steps < 2:
         raise ValueError("steps must be at least 2")
 
     left_agent = _resolve_agent(left)
     right_agent = _resolve_agent(right)
+    episode = {"episodeSteps": steps, "seed": seed}
+    if configuration:
+        episode.update(configuration)
 
-    environment = make(
-        "kaggriculture",
-        configuration={"episodeSteps": steps, "seed": seed},
-        debug=True,
-    )
+    environment = make("kaggriculture", configuration=episode, debug=True)
+    restore = prepare(environment) if prepare is not None else None
     started = time.perf_counter()
-    environment.run([left_agent, right_agent])
+    try:
+        environment.run([left_agent, right_agent])
+    finally:
+        if restore is not None:
+            restore()
     elapsed_seconds = time.perf_counter() - started
     terminal = environment.steps[-1]
 
