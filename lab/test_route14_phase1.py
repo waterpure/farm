@@ -92,7 +92,7 @@ class Route14Phase1Tests(unittest.TestCase):
         tasks = field_tasks(_observation(tiles, day=10))
         waters = [task.target for task in tasks if task.kind == "WATER"]
         harvests = [task.target for task in tasks if task.kind == "HARVEST"]
-        self.assertEqual(waters, [(0, 0)])
+        self.assertEqual(waters, [(0, 0), (2, 0)])
         self.assertEqual(harvests, [(2, 0)])
 
     def test_feed_is_mandatory_only_after_a_missed_day(self) -> None:

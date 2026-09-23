@@ -69,7 +69,7 @@ class Route14StateTests(unittest.TestCase):
         self.assertEqual(watered.weed_countdown_days, 2)
         self.assertEqual(watered.water_count_today, 1)
         self.assertFalse(watered.must_water)
-        self.assertTrue(melon.mature and not melon.must_water)
+        self.assertTrue(melon.mature and melon.must_water)
         self.assertEqual(melon.harvest_countdown_days, 0)
         self.assertEqual(melon.remaining_harvests, 1)
         self.assertEqual(melon.rot_countdown_steps, 72)

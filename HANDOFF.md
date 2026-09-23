@@ -1818,3 +1818,24 @@ LLM 不适合、也不需要参与评测。`.pkl` 若使用，装的是小型策
 - seed1：动物订单 COW 15、SHEEP 4；动物产品销售 WOOL 23、MILK 68；FEED 173 次；Wheat pickup 174 份；BUY_WHEAT 29 次；Day1（引擎 day0）Hour1 买 Wheat 2，未出现 SELL WHEAT 2；Day2（引擎 day1）收工仍有 2 只动物；final money 34,009。
 
 尚存风险：本轮只证明首日条件 FEED 和买麦执行闭环，未证明首日喂养在所有种子上是最优经济选择；区域外任务覆盖、后期动物购买策略仍未处理。下一步应先做单局对照分析，再决定是否保留该策略。
+
+## 2026-09-23：按作物当前状态发布 WATER/FERTILIZE
+
+本轮只处理作物状态生命周期中最早拥有该判断的层：`lab/route14_state.py::_crop_state` 与 `lab/task_grid.py` 的 WATER/FERTILIZE 判定。未修改 CARE、RegionRoute、经济决策或扩地；没有声称 FERTILIZE 已产生实际收益，因为当前 RegionRoute 仍不执行该动作。
+
+改动与规则：
+
+- `must_water` 只由真实存活风险决定。作物当天未浇水且 `consecutive_unwatered >= 1` 时，今晚会转成 WEED，始终发布 mandatory `WATER`；即使一次性作物已经达到产量上限、当天同时有 `HARVEST`，也不再抑制保命浇水。
+- 仅为增产的 `WATER` 仍按官方增产窗口和当前 `yield_units` 发布，产量已达上限时不发布增产水。
+- `FERTILIZE` 先检查肥料库存、当前施肥是否仍有效、剩余可收获次数，再比较施肥/不施肥在官方窗口、产量上限和赛季剩余时间下的最终可出售产量；只有差值大于 0 才发布。
+- 一次性作物收获后原株消失，旧的增产任务不继承；持续收获作物在新 observation 显示收获后按新的 `yield_units` 和剩余生产夜重新判断。
+- 赛季结束前无法成熟并出售、错过官方增产窗口、普通浇水已经足以达到上限、已有施肥效果或当前已达上限，均不发布 `FERTILIZE`。
+
+验证：
+
+- `./.venv/bin/python -m unittest discover -s lab -p 'test_*.py'`：284 tests OK。
+- `python -m py_compile lab/route14_state.py lab/task_grid.py`：通过。
+- `git diff --check`：通过。
+- 定向覆盖：上限小麦仍需 mandatory WATER；未达上限且施肥有增益；浇水已足够达到上限；持续作物收获后重新判定；一次性作物收获后任务结束；错过窗口或赛季剩余时间不足不施肥。
+
+剩余风险：WATER/FERTILIZE 的发布状态已按 observation 重算，但 RegionRoute 尚未执行 FERTILIZE，因此本轮没有验证施肥动作会改变真实产量或经济结果；仍需后续单独接通执行链并做收益评测。

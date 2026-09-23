@@ -127,12 +127,12 @@ class RegionRouteTests(unittest.TestCase):
         )
         self.assertEqual(route.finish_hour, 12)
 
-    def test_ripe_wheat_below_the_cap_is_harvested_while_the_water_stays_optional(self) -> None:
+    def test_ripe_wheat_below_the_cap_is_harvested_while_dry_water_is_mandatory(self) -> None:
         world = _world("WHEAT", day=2, units=4, dry=1)
         grid = TaskGridBuilder().build(world)
         water = grid[2][3].tasks[WATER]
         self.assertEqual(water.yield_gain, 1)
-        self.assertFalse(water.mandatory)
+        self.assertTrue(water.mandatory)
         self.assertIn(HARVEST, grid[2][3].tasks)
 
         plan = plan_region_routes(grid, [RegionWorker("Farmer", (2, 3))])
@@ -143,17 +143,17 @@ class RegionRouteTests(unittest.TestCase):
         self.assertEqual(operations[:2], [WATER, HARVEST])
         self.assertEqual(operations[-1], "PLACE")
         self.assertEqual(grid[2][3].tasks[WATER].yield_gain, 1)
-        self.assertFalse(grid[2][3].tasks[WATER].mandatory)
+        self.assertTrue(grid[2][3].tasks[WATER].mandatory)
 
-    def test_wheat_at_max_yield_is_harvested_without_a_water_stop(self) -> None:
+    def test_wheat_at_max_yield_is_harvested_with_survival_water_when_dry(self) -> None:
         world = _world("WHEAT", day=4, units=6, dry=1, fertilized_until=4)
         grid = TaskGridBuilder().build(world)
-        self.assertNotIn(WATER, grid[2][3].tasks)
+        self.assertIn(WATER, grid[2][3].tasks)
+        self.assertTrue(grid[2][3].tasks[WATER].mandatory)
         self.assertEqual(grid[2][3].tasks[HARVEST].yield_amount, 6)
         plan = plan_region_routes(grid, [RegionWorker("Farmer", (2, 3))])
         operations = [action.operation for action in plan.worker_routes[0].actions_by_hour]
-        self.assertEqual(operations[0], HARVEST)
-        self.assertNotIn(WATER, operations)
+        self.assertEqual(operations[:2], [WATER, HARVEST])
         self.assertEqual(plan.worker_routes[0].actions_by_hour[-1].args, ("WHEAT", 6))
 
     def test_one_shot_visit_waters_before_it_harvests(self) -> None:

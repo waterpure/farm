@@ -440,7 +440,10 @@ def _crop_state(tile: dict[str, Any], position: tuple[int, int], day: int, step:
     dry_days = _int(tile.get("consecutive_unwatered"))
     mature = units > 0 and age >= _int(spec["first_yield_day"])
     dies_tonight = not watered and dry_days >= 1
-    must_water = dies_tonight and not (mature and not spec["ongoing"])
+    # Survival is independent from yield.  Even a one-shot crop already at
+    # its yield cap still needs WATER when the observation says it would turn
+    # into a weed tonight.
+    must_water = dies_tonight
     fertilized_until = _int(tile.get("fertilized_until_day"), -1)
     fertilized_today = fertilized_until == day + 2
     fertilizer_days = max(0, fertilized_until - day + 1) if fertilized_until >= day else 0

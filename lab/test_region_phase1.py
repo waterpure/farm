@@ -115,7 +115,7 @@ class RegionPhase1Tests(unittest.TestCase):
         self.assertEqual(agent(first)["farmer"], ["WATER"])
         water = agent.telemetry["grid"][2][3].tasks["WATER"]
         self.assertEqual(water.status, SCHEDULED)
-        self.assertFalse(water.mandatory)
+        self.assertTrue(water.mandatory)
         self.assertEqual(water.yield_gain, 1)
 
         tiles[3][2]["watered_today"] = True

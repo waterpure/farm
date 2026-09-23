@@ -320,10 +320,9 @@ def _previous_task(previous: TaskGrid | None, position: tuple[int, int], task_ty
 
 def _water_task(world: WorldState, crop: CropState, prior: TaskState | None) -> WaterTask | None:
     gain = water_yield_gain(crop)
-    # A one-shot plant is gone after today's harvest, so staying alive overnight
-    # is not a reason to water. Extra yield still is, and that stays optional.
-    survival = crop.weed_countdown_days == 0 and not _harvesting_one_shot(crop)
-    mandatory = survival
+    # Survival and yield are separate decisions.  A crop can need mandatory
+    # WATER even when it is already at its production cap.
+    mandatory = crop.must_water
     turns = _turns_until_weed(world.hour, crop.weed_countdown_days)
     if crop.watered_today:
         if prior is None:
@@ -338,8 +337,6 @@ def _water_task(world: WorldState, crop: CropState, prior: TaskState | None) -> 
             turns_until_weed=turns,
             yield_gain=0,
         )
-    if _harvesting_one_shot(crop) and gain <= 0:
-        return None
     needed = mandatory or gain > 0
     if not needed:
         return None
@@ -389,10 +386,10 @@ def should_fertilize(crop: CropState, state: WorldState) -> bool:
         return False
     if crop.fertilizer_days_left > 0 or crop.fertilized_today:
         return False
-    return fertilizer_yield_gain(crop) > 0
+    return fertilizer_yield_gain(crop, state) > 0
 
 
-def fertilizer_yield_gain(crop: CropState) -> int:
+def fertilizer_yield_gain(crop: CropState, state: WorldState | None = None) -> int:
     """Extra units from fertilizing now, if every useful water still happens.
 
     Fertilizer covers today and the next two days. One-shot crops gain the
@@ -402,9 +399,14 @@ def fertilizer_yield_gain(crop: CropState) -> int:
     """
 
     spec = ENGINE_CROPS[crop.crop]
+    days_remaining = (
+        max(0, int(state.days_remaining))
+        if state is not None
+        else max(0, SEASON_DAYS - crop.age_days)
+    )
     if spec["ongoing"]:
-        return _ongoing_fertilizer_gain(crop, spec)
-    return _oneshot_fertilizer_gain(crop, spec)
+        return _ongoing_fertilizer_gain(crop, spec, days_remaining)
+    return _oneshot_fertilizer_gain(crop, spec, days_remaining)
 
 
 def _fertilizer_on_hand(state: WorldState) -> int:
@@ -456,43 +458,64 @@ def _carried(prior: TaskState | None) -> tuple[str, str | None, int | None]:
     return PENDING, None, None
 
 
-def _oneshot_fertilizer_gain(crop: CropState, spec: dict) -> int:
+def _oneshot_fertilizer_gain(crop: CropState, spec: dict, days_remaining: int) -> int:
     cap = int(spec["max_yield"])
+    first_yield_day = int(spec["first_yield_day"])
     window_start = (int(spec["max_yield_day"]) + 1) // 2
     window_end = int(spec["max_yield_day"])
 
+    # Extra units that cannot mature before the season ends are not
+    # sellable, so they are not a reason to publish FERTILIZE.
+    if crop.age_days + max(0, days_remaining - 1) < first_yield_day:
+        return 0
+
     def run(fertilize: bool) -> int:
         units = crop.yield_units
-        if not crop.watered_today and window_start <= crop.age_days <= window_end:
-            units = min(cap, units + (2 if fertilize else 1))
-        age = crop.age_days
-        for ahead in range(1, max(0, window_end - age) + 1):
+        for ahead in range(max(0, days_remaining)):
             if units >= cap:
                 break
-            boosted = fertilize and ahead <= 2
-            units = min(cap, units + (2 if boosted else 1))
+            age = crop.age_days + ahead
+            if not window_start <= age <= window_end:
+                continue
+            if ahead == 0 and crop.watered_today:
+                continue
+            bonus = 2 if fertilize and ahead <= 2 else 1
+            units = min(cap, units + bonus)
         return units
 
     return run(True) - run(False)
 
 
-def _ongoing_fertilizer_gain(crop: CropState, spec: dict) -> int:
+def _ongoing_fertilizer_gain(crop: CropState, spec: dict, days_remaining: int) -> int:
+    """Additional saleable units from fertilizing this observation.
+
+    The engine's ``max_yield`` is both the number of production events and
+    the storage cap.  Simulate the remaining production nights through the
+    season, clamping the current stock at that cap.  Fertilizer applied now
+    is active for the next three daily refreshes (today plus the next two
+    engine refresh windows), so the comparison cannot overstate late-season
+    or already-capped crops.
+    """
+
     cap = int(spec["max_yield"])
     first = int(spec["first_yield_day"])
     interval = max(1, int(spec["interval"]))
 
     def run(fertilize: bool) -> int:
-        total = 0
-        sitting = crop.yield_units
-        for ahead in range(SEASON_DAYS):
-            days_since_first = crop.age_days + ahead + 1 - first
+        produced = 0
+        sitting = min(cap, max(0, crop.yield_units))
+        for ahead in range(1, max(0, days_remaining)):
+            future_age = crop.age_days + ahead
+            days_since_first = future_age - first
             if days_since_first < 0 or days_since_first % interval != 0:
                 continue
             if days_since_first // interval + 1 > cap:
                 break
-            total += sitting
-            sitting = min(cap, 2 if fertilize and ahead <= 2 else 1)
-        return total + sitting
+            bonus = 2 if fertilize and ahead <= 3 else 1
+            before = sitting
+            sitting = min(cap, sitting + bonus)
+            produced += sitting - before
+        return produced
 
     return run(True) - run(False)
 
