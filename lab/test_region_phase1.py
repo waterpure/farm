@@ -1,4 +1,4 @@
-"""The 5×5 route drives each real hour. It does not guess where a hand is born."""
+"""The 5×5 route drives each real hour. The morning predicts the official birth tile."""
 
 from __future__ import annotations
 
@@ -27,7 +27,8 @@ class RegionPhase1Tests(unittest.TestCase):
 
         self.assertEqual(hired["farmer"], ["PASS"])
         self.assertIn(["HIRE"], hired["market"])
-        self.assertIsNone(agent.telemetry["plan"])
+        self.assertIsNotNone(agent.telemetry["plan"])
+        self.assertIn(("Hand1", (5, 4)), agent.telemetry["planned_workers"])
 
         appeared = _observation(tiles, day=1, hour=1, farmer=(4, 4), hands=[(1, 2)])
         agent(appeared)
@@ -124,7 +125,7 @@ class RegionPhase1Tests(unittest.TestCase):
     def test_engine_steps_land_on_the_squares_the_route_already_named(self) -> None:
         environment = make(
             "kaggriculture",
-            configuration={"episodeSteps": 8, "seed": 1},
+            configuration={"episodeSteps": 30, "seed": 1},
             debug=True,
         )
         environment.reset()
@@ -135,19 +136,24 @@ class RegionPhase1Tests(unittest.TestCase):
         farm["tiles"][4][2] = plant
         agent = make_region_phase1_agent()
         opponent = {"farmer": ["PASS"], "hands": [], "market": []}
-        trace: list[tuple[str, tuple[int, int]]] = []
-        for _ in range(4):
+        planned: dict[int, list] = {}
+        harvest_hour = None
+        for _ in range(24):
             observation = environment.steps[-1][0].observation
+            hour = int(observation.hour)
             action = agent(observation)
+            if not planned:
+                farmer = next(route for route in agent.telemetry["plan"].worker_routes if route.worker_id == "Farmer")
+                planned = {step.hour: [step.operation, *step.args] for step in farmer.actions_by_hour}
+                harvest_hour = next(step.hour for step in farmer.actions_by_hour if step.operation == "HARVEST")
             before = tuple(observation.farms[0]["farmer"])
-            trace.append((action["farmer"][0], before))
+            self.assertEqual(action["farmer"], planned.get(hour, ["PASS"]))
             environment.step([action, opponent])
             after = tuple(environment.steps[-1][0].observation.farms[0]["farmer"])
             self.assertEqual(after, _moved(before, action["farmer"][0]))
+            if hour == harvest_hour:
+                break
 
-        self.assertEqual([step[0] for step in trace], ["PASS", "WEST", "WEST", "HARVEST"])
-        self.assertEqual(trace[1][1], (4, 4))
-        self.assertEqual(trace[3][1], (2, 4))
         self.assertIsNone(environment.steps[-1][0].observation.farms[0]["tiles"][4][2])
 
     def test_the_engine_marks_the_animal_fed_after_pickup(self) -> None:

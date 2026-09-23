@@ -101,6 +101,8 @@ def plan_region_routes(
     include_optional: bool = True,
     shed_animals: dict[str, int] | None = None,
     shed_total: int = 0,
+    blocked_production: Sequence[tuple[int, int]] | None = None,
+    include_unpaid_production: bool = False,
 ) -> RegionRoutePlan:
     """Assign every must-do tile in one square to the given workers.
 
@@ -145,7 +147,16 @@ def plan_region_routes(
     else:
         scored = _Score(tuple(tuple() for _ in crew), (), 0, None)
     scored = _add_production_plans(
-        task_grid, crew, scored, start_hour, end_hour, pantry, region_size, origin
+        task_grid,
+        crew,
+        scored,
+        start_hour,
+        end_hour,
+        pantry,
+        region_size,
+        origin,
+        blocked_production or (),
+        include_unpaid_production,
     )
     return _materialize(crew, scored, start_hour, end_hour, pantry)
 
@@ -957,20 +968,28 @@ def _extract_production_visits(
     grid: TaskGrid,
     region_size: int,
     origin: tuple[int, int],
+    blocked: Sequence[tuple[int, int]] = (),
+    include_unpaid: bool = False,
 ) -> tuple[TileVisit, ...]:
-    """Empty-tile plans this square can start with a seed or animal it already has.
+    """Empty-tile plans this square may start today.
 
-    A plan that still needs a purchase stays on the grid and is not a visit.
-    The pickup that fetches an animal is not part of the visit; the walk adds it.
+    A purchase is not a field job. The caller buys a seed or an animal before
+    the planned hour, then this visit only plants, builds, and places.
+    Without `include_unpaid`, a plan that still needs cash stays off the route.
     """
 
+    refused = set(blocked)
     visits: list[TileVisit] = []
     x0, y0 = origin
     for x in range(x0, x0 + region_size):
         for y in range(y0, y0 + region_size):
             cell = _cell_at(grid, (x, y))
             plan = getattr(cell, "production_plan", None) if cell is not None else None
-            if plan is None or int(getattr(plan, "startup_cash", 1) or 0) != 0:
+            if plan is None or cell.coord in refused:
+                continue
+            if not include_unpaid and int(getattr(plan, "startup_cash", 1) or 0) != 0:
+                continue
+            if include_unpaid and getattr(plan, "kind", None) not in {"crop", "animal"}:
                 continue
             actions = tuple(getattr(plan, "actions", ()) or ())
             if not actions or not _production_pending(cell, actions):
@@ -1014,6 +1033,8 @@ def _add_production_plans(
     pantry: _Pantry,
     region_size: int,
     origin: tuple[int, int],
+    blocked: Sequence[tuple[int, int]] = (),
+    include_unpaid: bool = False,
 ) -> _Score:
     """Try each committed plan after the mandatory route is fixed.
 
@@ -1025,7 +1046,7 @@ def _add_production_plans(
     routes = [list(route) for route in scored.routes]
     pending = [
         visit
-        for visit in _extract_production_visits(grid, region_size, origin)
+        for visit in _extract_production_visits(grid, region_size, origin, blocked, include_unpaid)
         if all(visit.coord not in {item.coord for item in route} for route in routes)
     ]
     while pending:
