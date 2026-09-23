@@ -103,9 +103,14 @@ class FertilizeTask(TaskState):
 
 @dataclass
 class TileTask(TaskState):
-    """Dig a weed, plant, build a shed, or put an animal into that shed."""
+    """Dig a weed, plant, build a shed, or put an animal into that shed.
+
+    `depends_on` names the earlier operation on this same tile. A seedling's
+    WATER depends on PLANT and is not the same record as a crop already in the ground.
+    """
 
     subject: str = ""
+    depends_on: str = ""
 
 
 @dataclass
@@ -115,6 +120,7 @@ class TaskBucket:
     coord: tuple[int, int]
     tile_type: str
     tasks: dict[str, TaskState] = field(default_factory=dict)
+    production_plan: Any = None
 
 
 class TaskGrid:
@@ -207,10 +213,23 @@ class TaskGridBuilder:
         return bucket
 
 
-def build_task_grid(world: WorldState, previous: TaskGrid | None = None) -> TaskGrid:
-    """Read the parsed farm and return one bucket per owned tile."""
+def build_task_grid(
+    world: WorldState,
+    previous: TaskGrid | None = None,
+    observation: dict[str, Any] | None = None,
+) -> TaskGrid:
+    """Read the parsed farm and return one bucket per owned tile.
 
-    return TaskGridBuilder().build(world, previous)
+    When `observation` is passed, each empty tile also receives at most one
+    committed production plan. The route still decides later whether to start it.
+    """
+
+    grid = TaskGridBuilder().build(world, previous)
+    if observation is not None:
+        from .production_plan import apply_empty_production_plans
+
+        apply_empty_production_plans(grid, world, observation)
+    return grid
 
 
 def apply_assignments(grid: TaskGrid, world: WorldState, assignments: list[Any]) -> None:

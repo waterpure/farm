@@ -54,7 +54,7 @@ def make_region_phase1_agent():
             return _hour_zero(observation, state)
         world = parse_world(observation)
         crew = _crew(world)
-        grid = build_task_grid(world, state["grid"])
+        grid = build_task_grid(world, state["grid"], observation)
         state["needs_replan"] = state["plan"] is not None and _diverged(crew, state)
         if state["plan"] is None or state["needs_replan"]:
             _reopen_scheduled(grid)
