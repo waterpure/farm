@@ -1,0 +1,703 @@
+{
+  "seed": 1,
+  "candidate": "region_phase1",
+  "opponent": "starter",
+  "seat": "left",
+  "steps": 720,
+  "final_money": 13372,
+  "reward": 13372.0,
+  "status": "DONE",
+  "animal_orders": {
+    "GOOSE": 0,
+    "COW": 13,
+    "SHEEP": 12
+  },
+  "animal_order_spend_if_filled": 11200,
+  "animal_product_sell_orders": {},
+  "feed_actions": 1,
+  "wheat_buy_orders": 7,
+  "events": [
+    {
+      "day": 0,
+      "hour": 0,
+      "kind": "BUY_ANIMAL",
+      "item": "COW",
+      "count": 1,
+      "money": 3000
+    },
+    {
+      "day": 0,
+      "hour": 0,
+      "kind": "BUY_ANIMAL",
+      "item": "SHEEP",
+      "count": 1,
+      "money": 3000
+    },
+    {
+      "day": 1,
+      "hour": 0,
+      "kind": "BUY_WHEAT",
+      "count": 2,
+      "money": 616,
+      "shed_wheat": 0
+    },
+    {
+      "day": 1,
+      "hour": 1,
+      "kind": "SELL",
+      "item": "WHEAT",
+      "count": 2,
+      "money": 563
+    },
+    {
+      "day": 12,
+      "hour": 0,
+      "kind": "BUY_ANIMAL",
+      "item": "COW",
+      "count": 5,
+      "money": 13620
+    },
+    {
+      "day": 12,
+      "hour": 0,
+      "kind": "BUY_ANIMAL",
+      "item": "SHEEP",
+      "count": 2,
+      "money": 13620
+    },
+    {
+      "day": 13,
+      "hour": 0,
+      "kind": "BUY_WHEAT",
+      "count": 7,
+      "money": 10138,
+      "shed_wheat": 0
+    },
+    {
+      "day": 13,
+      "hour": 0,
+      "kind": "BUY_ANIMAL",
+      "item": "COW",
+      "count": 2,
+      "money": 10138
+    },
+    {
+      "day": 13,
+      "hour": 0,
+      "kind": "BUY_ANIMAL",
+      "item": "SHEEP",
+      "count": 1,
+      "money": 10138
+    },
+    {
+      "day": 13,
+      "hour": 1,
+      "kind": "SELL",
+      "item": "WHEAT",
+      "count": 7,
+      "money": 11325
+    },
+    {
+      "day": 14,
+      "hour": 0,
+      "kind": "BUY_WHEAT",
+      "count": 2,
+      "money": 11577,
+      "shed_wheat": 1
+    },
+    {
+      "day": 14,
+      "hour": 0,
+      "kind": "BUY_ANIMAL",
+      "item": "COW",
+      "count": 4,
+      "money": 11577
+    },
+    {
+      "day": 14,
+      "hour": 0,
+      "kind": "BUY_ANIMAL",
+      "item": "SHEEP",
+      "count": 2,
+      "money": 11577
+    },
+    {
+      "day": 14,
+      "hour": 1,
+      "kind": "SELL",
+      "item": "WHEAT",
+      "count": 3,
+      "money": 10887
+    },
+    {
+      "day": 14,
+      "hour": 1,
+      "kind": "PICKUP_WHEAT",
+      "count": 1,
+      "money": 10887
+    },
+    {
+      "day": 14,
+      "hour": 22,
+      "kind": "FEED",
+      "money": 10960
+    },
+    {
+      "day": 15,
+      "hour": 0,
+      "kind": "BUY_WHEAT",
+      "count": 6,
+      "money": 10960,
+      "shed_wheat": 0
+    },
+    {
+      "day": 15,
+      "hour": 1,
+      "kind": "SELL",
+      "item": "WHEAT",
+      "count": 6,
+      "money": 10738
+    },
+    {
+      "day": 16,
+      "hour": 0,
+      "kind": "BUY_WHEAT",
+      "count": 1,
+      "money": 10960,
+      "shed_wheat": 0
+    },
+    {
+      "day": 16,
+      "hour": 1,
+      "kind": "SELL",
+      "item": "WHEAT",
+      "count": 1,
+      "money": 10922
+    },
+    {
+      "day": 22,
+      "hour": 0,
+      "kind": "BUY_ANIMAL",
+      "item": "COW",
+      "count": 1,
+      "money": 11626
+    },
+    {
+      "day": 23,
+      "hour": 0,
+      "kind": "BUY_WHEAT",
+      "count": 1,
+      "money": 11445,
+      "shed_wheat": 0
+    },
+    {
+      "day": 23,
+      "hour": 1,
+      "kind": "SELL",
+      "item": "WHEAT",
+      "count": 1,
+      "money": 16330
+    },
+    {
+      "day": 24,
+      "hour": 0,
+      "kind": "BUY_ANIMAL",
+      "item": "SHEEP",
+      "count": 6,
+      "money": 16373
+    },
+    {
+      "day": 25,
+      "hour": 0,
+      "kind": "BUY_WHEAT",
+      "count": 6,
+      "money": 13372,
+      "shed_wheat": 0
+    },
+    {
+      "day": 25,
+      "hour": 1,
+      "kind": "SELL",
+      "item": "WHEAT",
+      "count": 6,
+      "money": 13102
+    }
+  ],
+  "daily": [
+    {
+      "day": 0,
+      "money": 3000,
+      "animal_count": 0,
+      "animals": [],
+      "shed": {}
+    },
+    {
+      "day": 1,
+      "money": 616,
+      "animal_count": 2,
+      "animals": [
+        {
+          "animal": "COW",
+          "x": 2,
+          "y": 2,
+          "unfed": 1,
+          "fed_today": false,
+          "yield_units": 0,
+          "placed_day": 0
+        },
+        {
+          "animal": "SHEEP",
+          "x": 4,
+          "y": 4,
+          "unfed": 1,
+          "fed_today": false,
+          "yield_units": 0,
+          "placed_day": 0
+        }
+      ],
+      "shed": {}
+    },
+    {
+      "day": 2,
+      "money": 617,
+      "animal_count": 0,
+      "animals": [],
+      "shed": {}
+    },
+    {
+      "day": 3,
+      "money": 375,
+      "animal_count": 0,
+      "animals": [],
+      "shed": {
+        "CARROT": 4
+      }
+    },
+    {
+      "day": 4,
+      "money": 355,
+      "animal_count": 0,
+      "animals": [],
+      "shed": {}
+    },
+    {
+      "day": 5,
+      "money": 354,
+      "animal_count": 0,
+      "animals": [],
+      "shed": {}
+    },
+    {
+      "day": 6,
+      "money": 354,
+      "animal_count": 0,
+      "animals": [],
+      "shed": {}
+    },
+    {
+      "day": 7,
+      "money": 353,
+      "animal_count": 0,
+      "animals": [],
+      "shed": {}
+    },
+    {
+      "day": 8,
+      "money": 353,
+      "animal_count": 0,
+      "animals": [],
+      "shed": {}
+    },
+    {
+      "day": 9,
+      "money": 352,
+      "animal_count": 0,
+      "animals": [],
+      "shed": {}
+    },
+    {
+      "day": 10,
+      "money": 352,
+      "animal_count": 0,
+      "animals": [],
+      "shed": {}
+    },
+    {
+      "day": 11,
+      "money": 351,
+      "animal_count": 0,
+      "animals": [],
+      "shed": {
+        "MELON": 54
+      }
+    },
+    {
+      "day": 12,
+      "money": 13620,
+      "animal_count": 0,
+      "animals": [],
+      "shed": {}
+    },
+    {
+      "day": 13,
+      "money": 10138,
+      "animal_count": 7,
+      "animals": [
+        {
+          "animal": "COW",
+          "x": 2,
+          "y": 0,
+          "unfed": 1,
+          "fed_today": false,
+          "yield_units": 0,
+          "placed_day": 12
+        },
+        {
+          "animal": "SHEEP",
+          "x": 4,
+          "y": 0,
+          "unfed": 1,
+          "fed_today": false,
+          "yield_units": 0,
+          "placed_day": 12
+        },
+        {
+          "animal": "COW",
+          "x": 3,
+          "y": 1,
+          "unfed": 1,
+          "fed_today": false,
+          "yield_units": 0,
+          "placed_day": 12
+        },
+        {
+          "animal": "COW",
+          "x": 4,
+          "y": 1,
+          "unfed": 1,
+          "fed_today": false,
+          "yield_units": 0,
+          "placed_day": 12
+        },
+        {
+          "animal": "SHEEP",
+          "x": 3,
+          "y": 2,
+          "unfed": 1,
+          "fed_today": false,
+          "yield_units": 0,
+          "placed_day": 12
+        },
+        {
+          "animal": "COW",
+          "x": 2,
+          "y": 3,
+          "unfed": 1,
+          "fed_today": false,
+          "yield_units": 0,
+          "placed_day": 12
+        },
+        {
+          "animal": "COW",
+          "x": 1,
+          "y": 4,
+          "unfed": 1,
+          "fed_today": false,
+          "yield_units": 0,
+          "placed_day": 12
+        }
+      ],
+      "shed": {
+        "MELON": 12
+      }
+    },
+    {
+      "day": 14,
+      "money": 11577,
+      "animal_count": 3,
+      "animals": [
+        {
+          "animal": "SHEEP",
+          "x": 0,
+          "y": 0,
+          "unfed": 1,
+          "fed_today": false,
+          "yield_units": 0,
+          "placed_day": 13
+        },
+        {
+          "animal": "COW",
+          "x": 1,
+          "y": 0,
+          "unfed": 1,
+          "fed_today": false,
+          "yield_units": 0,
+          "placed_day": 13
+        },
+        {
+          "animal": "COW",
+          "x": 0,
+          "y": 1,
+          "unfed": 1,
+          "fed_today": false,
+          "yield_units": 0,
+          "placed_day": 13
+        }
+      ],
+      "shed": {
+        "WHEAT": 1,
+        "CARROT": 5,
+        "MELON": 8
+      }
+    },
+    {
+      "day": 15,
+      "money": 10960,
+      "animal_count": 7,
+      "animals": [
+        {
+          "animal": "SHEEP",
+          "x": 0,
+          "y": 0,
+          "unfed": 0,
+          "fed_today": false,
+          "yield_units": 0,
+          "placed_day": 13
+        },
+        {
+          "animal": "COW",
+          "x": 1,
+          "y": 1,
+          "unfed": 1,
+          "fed_today": false,
+          "yield_units": 0,
+          "placed_day": 14
+        },
+        {
+          "animal": "SHEEP",
+          "x": 0,
+          "y": 2,
+          "unfed": 1,
+          "fed_today": false,
+          "yield_units": 0,
+          "placed_day": 14
+        },
+        {
+          "animal": "COW",
+          "x": 4,
+          "y": 2,
+          "unfed": 1,
+          "fed_today": false,
+          "yield_units": 0,
+          "placed_day": 14
+        },
+        {
+          "animal": "COW",
+          "x": 3,
+          "y": 3,
+          "unfed": 1,
+          "fed_today": false,
+          "yield_units": 0,
+          "placed_day": 14
+        },
+        {
+          "animal": "SHEEP",
+          "x": 2,
+          "y": 4,
+          "unfed": 1,
+          "fed_today": false,
+          "yield_units": 0,
+          "placed_day": 14
+        },
+        {
+          "animal": "COW",
+          "x": 3,
+          "y": 4,
+          "unfed": 1,
+          "fed_today": false,
+          "yield_units": 0,
+          "placed_day": 14
+        }
+      ],
+      "shed": {}
+    },
+    {
+      "day": 16,
+      "money": 10960,
+      "animal_count": 1,
+      "animals": [
+        {
+          "animal": "SHEEP",
+          "x": 0,
+          "y": 0,
+          "unfed": 1,
+          "fed_today": false,
+          "yield_units": 0,
+          "placed_day": 13
+        }
+      ],
+      "shed": {}
+    },
+    {
+      "day": 17,
+      "money": 10960,
+      "animal_count": 0,
+      "animals": [],
+      "shed": {}
+    },
+    {
+      "day": 18,
+      "money": 10960,
+      "animal_count": 0,
+      "animals": [],
+      "shed": {}
+    },
+    {
+      "day": 19,
+      "money": 10960,
+      "animal_count": 0,
+      "animals": [],
+      "shed": {}
+    },
+    {
+      "day": 20,
+      "money": 10960,
+      "animal_count": 0,
+      "animals": [],
+      "shed": {}
+    },
+    {
+      "day": 21,
+      "money": 10960,
+      "animal_count": 0,
+      "animals": [],
+      "shed": {}
+    },
+    {
+      "day": 22,
+      "money": 11626,
+      "animal_count": 0,
+      "animals": [],
+      "shed": {
+        "MELON": 1
+      }
+    },
+    {
+      "day": 23,
+      "money": 11445,
+      "animal_count": 1,
+      "animals": [
+        {
+          "animal": "COW",
+          "x": 4,
+          "y": 3,
+          "unfed": 1,
+          "fed_today": false,
+          "yield_units": 0,
+          "placed_day": 22
+        }
+      ],
+      "shed": {
+        "MELON": 24
+      }
+    },
+    {
+      "day": 24,
+      "money": 16373,
+      "animal_count": 0,
+      "animals": [],
+      "shed": {}
+    },
+    {
+      "day": 25,
+      "money": 13372,
+      "animal_count": 6,
+      "animals": [
+        {
+          "animal": "SHEEP",
+          "x": 3,
+          "y": 0,
+          "unfed": 1,
+          "fed_today": false,
+          "yield_units": 0,
+          "placed_day": 24
+        },
+        {
+          "animal": "SHEEP",
+          "x": 2,
+          "y": 1,
+          "unfed": 1,
+          "fed_today": false,
+          "yield_units": 0,
+          "placed_day": 24
+        },
+        {
+          "animal": "SHEEP",
+          "x": 1,
+          "y": 2,
+          "unfed": 1,
+          "fed_today": false,
+          "yield_units": 0,
+          "placed_day": 24
+        },
+        {
+          "animal": "SHEEP",
+          "x": 0,
+          "y": 3,
+          "unfed": 1,
+          "fed_today": false,
+          "yield_units": 0,
+          "placed_day": 24
+        },
+        {
+          "animal": "SHEEP",
+          "x": 1,
+          "y": 3,
+          "unfed": 1,
+          "fed_today": false,
+          "yield_units": 0,
+          "placed_day": 24
+        },
+        {
+          "animal": "SHEEP",
+          "x": 0,
+          "y": 4,
+          "unfed": 1,
+          "fed_today": false,
+          "yield_units": 0,
+          "placed_day": 24
+        }
+      ],
+      "shed": {}
+    },
+    {
+      "day": 26,
+      "money": 13372,
+      "animal_count": 0,
+      "animals": [],
+      "shed": {}
+    },
+    {
+      "day": 27,
+      "money": 13372,
+      "animal_count": 0,
+      "animals": [],
+      "shed": {}
+    },
+    {
+      "day": 28,
+      "money": 13372,
+      "animal_count": 0,
+      "animals": [],
+      "shed": {}
+    },
+    {
+      "day": 29,
+      "money": 13372,
+      "animal_count": 0,
+      "animals": [],
+      "shed": {}
+    }
+  ],
+  "note": "One game. Animal product sell orders are what the agent asked to sell, not a price of zero. Heads escape before the first wool, milk, or egg."
+}
