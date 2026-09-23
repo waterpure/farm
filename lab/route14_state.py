@@ -469,6 +469,17 @@ def _crop_state(tile: dict[str, Any], position: tuple[int, int], day: int, step:
     )
 
 
+def animal_wheat_per_day(animal: str = "") -> int:
+    """Wheat one head eats on a day it is fed.
+
+    The official feed action takes one unit. Standing animals and a head we
+    are only planning to place use the same ration.
+    """
+
+    del animal
+    return 1
+
+
 def _animal_state(tile: dict[str, Any], position: tuple[int, int], day: int, board: int, market: MarketState) -> AnimalState:
     animal = str(tile.get("animal") or "")
     spec = ENGINE_ANIMALS[animal]
@@ -497,7 +508,7 @@ def _animal_state(tile: dict[str, Any], position: tuple[int, int], day: int, boa
         escape_countdown_days=_escape_countdown(fed, missed),
         must_feed=not fed and missed >= 1,
         care_bonus=bonus,
-        wheat_per_day=1,
+        wheat_per_day=animal_wheat_per_day(animal),
         fertilizer_ready=bool(tile.get("fertilizer_available", False)),
         remaining_productions=_remaining_productions(day, _int(tile.get("placed_day")), _int(spec["first_yield_day"]), _int(spec["interval"])),
         next_yield_units=next_units,

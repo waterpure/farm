@@ -896,6 +896,19 @@ def wheat_unit_price(observation: dict[str, Any]) -> int:
     return max(1, _int(prices.get("WHEAT"), 25))
 
 
+def wheat_buy_price(observation: dict[str, Any]) -> int:
+    """What one BUY_PRODUCT WHEAT costs on the current book.
+
+    The engine quotes a buy at the inventory after this unit is removed.
+    When that book is missing, use the spot quote already on the observation.
+    """
+
+    inventory = market_inventory(observation, "WHEAT")
+    if _market_price is not None and inventory is not None:
+        return max(1, int(_market_price("WHEAT", max(0, int(inventory) - 1))))
+    return wheat_unit_price(observation)
+
+
 def feed_runway_cost(observation: dict[str, Any], heads: int) -> int:
     return max(0, heads) * wheat_unit_price(observation) * max(1, remaining_days(observation))
 

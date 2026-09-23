@@ -347,6 +347,7 @@ class RegionProductionTests(unittest.TestCase):
         farm["farmer"] = [4, 4]
         farm["money"] = 0
         observation.private["shed"]["SHEEP"] = 1
+        observation.private["shed"]["WHEAT"] = 7
         agent = make_region_phase1_agent()
         opponent = {"farmer": ["PASS"], "hands": [], "market": []}
         played: list[list] = []
@@ -400,7 +401,7 @@ class RegionProductionTests(unittest.TestCase):
 
         pasture = _tiles()
         pasture[1][1] = None
-        sheep_board = _observation(pasture, day=0, hour=1, money=0, farmer=(4, 4), shed={"SHEEP": 1})
+        sheep_board = _observation(pasture, day=0, hour=1, money=0, farmer=(4, 4), shed={"SHEEP": 1, "WHEAT": 7})
         sheep_board["market"]["inventory"] = {}
         sheep_board["market"]["prices"] = {"WOOL": 500, "WHEAT": 0}
         sheep_world = parse_world(sheep_board)

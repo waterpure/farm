@@ -290,7 +290,8 @@ def _plan_for_hires(
     seeds = _owned_seeds(world)
     real_animals = _shed_animals(world)
     blocked: set[tuple[int, int]] = set()
-    budget = _purchase_budget(world, _wheat_outlay(day_route), hire_cost)
+    feed_reserve, cash_buffer = _operating_holdback(grid)
+    budget = _purchase_budget(world, _wheat_outlay(day_route), hire_cost, feed_reserve, cash_buffer)
     shed_room = _animal_room(observation, day_route, grid, world)
     queue: dict[int, list[Any]] = {hour: [] for hour in range(24)}
     plan: RegionRoutePlan | None = None
@@ -536,10 +537,33 @@ def _place_products(plan: RegionRoutePlan) -> dict[int, set[str]]:
     return products
 
 
-def _purchase_budget(world: Any, wheat_cost: int, hire_cost: int) -> int:
-    """Cash left for seeds and animals after this crew's hires and the wheat buy."""
+def _operating_holdback(grid: TaskGrid) -> tuple[int, int]:
+    """Feed cash and the safety pad the morning portfolio already promised.
 
-    return max(0, int(world.money) - int(wheat_cost) - int(hire_cost))
+    A hand-built grid has no portfolio, so nothing extra is held back. Once a
+    portfolio exists, the real hire cost replaces the portfolio's hire guess:
+    that guess is not added again.
+    """
+
+    portfolio = getattr(grid, "portfolio", None)
+    if portfolio is None:
+        return 0, 0
+    return int(portfolio.reserved_feed_cash), int(portfolio.cash_buffer)
+
+
+def _purchase_budget(
+    world: Any,
+    wheat_cost: int,
+    hire_cost: int,
+    feed_reserve: int = 0,
+    cash_buffer: int = 0,
+) -> int:
+    """Cash left for seeds and animals after hires, wheat, feed, and the pad."""
+
+    return max(
+        0,
+        int(world.money) - int(wheat_cost) - int(hire_cost) - int(feed_reserve) - int(cash_buffer),
+    )
 
 
 def _animal_room(observation: dict[str, Any], day_route: Any, grid: TaskGrid, world: Any) -> int:

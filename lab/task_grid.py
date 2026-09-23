@@ -129,6 +129,7 @@ class TaskGrid:
     def __init__(self, width: int = BOARD_SIZE, height: int = BOARD_SIZE) -> None:
         self.width = width
         self.height = height
+        self.portfolio: Any = None
         self._cells: list[list[TaskBucket | None]] = [[None for _ in range(height)] for _ in range(width)]
 
     def __getitem__(self, x: int) -> list[TaskBucket | None]:
