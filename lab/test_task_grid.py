@@ -6,15 +6,20 @@ import unittest
 
 from kaggle_environments.envs.kaggriculture.kaggriculture import _apply_unit_action, _daily_refresh_plants
 
-from lab.route14_state import COMPLETED, PENDING, SCHEDULED, parse_world
+from lab.route14_phase1 import field_tasks
+from lab.route14_state import COMPLETED, PENDING, SCHEDULED, TaskAssignment, parse_world
 from lab.task_grid import (
+    BUILD_PASTURE,
     CARE,
     COLLECT_FERTILIZER,
+    DIG,
     FEED,
     FERTILIZE,
     HARVEST,
     WATER,
     TaskGridBuilder,
+    apply_assignments,
+    build_task_grid,
     should_fertilize,
     water_yield_gain,
 )
@@ -366,6 +371,56 @@ class TaskGridTests(unittest.TestCase):
         self.assertTrue(tasks[WATER].mandatory)
         self.assertNotIn(COLLECT_FERTILIZER, tasks)
         self.assertNotIn(FEED, tasks)
+
+    def test_scheduled_water_survives_a_rebuild(self) -> None:
+        world = _world("WHEAT", day=2, units=1, dry=1, hour=5)
+        grid = build_task_grid(world)
+        grid.schedule(2, 3, WATER, "Hand2", 6)
+        again = build_task_grid(world, grid)
+        water = again[2][3].tasks[WATER]
+        self.assertEqual(water.status, SCHEDULED)
+        self.assertEqual(water.assigned_worker, "Hand2")
+        self.assertEqual(water.planned_hour, 6)
+        self.assertIn(HARVEST, again[2][3].tasks)
+
+    def test_weed_can_be_dug_and_an_empty_shed_is_not_a_dig(self) -> None:
+        tiles = _tiles()
+        tiles[2][2] = {"kind": "WEED"}
+        tiles[1][1] = {"kind": "PASTURE"}
+        grid = build_task_grid(parse_world(_observation(tiles, day=1)))
+        self.assertEqual(grid[2][2].tasks[DIG].status, PENDING)
+        self.assertNotIn(DIG, grid[1][1].tasks)
+
+    def test_a_scheduled_shed_stays_until_the_pasture_exists(self) -> None:
+        tiles = _tiles()
+        tiles[4][2] = None
+        world = parse_world(_observation(tiles, day=1, hour=2))
+        grid = build_task_grid(world)
+        apply_assignments(grid, world, [TaskAssignment(BUILD_PASTURE, (2, 4), "Hand2", 4, subject="PASTURE")])
+        self.assertEqual(grid[2][4].tasks[BUILD_PASTURE].status, SCHEDULED)
+        kept = build_task_grid(world, grid)
+        self.assertEqual(kept[2][4].tasks[BUILD_PASTURE].status, SCHEDULED)
+        tiles[4][2] = {"kind": "PASTURE"}
+        done = build_task_grid(parse_world(_observation(tiles, day=1, hour=3)), kept)
+        self.assertEqual(done[2][4].tasks[BUILD_PASTURE].status, COMPLETED)
+
+    def test_phase1_reads_pending_jobs_from_the_grid(self) -> None:
+        tiles = _tiles()
+        tiles[3][2] = _plant("WHEAT", planted_day=2, units=1, dry=1)
+        tiles[4][2] = _plant("WHEAT", units=1, dry=0)
+        tiles[1][1] = _animal("SHEEP", unfed=1)
+        tiles[1][2] = _animal("COW", unfed=0)
+        observation = _observation(tiles, day=2, hour=0)
+        grid = build_task_grid(parse_world(observation))
+        self.assertTrue(grid[2][3].tasks[WATER].mandatory)
+        self.assertFalse(grid[2][4].tasks[WATER].mandatory)
+        self.assertEqual(grid[2][4].tasks[WATER].yield_gain, 1)
+        self.assertIn(HARVEST, grid[2][4].tasks)
+        tasks = field_tasks(observation)
+        self.assertEqual(
+            sorted((task.kind, task.target) for task in tasks),
+            [("FEED", (1, 1)), ("HARVEST", (2, 4)), ("WATER", (2, 3))],
+        )
 
 
 if __name__ == "__main__":

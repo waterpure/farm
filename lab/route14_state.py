@@ -254,6 +254,12 @@ class WorkerState:
     remaining: list[WorkerStep] = field(default_factory=list)
     planned: bool = False
 
+    @property
+    def coord(self) -> tuple[int, int]:
+        """Where this worker is standing. A day route starts from here at hour 1."""
+
+        return self.position
+
 
 @dataclass
 class MarketState:
@@ -286,6 +292,7 @@ class FarmState:
     inventory: InventoryState | None
     tasks: list[FieldTaskState] = field(default_factory=list)
     task_pool: list[FieldTaskState] = field(default_factory=list)
+    task_grid: Any = None
     fallow_positions: list[tuple[int, int]] = field(default_factory=list)
     escaped_positions: list[tuple[int, int]] = field(default_factory=list)
 

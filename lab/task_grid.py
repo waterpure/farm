@@ -9,7 +9,8 @@ and an hour are written.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
+from typing import Any
 
 from kaggle_environments.envs.kaggriculture.kaggriculture import CROPS as ENGINE_CROPS
 
@@ -32,6 +33,12 @@ FEED = "FEED"
 CARE = "CARE"
 COLLECT_FERTILIZER = "COLLECT_FERTILIZER"
 FERTILIZE = "FERTILIZE"
+DIG = "DIG"
+PLANT = "PLANT"
+BUILD_COOP = "BUILD_COOP"
+BUILD_PASTURE = "BUILD_PASTURE"
+PLACE_ANIMAL = "PLACE_ANIMAL"
+TILE_JOBS = (DIG, PLANT, BUILD_COOP, BUILD_PASTURE, PLACE_ANIMAL)
 
 
 @dataclass
@@ -92,6 +99,13 @@ class FertilizeTask(TaskState):
 
     fertilized_today: bool = False
     fertilizer_days_left: int = 0
+
+
+@dataclass
+class TileTask(TaskState):
+    """Dig a weed, plant, build a shed, or put an animal into that shed."""
+
+    subject: str = ""
 
 
 @dataclass
@@ -156,6 +170,9 @@ class TaskGridBuilder:
                 done = _completed_harvest(_previous_task(previous, land.position, HARVEST))
                 if done is not None:
                     bucket.tasks[HARVEST] = done
+            if land.weed and land.needs_dig:
+                bucket.tasks[DIG] = _open_tile(DIG, _previous_task(previous, land.position, DIG))
+            _keep_tile_jobs(bucket, world, previous)
             grid.put(bucket)
         for building in farm.buildings:
             if building.position in occupied:
@@ -171,6 +188,7 @@ class TaskGridBuilder:
                 collect = _collect_task(animal, _previous_task(previous, building.position, COLLECT_FERTILIZER))
                 if collect is not None:
                     bucket.tasks[COLLECT_FERTILIZER] = collect
+            _keep_tile_jobs(bucket, world, previous)
             grid.put(bucket)
         return grid
 
@@ -185,7 +203,80 @@ class TaskGridBuilder:
         fertilize = _fertilize_task(world, crop, _previous_task(previous, crop.position, FERTILIZE))
         if fertilize is not None:
             bucket.tasks[FERTILIZE] = fertilize
+        _keep_tile_jobs(bucket, world, previous)
         return bucket
+
+
+def build_task_grid(world: WorldState, previous: TaskGrid | None = None) -> TaskGrid:
+    """Read the parsed farm and return one bucket per owned tile."""
+
+    return TaskGridBuilder().build(world, previous)
+
+
+def apply_assignments(grid: TaskGrid, world: WorldState, assignments: list[Any]) -> None:
+    """Mark jobs scheduled. This does not mark them done."""
+
+    for item in assignments:
+        x, y = item.position
+        if x >= grid.width or y >= grid.height:
+            continue
+        cell = grid[x][y]
+        if cell is None:
+            continue
+        if item.kind in {WATER, FEED, HARVEST}:
+            task = cell.tasks.get(item.kind)
+            if task is None or task.status == COMPLETED:
+                continue
+            task.status = SCHEDULED
+            task.assigned_worker = item.assigned_worker
+            task.planned_hour = item.planned_hour
+            continue
+        if item.kind not in TILE_JOBS:
+            continue
+        if _tile_done(world.farm, item.position, item.kind, item.subject):
+            cell.tasks[item.kind] = TileTask(item.kind, COMPLETED, False, item.assigned_worker, item.planned_hour, item.subject)
+        else:
+            cell.tasks[item.kind] = TileTask(item.kind, SCHEDULED, False, item.assigned_worker, item.planned_hour, item.subject)
+
+
+def _open_tile(kind: str, prior: TaskState | None) -> TileTask:
+    status, worker, hour = _carried(prior)
+    subject = prior.subject if isinstance(prior, TileTask) else ""
+    return TileTask(kind, status, False, worker, hour, subject)
+
+
+def _keep_tile_jobs(bucket: TaskBucket, world: WorldState, previous: TaskGrid | None) -> None:
+    """Keep a scheduled dig, plant, build, or placement until the board shows it."""
+
+    for kind in TILE_JOBS:
+        if kind in bucket.tasks:
+            continue
+        prior = _previous_task(previous, bucket.coord, kind)
+        if prior is None or prior.status == COMPLETED:
+            continue
+        subject = prior.subject if isinstance(prior, TileTask) else ""
+        if _tile_done(world.farm, bucket.coord, kind, subject):
+            bucket.tasks[kind] = TileTask(kind, COMPLETED, False, prior.assigned_worker, prior.planned_hour, subject)
+        else:
+            bucket.tasks[kind] = replace(prior)
+
+
+def _tile_done(farm: Any, position: tuple[int, int], kind: str, subject: str) -> bool:
+    crop = next((item for item in farm.crops if item.position == position), None)
+    animal = next((item for item in farm.animals if item.position == position), None)
+    land = next((item for item in farm.lands if item.position == position), None)
+    building = next((item for item in farm.buildings if item.position == position), None)
+    if kind == PLANT:
+        return crop is not None and (not subject or crop.crop == subject)
+    if kind == BUILD_COOP:
+        return building is not None and building.structure == "COOP"
+    if kind == BUILD_PASTURE:
+        return building is not None and building.structure == "PASTURE"
+    if kind == PLACE_ANIMAL:
+        return animal is not None and (not subject or animal.animal == subject)
+    if kind == DIG:
+        return crop is None and animal is None and building is None and land is not None and land.empty and not land.weed
+    return False
 
 
 def _previous_task(previous: TaskGrid | None, position: tuple[int, int], task_type: str) -> TaskState | None:

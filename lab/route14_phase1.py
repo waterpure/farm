@@ -24,6 +24,7 @@ from kaggle_environments.envs.kaggriculture.kaggriculture import (
 )
 
 from .route14_economy import fib_hire_cost
+from .task_grid import FEED, HARVEST, WATER, apply_assignments, build_task_grid
 from .route14_state import (
     PENDING,
     SHED_CAPACITY,
@@ -173,14 +174,42 @@ class DayRoute:
 
 
 def field_tasks(observation: dict[str, Any]) -> list[FieldTask]:
-    """Take today's open jobs from the task pool, one job per tile and kind."""
+    """Read pending water, feed, and harvest jobs from the tile grid.
 
-    pool = parse_world(observation).farm.task_pool
-    return [
-        FieldTask(task.kind, task.position, task.goods if task.kind == "HARVEST" else "", task.units, task.subject)
-        for task in pool
-        if task.status == PENDING
-    ]
+    Optional water and a feed that is not yet urgent stay on the grid. This
+    route still takes only the jobs the current phase already schedules.
+    """
+
+    world = parse_world(observation)
+    grid = build_task_grid(world)
+    world.farm.task_grid = grid
+    crops = {crop.position: crop for crop in world.farm.crops}
+    animals = {animal.position: animal for animal in world.farm.animals}
+    tasks: list[FieldTask] = []
+    for x in range(grid.width):
+        for cell in grid[x]:
+            if cell is None:
+                continue
+            for kind in (WATER, FEED, HARVEST):
+                task = cell.tasks.get(kind)
+                if task is None or task.status != PENDING:
+                    continue
+                if kind == WATER:
+                    crop = crops.get(cell.coord)
+                    if crop is None or not crop.must_water:
+                        continue
+                    tasks.append(FieldTask(WATER, cell.coord, "", 0, crop.crop))
+                elif kind == FEED:
+                    animal = animals.get(cell.coord)
+                    if animal is None or not animal.must_feed:
+                        continue
+                    tasks.append(FieldTask(FEED, cell.coord, "", 0, animal.animal))
+                else:
+                    animal = animals.get(cell.coord)
+                    product = animal.product if animal is not None else cell.tile_type
+                    name = animal.animal if animal is not None else cell.tile_type
+                    tasks.append(FieldTask(HARVEST, cell.coord, product, task.yield_amount, name))
+    return tasks
 
 
 def _positions(farm: dict[str, Any]) -> list[tuple[int, int]]:
@@ -680,6 +709,7 @@ def attach_route(
     fallow: list[tuple[int, int]] | None = None,
     animals: list[tuple[int, int]] | None = None,
     escaped: list[tuple[int, int]] | None = None,
+    previous_grid: Any = None,
 ) -> None:
     """Write the route onto workers and mark those needs scheduled.
 
@@ -711,6 +741,9 @@ def attach_route(
             holder.next_price = price
             holder.next_revenue = price * batch.units
     settle_tasks(farm, _task_assignments(route), previous_tasks, fallow, animals, escaped)
+    grid = build_task_grid(world, previous_grid)
+    apply_assignments(grid, world, _task_assignments(route))
+    farm.task_grid = grid
     if farm.inventory is not None:
         intake = sum(batch.units for batch in route.batches)
         carried = sum(farm.inventory.carried.values())
@@ -742,6 +775,7 @@ def make_route14_phase1_agent():
         "wheat_bought": False,
         "rival_hands": None,
         "tasks": [],
+        "grid": None,
         "fallow": [],
         "animals": [],
         "escaped": [],
@@ -757,6 +791,7 @@ def make_route14_phase1_agent():
             if day_changed:
                 state["wheat_bought"] = False
                 state["tasks"] = []
+                state["grid"] = None
             state["day"] = day
             state["rival_hands"] = rival_hands
             state["route"] = choose_day_route(observation)
@@ -772,8 +807,10 @@ def make_route14_phase1_agent():
             state["fallow"],
             state["animals"],
             state["escaped"],
+            state["grid"],
         )
         state["tasks"] = list(world.farm.tasks)
+        state["grid"] = world.farm.task_grid
         state["fallow"] = list(world.farm.fallow_positions)
         state["escaped"] = list(world.farm.escaped_positions)
         state["animals"] = [animal.position for animal in world.farm.animals]
