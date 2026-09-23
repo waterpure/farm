@@ -1855,3 +1855,27 @@ LLM 不适合、也不需要参与评测。`.pkl` 若使用，装的是小型策
 - `python -m py_compile lab/route14_state.py lab/task_grid.py` 与 `git diff --check`：通过。
 
 注意：官方引擎 README 的 ongoing 规则是每个生产事件默认给 1，浇水且施肥时给 2；本轮任务层仍按用户要求在实际生产刷新日把 WATER 作为必需日常任务发布，收益计算没有伪造成“无水完全没有基础产量”。
+
+## 2026-09-23：接通 FERTILIZE 路线并完成 seed1 单局
+
+本轮把已经由 TaskGrid 判断出的 `FERTILIZE` 接入主区域执行链，同时保持 CARE 的原有可选同格增产逻辑：
+
+- `lab/region_route.py`：`FERTILIZE` 进入访问任务排序；路线会从 shed `PICKUP FERTILIZER`，执行 `FERTILIZE`，并把消耗计入库存/仓库容量校验。已有动物格若有 `COLLECT_FERTILIZER`，且该格本来就因 FEED/CARE/HARVEST 被访问，会顺手收肥。
+- `lab/region_phase1.py`：把 `FERTILIZE`、`COLLECT_FERTILIZER` 纳入字段动作回写；执行时只验证真实 pickup 库存，避免把已经拿到工人手里的肥料误判成 shed 库存不足；当天路线要用的肥料从 `SELL FERTILIZER` 中预留。
+- `lab/task_grid.py`：允许 `FERTILIZE` 和 `COLLECT_FERTILIZER` 的路线 assignment 正确写回 scheduled/completed 状态。
+- `lab/test_region_route.py`：新增真实肥料 pickup + FERTILIZE 路线测试，并更新动物顺手收肥测试。
+
+验证：
+
+- `./.venv/bin/python -m unittest discover -s lab -p 'test_*.py'`：286 tests OK。
+- `py_compile` 与 `git diff --check`：通过。
+- seed=1、starter、720 steps：`DONE`，现金对账误差 0，无 failed unit/market action。
+- 记录：`experiments/region_phase1_fertilize_v4.jsonl`、`experiments/region_phase1_fertilize_v4_summary.json`。
+- 本版结果：final money **31,598**；sell revenue **42,850**；total spend **14,252**；plant successes **32**；harvest successes **93**；sell units **192**；实际 `FERTILIZE` **3** 次，`COLLECT_FERTILIZER` **47** 次；`FERTILIZER` 销售收入 **4,120**。
+
+收益观察与后续机会：
+
+- 接通施肥/收肥后，相对接通前记录 `region_phase1_fertilize_v1` 的 25,912，本版为 31,598；但同时 crew/动物投资选择发生变化，不能把全部差额归因于施肥，仍需固定同一日路线做 A/B。
+- 本局没有 TOMATO/STRAWBERRY 销售，收入主要来自 MELON、MILK、WOOL；应继续审计种植选择是否过度集中于甜瓜和动物线。
+- 47 次收肥只实际施肥 3 次，说明大部分肥料在当前 observation 下没有被判断为能增加本季可售产量，最终作为肥料卖出；下一轮可比较“卖肥”与“保留肥料等待下一茬”的机会成本，并检查施肥任务是否出现得太晚。
+- 406 个移动小时、226 个 PASS 小时，且无失败动作；后续更有价值的优化方向是减少路线回 shed/重复移动、改进雇工与动物购买时机，而不是放宽 FERTILIZE 判定。

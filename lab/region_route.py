@@ -16,12 +16,12 @@ from kaggle_environments.envs.kaggriculture.kaggriculture import ANIMALS as ENGI
 from kaggle_environments.envs.kaggriculture.kaggriculture import CROPS as ENGINE_CROPS
 
 from .route14_state import ANIMAL_NAMES, PENDING, SHED_CAPACITY, shed_doors
-from .task_grid import CARE, FEED, HARVEST, PLACE_ANIMAL, PLANT, WATER, TaskGrid
+from .task_grid import CARE, COLLECT_FERTILIZER, FEED, FERTILIZE, HARVEST, PLACE_ANIMAL, PLANT, WATER, TaskGrid
 
 
 EXACT_TILES = 10
-MUST_KINDS = (WATER, FEED, HARVEST)
-_KIND_RANK = {WATER: 0, FEED: 1, CARE: 2, HARVEST: 3}
+MUST_KINDS = (WATER, FEED, FERTILIZE, HARVEST)
+_KIND_RANK = {FERTILIZE: 0, WATER: 1, FEED: 2, CARE: 3, COLLECT_FERTILIZER: 4, HARVEST: 5}
 _MAX_ROUNDS = 24
 
 
@@ -100,6 +100,7 @@ def plan_region_routes(
     shed_coords: Sequence[tuple[int, int]] | None = None,
     include_optional: bool = True,
     shed_animals: dict[str, int] | None = None,
+    shed_fertilizer: int = 0,
     shed_total: int = 0,
     blocked_production: Sequence[tuple[int, int]] | None = None,
     include_unpaid_production: bool = False,
@@ -125,9 +126,11 @@ def plan_region_routes(
         raise ValueError("shed_wheat cannot be negative")
     if shed_total < 0:
         raise ValueError("shed_total cannot be negative")
+    if shed_fertilizer < 0:
+        raise ValueError("shed_fertilizer cannot be negative")
     animal_stock = _animal_stock(shed_animals)
     doors = tuple(shed_coords) if shed_coords is not None else shed_doors(task_grid.width)
-    pantry = _Pantry(shed_wheat, doors, animal_stock, shed_total)
+    pantry = _Pantry(shed_wheat, doors, animal_stock, shed_total, shed_fertilizer)
     visits = _extract_visits(task_grid, region_size, origin)
     if visits:
         routes: list[list[TileVisit]] = [[] for _ in crew]
@@ -223,6 +226,7 @@ class _Pantry:
     doors: tuple[tuple[int, int], ...]
     animals: tuple[tuple[str, int], ...] = ()
     shed_total: int = 0
+    fertilizer: int = 0
 
 
 @dataclass(frozen=True)
@@ -365,6 +369,7 @@ def _end_inventory(worker: RegionWorker, leg: _Leg) -> dict[str, int]:
         add(name, amount)
     for visit in leg.visits:
         add("WHEAT", -visit.tasks.count(FEED))
+        add("FERTILIZER", -visit.tasks.count(FERTILIZE))
         if visit.harvest_product and visit.harvest_units > 0 and HARVEST in visit.tasks:
             add(visit.harvest_product, visit.harvest_units)
         for subject in _placed_animals(visit):
@@ -376,6 +381,10 @@ def _end_inventory(worker: RegionWorker, leg: _Leg) -> dict[str, int]:
 
 def _feed_count(visits: Sequence[TileVisit]) -> int:
     return sum(1 for visit in visits if FEED in visit.tasks)
+
+
+def _fertilize_count(visits: Sequence[TileVisit]) -> int:
+    return sum(1 for visit in visits if FERTILIZE in visit.tasks)
 
 
 def _carried(worker: RegionWorker, item: str) -> int:
@@ -442,8 +451,21 @@ def _pickup_needed(worker: RegionWorker, visits: Sequence[TileVisit]) -> int:
     return max(0, _feed_count(visits) - _carried(worker, "WHEAT"))
 
 
+def _fertilizer_pickup_needed(worker: RegionWorker, visits: Sequence[TileVisit]) -> int:
+    """Fertilizer this worker must take for the crop actions on this route."""
+
+    return max(0, _fertilize_count(visits) - _carried(worker, "FERTILIZER"))
+
+
 def _wheat_draw(workers: Sequence[RegionWorker], routes: Sequence[Sequence[TileVisit]]) -> int:
     return sum(_pickup_needed(worker, route) for worker, route in zip(workers, routes))
+
+
+def _fertilizer_draw(workers: Sequence[RegionWorker], routes: Sequence[Sequence[TileVisit]]) -> int:
+    return sum(
+        _fertilizer_pickup_needed(worker, route)
+        for worker, route in zip(workers, routes)
+    )
 
 
 def _within_wheat(
@@ -452,6 +474,14 @@ def _within_wheat(
     pantry: _Pantry,
 ) -> bool:
     return _wheat_draw(workers, routes) <= pantry.wheat
+
+
+def _within_fertilizer(
+    workers: Sequence[RegionWorker],
+    routes: Sequence[Sequence[TileVisit]],
+    pantry: _Pantry,
+) -> bool:
+    return _fertilizer_draw(workers, routes) <= pantry.fertilizer
 
 
 def _layout(worker: RegionWorker, visits: Sequence[TileVisit], doors: Sequence[tuple[int, int]]) -> _Leg:
@@ -464,7 +494,9 @@ def _layout(worker: RegionWorker, visits: Sequence[TileVisit], doors: Sequence[t
     items = list(visits)
     pickup = _pickup_needed(worker, items)
     animals = _item_pickups(worker, items)
-    if not items or (pickup <= 0 and not animals):
+    fertilizer = _fertilizer_pickup_needed(worker, items)
+    item_pickups = animals + (("FERTILIZER", fertilizer),) if fertilizer > 0 else animals
+    if not items or (pickup <= 0 and not item_pickups):
         ordered = _reorder(worker.coord, items)
         travel = _path_moves(worker.coord, [visit.coord for visit in ordered])
         return _with_return(None, 0, ordered, travel, doors)
@@ -472,13 +504,13 @@ def _layout(worker: RegionWorker, visits: Sequence[TileVisit], doors: Sequence[t
     for door in doors:
         ordered = _reorder(door, items)
         travel = _manhattan(worker.coord, door) + _path_moves(door, [visit.coord for visit in ordered])
-        leg = _with_return(door, pickup, ordered, travel, doors, animals)
+        leg = _with_return(door, pickup, ordered, travel, doors, item_pickups)
         key = (leg.action_total, leg.travel + leg.return_travel, door)
         if best is None or key < best[0]:
             best = (key, leg)
     if best is None:
         ordered = _reorder(worker.coord, items)
-        return _with_return(None, pickup, ordered, 10**9, doors, animals)
+        return _with_return(None, pickup, ordered, 10**9, doors, item_pickups)
     return best[1]
 
 
@@ -629,7 +661,7 @@ def _best_insertion(
             continue
         trial_routes = [list(route) for route in routes]
         trial_routes[worker_index] = trial
-        if not _within_animals(workers, trial_routes, pantry):
+        if not _within_animals(workers, trial_routes, pantry) or not _within_fertilizer(workers, trial_routes, pantry):
             continue
         if not _end_day_capacity_safe(
             workers, trial_routes, pantry, pantry.shed_total, start_hour, end_hour
@@ -739,7 +771,11 @@ def _crew_can_carry(
 ) -> bool:
     """Wheat, animals, and the day-end shed all still fit."""
 
-    if not _within_wheat(workers, routes, pantry) or not _within_animals(workers, routes, pantry):
+    if (
+        not _within_wheat(workers, routes, pantry)
+        or not _within_animals(workers, routes, pantry)
+        or not _within_fertilizer(workers, routes, pantry)
+    ):
         return False
     return _end_day_capacity_safe(workers, routes, pantry, pantry.shed_total, start_hour, end_hour)
 
@@ -923,6 +959,13 @@ def _optional_candidates(grid: TaskGrid, routes: Sequence[Sequence[TileVisit]]) 
                 and (FEED in visit.tasks or HARVEST in visit.tasks)
             ):
                 found.append(_Optional(int(care.bonus_gain), visit.coord, CARE, worker_index))
+            collect = cell.tasks.get(COLLECT_FERTILIZER)
+            if (
+                COLLECT_FERTILIZER not in visit.tasks
+                and _open_collect(collect)
+                and (FEED in visit.tasks or CARE in visit.tasks or HARVEST in visit.tasks)
+            ):
+                found.append(_Optional(1, visit.coord, COLLECT_FERTILIZER, worker_index))
     found.sort(key=lambda item: (-item.benefit, item.coord[1], item.coord[0], item.kind))
     return found
 
@@ -946,6 +989,12 @@ def _open_care(task: object) -> bool:
     if task is None or getattr(task, "status", None) != PENDING:
         return False
     return int(getattr(task, "bonus_gain", 0) or 0) > 0
+
+
+def _open_collect(task: object) -> bool:
+    return task is not None and getattr(task, "status", None) == PENDING and bool(
+        getattr(task, "fertilizer_ready", False)
+    )
 
 
 def _with_added_task(visit: TileVisit, kind: str) -> TileVisit:
@@ -1069,7 +1118,11 @@ def _add_production_plans(
             for worker_index, worker in enumerate(workers):
                 trial = [list(route) for route in routes]
                 trial[worker_index] = trial[worker_index] + [visit]
-                if not _within_wheat(workers, trial, pantry) or not _within_animals(workers, trial, pantry):
+                if (
+                    not _within_wheat(workers, trial, pantry)
+                    or not _within_animals(workers, trial, pantry)
+                    or not _within_fertilizer(workers, trial, pantry)
+                ):
                     continue
                 old = _fit_leg(worker, routes[worker_index], pantry.doors, start_hour, end_hour)
                 new = _fit_leg(worker, trial[worker_index], pantry.doors, start_hour, end_hour)

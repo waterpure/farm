@@ -44,7 +44,9 @@ from .task_grid import (
     BUILD_COOP,
     BUILD_PASTURE,
     CARE,
+    COLLECT_FERTILIZER,
     FEED,
+    FERTILIZE,
     HARVEST,
     PLACE_ANIMAL,
     PLANT,
@@ -57,7 +59,7 @@ from .task_grid import (
 
 REGION_SIZE = 5
 MAX_REGION_WORKERS = 4
-FIELD_OPERATIONS = {WATER, FEED, CARE, HARVEST, PLANT, BUILD_COOP, BUILD_PASTURE, PLACE_ANIMAL}
+FIELD_OPERATIONS = {WATER, FEED, CARE, COLLECT_FERTILIZER, FERTILIZE, HARVEST, PLANT, BUILD_COOP, BUILD_PASTURE, PLACE_ANIMAL}
 _MOVES = {
     "NORTH": (0, -1),
     "SOUTH": (0, 1),
@@ -113,6 +115,7 @@ def make_region_phase1_agent():
                 shed_wheat=_shed_wheat(world),
                 shed_coords=shed_doors(grid.width),
                 shed_animals=_shed_animals(world),
+                shed_fertilizer=_shed_fertilizer(world),
                 shed_total=_shed_total(world),
             )
             apply_assignments(grid, world, _assignments(plan))
@@ -311,6 +314,7 @@ def _plan_for_hires(
                 ),
             shed_coords=shed_doors(grid.width),
             shed_animals=offered,
+            shed_fertilizer=_shed_fertilizer(world),
             shed_total=_shed_total(world),
             blocked_production=tuple(sorted(blocked)),
             include_unpaid_production=True,
@@ -859,11 +863,12 @@ def _spendable(world: Any) -> dict[str, Any]:
 
     inventory = getattr(world.farm, "inventory", None)
     if inventory is None:
-        return {"seeds": {}, "animals": {}, "wheat": 0}
+        return {"seeds": {}, "animals": {}, "wheat": 0, "fertilizer": 0}
     return {
         "seeds": {str(name): int(amount or 0) for name, amount in inventory.seeds.items()},
         "animals": {name: int(inventory.shed.get(name, 0) or 0) for name in ANIMAL_NAMES},
         "wheat": int(inventory.shed.get("WHEAT", 0) or 0),
+        "fertilizer": int(inventory.shed.get("FERTILIZER", 0) or 0),
     }
 
 
@@ -909,6 +914,12 @@ def _take_stock(command: list[Any], stock: dict[str, Any]) -> bool:
             return False
         stock["wheat"] -= amount
         return True
+    if command[0] == "PICKUP" and len(command) >= 3 and str(command[1]) == "FERTILIZER":
+        amount = int(command[2])
+        if stock.get("fertilizer", 0) < amount:
+            return False
+        stock["fertilizer"] -= amount
+        return True
     return True
 
 
@@ -950,8 +961,8 @@ def _mandatory_feed_reserve(
     return count
 
 
-def _reserved_pickups(plan: RegionRoutePlan | None, hour: int) -> int:
-    """Wheat this region's plan still takes from the shed at/after this hour.
+def _reserved_pickups(plan: RegionRoutePlan | None, hour: int, item: str = "WHEAT") -> int:
+    """An item this region's plan still takes from the shed at/after this hour.
 
     The sale list is not the old day route. A worker may be sent to an animal
     the old route gave to someone who already had wheat. The engine runs unit
@@ -966,10 +977,31 @@ def _reserved_pickups(plan: RegionRoutePlan | None, hour: int) -> int:
         for action in route.actions_by_hour:
             if action.hour < hour or action.operation != "PICKUP" or len(action.args) < 2:
                 continue
-            if action.args[0] != "WHEAT":
+            if action.args[0] != item:
                 continue
             reserved += int(action.args[1])
     return reserved
+
+
+def _protect_fertilizer_sales(
+    orders: list[list[Any]],
+    plan: RegionRoutePlan | None,
+    hour: int,
+) -> list[list[Any]]:
+    """Keep fertilizer committed to today's crop route out of SELL orders."""
+
+    reserve = _reserved_pickups(plan, hour, "FERTILIZER")
+    if reserve <= 0:
+        return orders
+    protected: list[list[Any]] = []
+    for order in orders:
+        if len(order) < 3 or order[0] != "SELL" or order[1] != "FERTILIZER":
+            protected.append(order)
+            continue
+        amount = max(0, int(order[2]) - reserve)
+        if amount > 0:
+            protected.append([order[0], order[1], amount])
+    return protected
 
 
 def _shed_animals(world: Any) -> dict[str, int]:
@@ -997,6 +1029,15 @@ def _shed_wheat(world: Any) -> int:
     if inventory is None:
         return 0
     return int(inventory.shed.get("WHEAT", 0) or 0)
+
+
+def _shed_fertilizer(world: Any) -> int:
+    """Fertilizer physically available for today's route."""
+
+    inventory = getattr(world.farm, "inventory", None)
+    if inventory is None:
+        return 0
+    return int(inventory.shed.get("FERTILIZER", 0) or 0)
 
 
 def _after(coord: tuple[int, int], operation: str) -> tuple[int, int]:
@@ -1027,6 +1068,7 @@ def _market(
     else:
         reserved = _reserved_pickups(state.get("plan"), hour)
     orders = _market_orders(observation, route, state["market_state"], commands, hour, reserved)
+    orders = _protect_fertilizer_sales(orders, state.get("plan"), hour)
     if hour != 0 or state.get("market_queue"):
         orders = [order for order in orders if order[0] != "HIRE"]
     for task in state.get("market_queue", {}).get(hour, []):

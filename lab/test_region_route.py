@@ -184,15 +184,35 @@ class RegionRouteTests(unittest.TestCase):
         bucket.tasks[WATER] = WaterTask(WATER, PENDING, True, needed=True, turns_until_weed=0, yield_gain=0)
         bucket.tasks[HARVEST] = HarvestTask(HARVEST, PENDING, True, yield_amount=1)
         bucket.tasks[FERTILIZE] = FertilizeTask(FERTILIZE, PENDING, False)
-        plan = plan_region_routes(_grid(bucket), [RegionWorker("Farmer", (1, 1))])
+        plan = plan_region_routes(
+            _grid(bucket),
+            [RegionWorker("Farmer", (1, 1), carrying_items=(("FERTILIZER", 1),))],
+        )
 
         visit = plan.worker_routes[0].visits[0]
-        self.assertEqual(visit.tasks, (WATER, HARVEST))
-        self.assertEqual(visit.action_count, 2)
+        self.assertEqual(visit.tasks, (FERTILIZE, WATER, HARVEST))
+        self.assertEqual(visit.action_count, 3)
         self.assertEqual(visit.harvest_product, "TOMATO")
         operations = [action.operation for action in plan.worker_routes[0].actions_by_hour]
-        self.assertEqual(operations[:2], [WATER, HARVEST])
+        self.assertEqual(operations[:3], [FERTILIZE, WATER, HARVEST])
         self.assertEqual(plan.worker_routes[0].actions_by_hour[-1].args, ("TOMATO", 1))
+
+    def test_fertilize_is_routed_with_a_real_fertilizer_pickup(self) -> None:
+        bucket = TaskBucket((1, 1), "TOMATO")
+        bucket.tasks[FERTILIZE] = FertilizeTask(FERTILIZE, PENDING, False)
+        plan = plan_region_routes(
+            _grid(bucket),
+            [RegionWorker("Farmer", (0, 0))],
+            shed_coords=((0, 0),),
+            shed_fertilizer=1,
+        )
+
+        route = plan.worker_routes[0]
+        self.assertEqual(route.visits[0].tasks, (FERTILIZE,))
+        self.assertEqual(
+            [(action.operation, action.args) for action in route.actions_by_hour],
+            [("PICKUP", ("FERTILIZER", 1)), ("EAST", ()), ("SOUTH", ()), (FERTILIZE, ())],
+        )
 
     def test_feed_and_harvest_on_one_animal_stay_together(self) -> None:
         bucket = TaskBucket((3, 4), "SHEEP")
@@ -202,10 +222,13 @@ class RegionRouteTests(unittest.TestCase):
         bucket.tasks[COLLECT_FERTILIZER] = CollectFertilizerTask(COLLECT_FERTILIZER, PENDING, False, fertilizer_ready=True)
         plan = plan_region_routes(_grid(bucket), [RegionWorker("Farmer", (3, 4), carrying_wheat=1)])
 
-        self.assertEqual(plan.worker_routes[0].visits[0].tasks, (FEED, HARVEST))
+        self.assertEqual(
+            plan.worker_routes[0].visits[0].tasks,
+            (FEED, COLLECT_FERTILIZER, HARVEST),
+        )
         self.assertEqual(plan.worker_routes[0].visits[0].harvest_product, "WOOL")
         operations = [action.operation for action in plan.worker_routes[0].actions_by_hour]
-        self.assertEqual(operations[:2], [FEED, HARVEST])
+        self.assertEqual(operations[:3], [FEED, COLLECT_FERTILIZER, HARVEST])
         places = [action for action in plan.worker_routes[0].actions_by_hour if action.operation == "PLACE"]
         self.assertEqual([(action.args) for action in places], [("WOOL", 1)])
 
