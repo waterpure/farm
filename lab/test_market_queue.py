@@ -13,6 +13,7 @@ from lab.production_plan import PlannedAction, ProductionPlan
 from lab.region_phase1 import (
     _action_for,
     _commit_day_plan,
+    _plan_for_hires,
     _predicted_crew,
     make_region_phase1_agent,
 )
@@ -260,29 +261,35 @@ class MarketQueueTests(unittest.TestCase):
     def test_hour_zero_hires_before_it_buys_the_animal_the_route_will_pick_up(self) -> None:
         grid = _grid(_water(2, 1), _crop_plan(2, 3, "STRAWBERRY", cash=100), _animal_plan(3, 4))
         observation = _observation(_tiles(), money=5000, farmer=(4, 4))
-        plan, queue, crew = _commit_day_plan(
+        chosen = _plan_for_hires(
             observation,
             parse_world(observation),
             grid,
-            _route(target_hires=2, extra_hires=2),
+            _route(target_hires=3, extra_hires=3, wages=99),
+            2,
         )
-        morning = queue[0]
-        plants = [action for route in plan.worker_routes for action in route.actions_by_hour if action.operation == PLANT]
+        self.assertTrue(chosen.feasible)
+        self.assertIsNotNone(chosen.plan)
+        morning = chosen.market_queue[0]
+        assert chosen.plan is not None
+        plants = [action for route in chosen.plan.worker_routes for action in route.actions_by_hour if action.operation == PLANT]
         pickups = [
             action
-            for route in plan.worker_routes
+            for route in chosen.plan.worker_routes
             for action in route.actions_by_hour
             if action.operation == "PICKUP" and action.args and action.args[0] == "SHEEP"
         ]
 
-        self.assertEqual([worker.coord for worker in crew], [(4, 4), (5, 4), (4, 5)])
+        self.assertEqual([worker.coord for worker in chosen.crew], [(4, 4), (5, 4), (4, 5)])
         self.assertEqual(sum(1 for task in morning if task.operation == "HIRE"), 2)
         self.assertTrue(plants)
         self.assertTrue(pickups)
         self.assertEqual(pickups[0].hour, 1)
         animals = [task for task in morning if task.operation == "BUY_ANIMAL"]
         self.assertEqual([(task.item, task.amount, task.deadline) for task in animals], [("SHEEP", 1, 0)])
-        seed_hours = [hour for hour, tasks in queue.items() if any(task.operation == "BUY_SEED" for task in tasks)]
+        seed_hours = [
+            hour for hour, tasks in chosen.market_queue.items() if any(task.operation == "BUY_SEED" for task in tasks)
+        ]
         self.assertEqual(seed_hours, [plants[0].hour - 1])
 
     def test_a_sheep_that_does_not_fit_is_dropped_and_the_hires_stay(self) -> None:
@@ -291,25 +298,31 @@ class MarketQueueTests(unittest.TestCase):
             _tiles(),
             money=5000,
             farmer=(4, 4),
-            shed={item: 1 for item in list(SALE_RANK)[:6]},
+            shed={item: 1 for item in list(SALE_RANK)[:7]},
         )
-        plan, queue, _crew = _commit_day_plan(
+        chosen = _plan_for_hires(
             observation,
             parse_world(observation),
             grid,
-            _route(target_hires=4, extra_hires=4),
+            _route(target_hires=4, extra_hires=4, wages=99),
+            3,
         )
-        self.assertEqual(sum(1 for task in queue[0] if task.operation == "HIRE"), 4)
-        bought = [task for tasks in queue.values() for task in tasks if task.operation == "BUY_ANIMAL"]
+        self.assertTrue(chosen.feasible)
+        self.assertIsNotNone(chosen.plan)
+        assert chosen.plan is not None
+        self.assertEqual(sum(1 for task in chosen.market_queue[0] if task.operation == "HIRE"), 3)
+        bought = [task for tasks in chosen.market_queue.values() for task in tasks if task.operation == "BUY_ANIMAL"]
         self.assertEqual(bought, [])
         placed = [
             action.coord
-            for route in plan.worker_routes
+            for route in chosen.plan.worker_routes
             for action in route.actions_by_hour
             if action.operation == "PLACE"
         ]
         self.assertEqual(placed, [])
-        self.assertTrue(any(action.operation == WATER for route in plan.worker_routes for action in route.actions_by_hour))
+        self.assertTrue(
+            any(action.operation == WATER for route in chosen.plan.worker_routes for action in route.actions_by_hour)
+        )
 
     def test_cash_for_one_sheep_keeps_the_richer_pasture_only(self) -> None:
         grid = _grid(_animal_plan(1, 1, money=9), _animal_plan(1, 2, money=1))
@@ -340,8 +353,9 @@ class MarketQueueTests(unittest.TestCase):
 
     def test_hour_one_plays_the_morning_plan_when_the_birth_tile_matches(self) -> None:
         tiles = _tiles()
-        for spot in ((0, 0), (0, 9), (9, 0), (9, 9)):
-            tiles[spot[1]][spot[0]] = _plant("WHEAT", dry=1)
+        for x in range(5):
+            for y in range(5):
+                tiles[y][x] = _plant("WHEAT", dry=1)
         agent = make_region_phase1_agent()
         observation = _observation(tiles, day=1, hour=0, farmer=(4, 4))
         observation["private"]["seeds"] = {"MELON": 1}
@@ -354,8 +368,8 @@ class MarketQueueTests(unittest.TestCase):
         self.assertEqual(observation["private"]["seeds"], {"MELON": 1})
         self.assertEqual(observation["private"]["shed"], {"SHEEP": 1})
         self.assertEqual([order for order in morning["market"] if order == ["HIRE"]], [["HIRE"] for _ in queued_hires])
-        self.assertTrue(hands)
-        self.assertEqual(hands[0], (5, 4))
+        self.assertEqual(hands, [(5, 4), (4, 5)])
+        self.assertEqual(agent.telemetry["planned_new_hires"], 2)
 
         agent(_observation(tiles, day=1, hour=1, farmer=(4, 4), hands=hands))
         self.assertIs(agent.telemetry["plan"], plan)

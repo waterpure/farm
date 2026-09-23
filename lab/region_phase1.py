@@ -8,6 +8,7 @@ real position does not match that prediction.
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Any
 
 from .market_queue import (
@@ -17,6 +18,7 @@ from .market_queue import (
     tasks_over_budget,
 )
 from .region_route import RegionRoutePlan, RegionWorker, plan_region_routes
+from .route14_economy import fib_hire_cost
 from .route14_phase1 import (
     MAX_MARKET_ORDERS,
     SALE_RANK,
@@ -78,6 +80,8 @@ def make_region_phase1_agent():
         "market_route": None,
         "market_state": {"wheat_bought": False},
         "market_queue": {},
+        "planned_new_hires": 0,
+        "crew_candidates": (),
         "tasks": [],
         "world": None,
     }
@@ -142,6 +146,8 @@ def _reset_day(state: dict[str, Any], day: int) -> None:
     state["market_route"] = None
     state["market_state"] = {"wheat_bought": False}
     state["market_queue"] = {}
+    state["planned_new_hires"] = 0
+    state["crew_candidates"] = ()
     state["force_replan"] = False
     state["tasks"] = []
     state["world"] = None
@@ -151,10 +157,18 @@ def _hour_zero(observation: dict[str, Any], state: dict[str, Any]) -> dict[str, 
     """Pass the morning, and write the worker route and the market queue."""
 
     if state["market_route"] is None:
+        # day_route is still a legacy market helper;
+        # its target_hires no longer decides RegionPhase1 crew size.
         state["market_route"] = choose_day_route(observation)
     world = parse_world(observation)
     grid = build_task_grid(world, None, observation)
-    plan, queue, crew = _commit_day_plan(observation, world, grid, state["market_route"])
+    best, summary = _choose_crew(observation, world, grid, state["market_route"])
+    if best.plan is None:
+        raise RuntimeError("the morning did not write a route")
+    plan = best.plan
+    queue, crew = best.market_queue, best.crew
+    state["planned_new_hires"] = best.new_hires
+    state["crew_candidates"] = summary
     apply_assignments(grid, world, _assignments(plan))
     state["grid"] = grid
     state["plan"] = plan
@@ -173,26 +187,110 @@ def _hour_zero(observation: dict[str, Any], state: dict[str, Any]) -> dict[str, 
     }
 
 
+@dataclass
+class CrewCandidate:
+    """One crew size after its route and its market queue are both feasible."""
+
+    new_hires: int
+    crew: list[RegionWorker]
+    plan: RegionRoutePlan | None
+    market_queue: dict[int, list[Any]]
+    mandatory_unfinished: int
+    production_value: float
+    hire_cost: int
+    total_move_count: int
+    finish_hour: int | None
+    feasible: bool = True
+
+    @property
+    def net_production_value(self) -> float:
+        return self.production_value - self.hire_cost
+
+    @property
+    def key(self) -> tuple:
+        """Fewer unfinished jobs, then a higher net, then a smaller crew."""
+
+        return (
+            self.mandatory_unfinished,
+            -self.net_production_value,
+            self.new_hires,
+            self.total_move_count,
+            0 if self.finish_hour is None else self.finish_hour,
+        )
+
+
 def _commit_day_plan(
     observation: dict[str, Any],
     world: Any,
     grid: TaskGrid,
     day_route: Any,
 ) -> tuple[RegionRoutePlan, dict[int, list[Any]], list[RegionWorker]]:
-    """Plan hours 1–23, then buy only what that route still lacks.
+    """Try every crew that still fits in four people, and keep the best day.
 
-    A seed or animal the market cannot deliver drops its whole production
-    chain, and the route is written again. Mandatory water, feed, and harvest
-    are never the thing that gets dropped.
+    day_route is still a legacy market helper;
+    its target_hires no longer decides RegionPhase1 crew size.
     """
 
+    best, _summary = _choose_crew(observation, world, grid, day_route)
+    if best.plan is None:
+        raise RuntimeError("the morning did not write a route")
+    return best.plan, best.market_queue, best.crew
+
+
+def _choose_crew(
+    observation: dict[str, Any],
+    world: Any,
+    grid: TaskGrid,
+    day_route: Any,
+) -> tuple[CrewCandidate, tuple[tuple[int, int, float, int], ...]]:
+    """Rank finished days. A crew that cannot actually be hired is left out."""
+
+    candidates = [
+        _plan_for_hires(observation, world, grid, day_route, new_hires)
+        for new_hires in _feasible_hire_counts(world)
+    ]
+    feasible = [candidate for candidate in candidates if candidate.feasible and candidate.plan is not None]
+    if not feasible:
+        raise RuntimeError("the morning did not write a route")
+    best = min(feasible, key=lambda candidate: candidate.key)
+    summary = tuple(
+        (candidate.new_hires, candidate.mandatory_unfinished, candidate.production_value, candidate.hire_cost)
+        for candidate in candidates
+        if candidate.feasible
+    )
+    return best, summary
+
+
+def _feasible_hire_counts(world: Any) -> list[int]:
+    """Zero new hands through as many as still fit beside the people already here."""
+
+    present = min(len(_crew(world)), MAX_REGION_WORKERS)
+    return list(range(MAX_REGION_WORKERS - present + 1))
+
+
+def _plan_for_hires(
+    observation: dict[str, Any],
+    world: Any,
+    grid: TaskGrid,
+    day_route: Any,
+    new_hires: int,
+) -> CrewCandidate:
+    """Write one crew's route and purchases. This does not pick the winner.
+
+    The blocked set starts empty. Nothing is removed from the task grid, so
+    the next crew size can try the same empty tiles again.
+    """
+
+    hire_cost = _hire_cost_for_count(_already_hired(observation), new_hires)
+    crew = _predicted_crew(world, new_hires, grid.width)
+    hour0_slots, leftover_sales = _opening_market(observation, day_route, grid)
+    if new_hires > MAX_MARKET_ORDERS - hour0_slots or hire_cost > _hire_cash(world, day_route):
+        return _rejected(new_hires, crew, hire_cost)
     origin = _region_origin(grid)
-    crew = _predicted_crew(world, _new_hires(observation, day_route), grid.width)
     seeds = _owned_seeds(world)
     real_animals = _shed_animals(world)
     blocked: set[tuple[int, int]] = set()
-    hour0_slots, leftover_sales = _opening_market(observation, day_route, grid)
-    budget = _purchase_budget(world, day_route)
+    budget = _purchase_budget(world, _wheat_outlay(day_route), hire_cost)
     shed_room = _animal_room(observation, day_route, grid, world)
     queue: dict[int, list[Any]] = {hour: [] for hour in range(24)}
     plan: RegionRoutePlan | None = None
@@ -209,10 +307,10 @@ def _commit_day_plan(
             shed_coords=shed_doors(grid.width),
             shed_animals=offered,
             shed_total=_shed_total(world),
-            blocked_production=tuple(blocked),
+            blocked_production=tuple(sorted(blocked)),
             include_unpaid_production=True,
         )
-        tasks = derive_supermarket_tasks(plan, seeds, real_animals, _new_hires(observation, day_route))
+        tasks = derive_supermarket_tasks(plan, seeds, real_animals, new_hires)
         occupied = _occupied_slots(hour0_slots, leftover_sales, plan)
         queue, failed = schedule_market_queue(tasks, occupied)
         queued = [task for hour_tasks in queue.values() for task in hour_tasks]
@@ -220,14 +318,101 @@ def _commit_day_plan(
         if sum(task.amount for task in queued if task.operation == "BUY_ANIMAL") > shed_room:
             failed = [*failed, *[task for task in queued if task.operation == "BUY_ANIMAL"]]
         if not failed:
-            return plan, queue, crew
+            break
         victim = _lowest_failed_plan(grid, failed)
         if victim is None or victim in blocked:
-            return plan, _without_tasks(queue, failed), crew
+            queue = _without_tasks(queue, failed)
+            break
         blocked.add(victim)
-    if plan is None:
-        raise RuntimeError("the morning did not write a route")
-    return plan, queue, crew
+    else:
+        if plan is None:
+            return _rejected(new_hires, crew, hire_cost)
+    if plan is None or _hire_orders(queue) != new_hires:
+        return _rejected(new_hires, crew, hire_cost)
+    return CrewCandidate(
+        new_hires,
+        crew,
+        plan,
+        queue,
+        len(plan.unfinished_visits),
+        _scheduled_production_value(grid, plan),
+        hire_cost,
+        plan.total_move_count,
+        plan.finish_hour,
+    )
+
+
+def _rejected(new_hires: int, crew: list[RegionWorker], hire_cost: int) -> CrewCandidate:
+    return CrewCandidate(
+        new_hires,
+        crew,
+        None,
+        {hour: [] for hour in range(24)},
+        0,
+        0.0,
+        hire_cost,
+        0,
+        None,
+        False,
+    )
+
+
+def _hire_orders(queue: dict[int, list[Any]]) -> int:
+    return sum(1 for task in queue.get(0, []) if task.operation == "HIRE")
+
+
+def _hire_cost_for_count(already_hired: int, new_hires: int) -> int:
+    """Official rising hire price, one new hand at a time."""
+
+    return sum(fib_hire_cost(already_hired + offset) for offset in range(max(0, new_hires)))
+
+
+def _already_hired(observation: dict[str, Any]) -> int:
+    player = int(observation.get("player") or 0)
+    farms = observation.get("farms") or []
+    farm = farms[player] if 0 <= player < len(farms) else {}
+    return int((farm or {}).get("hires_today") or 0)
+
+
+def _hire_cash(world: Any, day_route: Any) -> int:
+    """Cash left for new hands after the wheat this morning still has to buy."""
+
+    return max(0, int(world.money) - _wheat_outlay(day_route))
+
+
+def _wheat_outlay(day_route: Any) -> int:
+    if int(getattr(day_route, "start_hour", 0) or 0) != 0:
+        return 0
+    return int(getattr(day_route, "wheat_cost", 0) or 0)
+
+
+def _scheduled_production_value(grid: TaskGrid, plan: RegionRoutePlan) -> float:
+    """Money per day of empty-tile chains the route actually plants or houses.
+
+    A harvest that was already standing in the field is mandatory work. It is
+    not counted again here.
+    """
+
+    coords: set[tuple[int, int]] = set()
+    for route in plan.worker_routes:
+        for action in route.actions_by_hour:
+            if action.coord is None:
+                continue
+            if action.operation == PLANT:
+                coords.add(action.coord)
+            elif (
+                action.operation == "PLACE"
+                and len(action.args) == 1
+                and str(action.args[0]) in ANIMAL_NAMES
+            ):
+                coords.add(action.coord)
+    total = 0.0
+    for coord in sorted(coords):
+        item = _plan_at(grid, coord)
+        if item is None:
+            continue
+        total += float(getattr(item, "money_per_day", 0) or 0)
+    return total
 
 
 def _predicted_crew(
@@ -256,14 +441,6 @@ def _next_spawn(board_size: int, positions: list[tuple[int, int]]) -> tuple[int,
     """The door the engine's `_spawn_hand` would pick for the next hire."""
 
     return _spawn_door(positions, shed_doors(board_size))
-
-
-def _new_hires(observation: dict[str, Any], day_route: Any) -> int:
-    player = int(observation.get("player") or 0)
-    farms = observation.get("farms") or []
-    farm = farms[player] if 0 <= player < len(farms) else {}
-    already = int((farm or {}).get("hires_today") or 0)
-    return max(0, int(day_route.target_hires) - already)
 
 
 def _owned_seeds(world: Any) -> dict[str, int]:
@@ -359,10 +536,10 @@ def _place_products(plan: RegionRoutePlan) -> dict[int, set[str]]:
     return products
 
 
-def _purchase_budget(world: Any, day_route: Any) -> int:
-    """Cash left after today's hires and wheat. A sale is not counted as spent."""
+def _purchase_budget(world: Any, wheat_cost: int, hire_cost: int) -> int:
+    """Cash left for seeds and animals after this crew's hires and the wheat buy."""
 
-    return max(0, int(world.money) - int(day_route.wages) - int(day_route.wheat_cost))
+    return max(0, int(world.money) - int(wheat_cost) - int(hire_cost))
 
 
 def _animal_room(observation: dict[str, Any], day_route: Any, grid: TaskGrid, world: Any) -> int:

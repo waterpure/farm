@@ -26,9 +26,10 @@ class RegionPhase1Tests(unittest.TestCase):
         hired = agent(morning)
 
         self.assertEqual(hired["farmer"], ["PASS"])
-        self.assertIn(["HIRE"], hired["market"])
+        self.assertEqual(agent.telemetry["planned_new_hires"], 0)
+        self.assertNotIn(["HIRE"], hired["market"])
         self.assertIsNotNone(agent.telemetry["plan"])
-        self.assertIn(("Hand1", (5, 4)), agent.telemetry["planned_workers"])
+        self.assertNotIn(("Hand1", (5, 4)), agent.telemetry["planned_workers"])
 
         appeared = _observation(tiles, day=1, hour=1, farmer=(4, 4), hands=[(1, 2)])
         agent(appeared)
@@ -234,7 +235,7 @@ class RegionPhase1Tests(unittest.TestCase):
         opened = agent(morning)
 
         self.assertEqual(morning["farms"][0]["hands"], [])
-        self.assertIn(["HIRE"], opened["market"])
+        self.assertEqual(agent.telemetry["planned_new_hires"], 0)
         wheat_sales = [order for order in opened["market"] if order[:2] == ["SELL", "WHEAT"]]
         self.assertEqual(wheat_sales, [["SELL", "WHEAT", 3]])
         self.assertNotIn(["SELL", "WHEAT", 4], opened["market"])
