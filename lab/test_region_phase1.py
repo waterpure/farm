@@ -105,18 +105,21 @@ class RegionPhase1Tests(unittest.TestCase):
         self.assertNotEqual(action["farmer"], ["HARVEST"])
         self.assertEqual(agent.telemetry["planned_workers"], [("Farmer", (0, 2))])
 
-    def test_optional_water_stays_on_the_grid_and_out_of_the_route(self) -> None:
+    def test_optional_water_on_a_harvest_tile_is_scheduled_before_the_harvest(self) -> None:
         tiles = _tiles()
         tiles[3][2] = _plant("WHEAT", units=4, dry=1)
-        observation = _observation(tiles, day=2, hour=1, farmer=(2, 3))
         agent = make_region_phase1_agent()
-        action = agent(observation)
-
-        self.assertEqual(action["farmer"], ["HARVEST"])
-        self.assertNotIn("WATER", [item.operation for item in agent.telemetry["plan"].worker_routes[0].actions_by_hour])
+        first = _observation(tiles, day=2, hour=1, farmer=(2, 3))
+        self.assertEqual(agent(first)["farmer"], ["WATER"])
         water = agent.telemetry["grid"][2][3].tasks["WATER"]
+        self.assertEqual(water.status, SCHEDULED)
         self.assertFalse(water.mandatory)
         self.assertEqual(water.yield_gain, 1)
+
+        tiles[3][2]["watered_today"] = True
+        second = _observation(tiles, day=2, hour=2, farmer=(2, 3))
+        self.assertEqual(agent(second)["farmer"], ["HARVEST"])
+        self.assertEqual(agent.telemetry["grid"][2][3].tasks["WATER"].status, COMPLETED)
 
     def test_engine_steps_land_on_the_squares_the_route_already_named(self) -> None:
         environment = make(
@@ -370,6 +373,57 @@ class RegionPhase1Tests(unittest.TestCase):
         done = next(task for task in agent.telemetry["world"].farm.tasks if task.kind == "HARVEST")
         self.assertEqual(done.status, COMPLETED)
         self.assertEqual((done.planned_hour, done.planned_drop_hour, done.planned_sell_hour), (1, 2, 2))
+
+    def test_care_shifts_the_recorded_unload_hour(self) -> None:
+        tiles = _tiles()
+        tiles[3][4] = _animal("SHEEP", units=1, fed=True)
+        agent = make_region_phase1_agent()
+        agent(_observation(tiles, day=1, hour=1, farmer=(4, 4)))
+        sheep = next(animal for animal in agent.telemetry["world"].farm.animals if animal.animal == "SHEEP")
+        actions = agent.telemetry["plan"].worker_routes[0].actions_by_hour
+        care = next(action.hour for action in actions if action.operation == "CARE")
+        harvest = next(action.hour for action in actions if action.operation == "HARVEST")
+        place = next(action.hour for action in actions if action.operation == "PLACE")
+
+        self.assertLess(care, harvest)
+        self.assertEqual(sheep.planned_care_hour, care)
+        self.assertEqual(sheep.care_status, SCHEDULED)
+        self.assertEqual(sheep.planned_harvest_hour, harvest)
+        self.assertEqual(sheep.planned_drop_hour, place)
+        self.assertEqual(sheep.planned_sell_hour, place)
+        self.assertEqual(agent.telemetry["grid"][4][3].tasks["CARE"].status, SCHEDULED)
+
+    def test_the_engine_marks_the_animal_fed_and_cared_on_separate_turns(self) -> None:
+        environment = make(
+            "kaggriculture",
+            configuration={"episodeSteps": 8, "seed": 1},
+            debug=True,
+        )
+        environment.reset()
+        observation = environment.steps[0][0].observation
+        farm = observation.farms[0]
+        animal = _animal("SHEEP", unfed=1)
+        animal["pending_care_bonus"] = 0
+        animal["fertilizer_available"] = False
+        animal["cared_today"] = False
+        farm["tiles"][4][3] = animal
+        farm["money"] = 0
+        observation.private["inventories"] = [{"WHEAT": 1}]
+        agent = make_region_phase1_agent()
+        opponent = {"farmer": ["PASS"], "hands": [], "market": []}
+        played: list[list] = []
+        for _ in range(4):
+            action = agent(environment.steps[-1][0].observation)
+            played.append(list(action["farmer"]))
+            environment.step([action, opponent])
+
+        self.assertEqual(played[0], ["PASS"])
+        self.assertEqual(played[1], ["WEST"])
+        self.assertEqual(played[2], ["FEED"])
+        self.assertEqual(played[3], ["CARE"])
+        tile = environment.steps[-1][0].observation.farms[0]["tiles"][4][3]
+        self.assertTrue(tile["fed_today"])
+        self.assertTrue(tile["cared_today"])
 
 
 def _moved(position: tuple[int, int], operation: str) -> tuple[int, int]:

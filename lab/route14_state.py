@@ -174,6 +174,9 @@ class AnimalState:
     planned_harvest_hour: int | None = None
     planned_drop_hour: int | None = None
     planned_sell_hour: int | None = None
+    care_status: str | None = None
+    care_worker: str | None = None
+    planned_care_hour: int | None = None
 
 
 @dataclass
@@ -658,6 +661,8 @@ def _need_confirmed(farm: FarmState, task: FieldTaskState) -> bool:
         return crop is not None and crop.watered_today
     if task.kind == "FEED":
         return animal is not None and animal.fed_today
+    if task.kind == "CARE":
+        return animal is not None and animal.cared_today
     if task.kind == "HARVEST" and task.units > 0:
         if crop is not None:
             return crop.yield_units <= 0
@@ -741,6 +746,9 @@ def _mirror_tasks(farm: FarmState) -> None:
         animal.planned_harvest_hour = None
         animal.planned_drop_hour = None
         animal.planned_sell_hour = None
+        animal.care_status = None
+        animal.care_worker = None
+        animal.planned_care_hour = None
     for task in farm.tasks:
         crop, animal, land = _occupants(farm, task.position)
         building = _building_at(farm, task.position)
@@ -764,6 +772,10 @@ def _mirror_tasks(farm: FarmState) -> None:
             animal.feed_status = task.status
             animal.feed_worker = task.assigned_worker
             animal.planned_feed_hour = task.planned_hour
+        elif task.kind == "CARE" and animal is not None:
+            animal.care_status = task.status
+            animal.care_worker = task.assigned_worker
+            animal.planned_care_hour = task.planned_hour
         elif task.kind == "HARVEST" and crop is not None:
             crop.harvest_status = task.status
             crop.harvest_worker = task.assigned_worker
@@ -887,12 +899,12 @@ def settle_tasks(
     for key, item in assigned.items():
         if key[0] in TILE_CHANGES and key not in merged:
             merged[key] = FieldTaskState(item.kind, item.position, PENDING, item.subject)
+        elif key[0] in {"CARE", "WATER"} and key not in merged:
+            merged[key] = FieldTaskState(item.kind, item.position, PENDING, item.subject)
     result: list[FieldTaskState] = []
     for key, task in merged.items():
         if _need_confirmed(farm, task):
             task.status = COMPLETED
-        elif not _need_open(farm, task):
-            continue
         elif key in assigned:
             item = assigned[key]
             task.assigned_worker = item.assigned_worker
@@ -902,6 +914,8 @@ def settle_tasks(
             if item.subject:
                 task.subject = item.subject
             task.status = SCHEDULED
+        elif not _need_open(farm, task):
+            continue
         else:
             task.assigned_worker = None
             task.planned_hour = None

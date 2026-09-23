@@ -16,12 +16,12 @@ from kaggle_environments.envs.kaggriculture.kaggriculture import ANIMALS as ENGI
 from kaggle_environments.envs.kaggriculture.kaggriculture import CROPS as ENGINE_CROPS
 
 from .route14_state import PENDING, shed_doors
-from .task_grid import FEED, HARVEST, WATER, TaskGrid
+from .task_grid import CARE, FEED, HARVEST, WATER, TaskGrid
 
 
 EXACT_TILES = 10
 MUST_KINDS = (WATER, FEED, HARVEST)
-_KIND_RANK = {WATER: 0, FEED: 1, HARVEST: 2}
+_KIND_RANK = {WATER: 0, FEED: 1, CARE: 2, HARVEST: 3}
 _MAX_ROUNDS = 24
 
 
@@ -94,6 +94,7 @@ def plan_region_routes(
     origin: tuple[int, int] = (0, 0),
     shed_wheat: int = 0,
     shed_coords: Sequence[tuple[int, int]] | None = None,
+    include_optional: bool = True,
 ) -> RegionRoutePlan:
     """Assign every must-do tile in one square to the given workers.
 
@@ -129,6 +130,10 @@ def plan_region_routes(
         worker_index, ordered = placed
         routes[worker_index] = ordered
     scored = _search(crew, routes, leftover, start_hour, end_hour, pantry)
+    if include_optional:
+        scored = _add_same_tile_optional_tasks(
+            task_grid, crew, scored, start_hour, end_hour, pantry
+        )
     return _materialize(crew, scored, start_hour, end_hour, pantry)
 
 
@@ -576,6 +581,108 @@ def _fits(
     """True when the shed stop, the walk, and the jobs all finish by end_hour."""
 
     return _leg_fits(_layout(worker, visits, doors), start_hour, end_hour)
+
+
+def _add_same_tile_optional_tasks(
+    grid: TaskGrid,
+    workers: Sequence[RegionWorker],
+    scored: _Score,
+    start_hour: int,
+    end_hour: int,
+    pantry: _Pantry,
+) -> _Score:
+    """Add care or extra-yield water only on tiles this route already visits.
+
+    Each added action costs one hour and is kept only when the worker's whole
+    walk, including the trip back to the shed, still finishes by end_hour.
+    A tile that is not already on the mandatory route is left alone.
+    """
+
+    routes = [list(route) for route in scored.routes]
+    candidates = _optional_candidates(grid, routes)
+    current = scored
+    for candidate in candidates:
+        trial = [list(route) for route in routes]
+        trial[candidate.worker_index] = [
+            _with_added_task(visit, candidate.kind) if visit.coord == candidate.coord else visit
+            for visit in trial[candidate.worker_index]
+        ]
+        if not _fits(
+            workers[candidate.worker_index],
+            trial[candidate.worker_index],
+            pantry.doors,
+            start_hour,
+            end_hour,
+        ):
+            continue
+        updated = _score(workers, trial, list(current.leftover), start_hour, end_hour, pantry)
+        if {visit.coord for visit in updated.leftover} != {visit.coord for visit in current.leftover}:
+            continue
+        routes = [list(route) for route in updated.routes]
+        current = updated
+    return current
+
+
+@dataclass(frozen=True)
+class _Optional:
+    benefit: int
+    coord: tuple[int, int]
+    kind: str
+    worker_index: int
+
+
+def _optional_candidates(grid: TaskGrid, routes: Sequence[Sequence[TileVisit]]) -> list[_Optional]:
+    found: list[_Optional] = []
+    for worker_index, route in enumerate(routes):
+        for visit in route:
+            cell = _cell_at(grid, visit.coord)
+            if cell is None:
+                continue
+            water = cell.tasks.get(WATER)
+            if WATER not in visit.tasks and _open_optional_water(water):
+                found.append(_Optional(int(water.yield_gain), visit.coord, WATER, worker_index))
+            care = cell.tasks.get(CARE)
+            if (
+                CARE not in visit.tasks
+                and _open_care(care)
+                and (FEED in visit.tasks or HARVEST in visit.tasks)
+            ):
+                found.append(_Optional(int(care.bonus_gain), visit.coord, CARE, worker_index))
+    found.sort(key=lambda item: (-item.benefit, item.coord[1], item.coord[0], item.kind))
+    return found
+
+
+def _cell_at(grid: TaskGrid, coord: tuple[int, int]):
+    x, y = coord
+    if not (0 <= x < grid.width and 0 <= y < grid.height):
+        return None
+    return grid[x][y]
+
+
+def _open_optional_water(task: object) -> bool:
+    if task is None or getattr(task, "status", None) != PENDING:
+        return False
+    if getattr(task, "mandatory", False):
+        return False
+    return int(getattr(task, "yield_gain", 0) or 0) > 0
+
+
+def _open_care(task: object) -> bool:
+    if task is None or getattr(task, "status", None) != PENDING:
+        return False
+    return int(getattr(task, "bonus_gain", 0) or 0) > 0
+
+
+def _with_added_task(visit: TileVisit, kind: str) -> TileVisit:
+    ordered = _task_order(visit.tile_type, [*visit.tasks, kind])
+    return TileVisit(
+        visit.coord,
+        ordered,
+        len(ordered),
+        visit.tile_type,
+        visit.harvest_product,
+        visit.harvest_units,
+    )
 
 
 def _expand(

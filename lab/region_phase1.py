@@ -13,12 +13,12 @@ from typing import Any
 from .region_route import RegionRoutePlan, RegionWorker, plan_region_routes
 from .route14_phase1 import _market_orders, choose_day_route
 from .route14_state import PENDING, SCHEDULED, TaskAssignment, parse_world, settle_tasks, shed_doors, worker_name
-from .task_grid import FEED, HARVEST, WATER, TaskGrid, apply_assignments, build_task_grid
+from .task_grid import CARE, FEED, HARVEST, WATER, TaskGrid, apply_assignments, build_task_grid
 
 
 REGION_SIZE = 5
 MAX_REGION_WORKERS = 4
-FIELD_OPERATIONS = {WATER, FEED, HARVEST}
+FIELD_OPERATIONS = {WATER, FEED, CARE, HARVEST}
 _MOVES = {
     "NORTH": (0, -1),
     "SOUTH": (0, 1),
@@ -178,7 +178,7 @@ def _must_coords(grid: TaskGrid) -> list[tuple[int, int]]:
                 task = cell.tasks.get(kind)
                 if task is None or task.status != PENDING:
                     continue
-                if kind in {WATER, FEED} and not getattr(task, "mandatory", False):
+                if kind != HARVEST and not getattr(task, "mandatory", False):
                     continue
                 coords.append(cell.coord)
                 break

@@ -223,7 +223,7 @@ def apply_assignments(grid: TaskGrid, world: WorldState, assignments: list[Any])
         cell = grid[x][y]
         if cell is None:
             continue
-        if item.kind in {WATER, FEED, HARVEST}:
+        if item.kind in {WATER, FEED, CARE, HARVEST}:
             task = cell.tasks.get(item.kind)
             if task is None or task.status == COMPLETED:
                 continue
