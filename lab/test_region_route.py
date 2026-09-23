@@ -12,11 +12,13 @@ from lab.region_route import (
     _insertion_extra,
     _path_moves,
     _reorder,
+    _task_order,
     _visit_sort,
     plan_region_routes,
 )
 from lab.route14_state import PENDING, SCHEDULED
 from lab.task_grid import (
+    TaskGridBuilder,
     CARE,
     COLLECT_FERTILIZER,
     FEED,
@@ -32,6 +34,7 @@ from lab.task_grid import (
     TaskGrid,
     WaterTask,
 )
+from lab.test_task_grid import _world
 
 
 def _harvest(x: int, y: int, tile: str = "WHEAT") -> TaskBucket:
@@ -79,28 +82,49 @@ class RegionRouteTests(unittest.TestCase):
         self.assertNotIn("GO_TO", [action.operation for action in route.actions_by_hour])
         self.assertEqual(route.finish_hour, 5)
 
-    def test_ripe_wheat_is_harvested_without_watering(self) -> None:
+    def test_ripe_wheat_below_the_cap_is_harvested_while_the_water_stays_optional(self) -> None:
+        world = _world("WHEAT", day=2, units=4, dry=1)
+        grid = TaskGridBuilder().build(world)
+        water = grid[2][3].tasks[WATER]
+        self.assertEqual(water.yield_gain, 1)
+        self.assertFalse(water.mandatory)
+        self.assertIn(HARVEST, grid[2][3].tasks)
+
+        plan = plan_region_routes(grid, [RegionWorker("Farmer", (2, 3))])
+
+        self.assertEqual(plan.worker_routes[0].visits[0].tasks, (HARVEST,))
+        self.assertEqual(
+            [action.operation for action in plan.worker_routes[0].actions_by_hour],
+            [HARVEST],
+        )
+        self.assertEqual(grid[2][3].tasks[WATER].yield_gain, 1)
+        self.assertFalse(grid[2][3].tasks[WATER].mandatory)
+
+    def test_wheat_at_max_yield_is_harvested_without_a_water_stop(self) -> None:
+        world = _world("WHEAT", day=4, units=6, dry=1, fertilized_until=4)
+        grid = TaskGridBuilder().build(world)
+        self.assertNotIn(WATER, grid[2][3].tasks)
+        self.assertEqual(grid[2][3].tasks[HARVEST].yield_amount, 6)
+        plan = plan_region_routes(grid, [RegionWorker("Farmer", (2, 3))])
+        self.assertEqual(
+            [action.operation for action in plan.worker_routes[0].actions_by_hour],
+            [HARVEST],
+        )
+
+    def test_one_shot_visit_waters_before_it_harvests(self) -> None:
+        self.assertEqual(_task_order("WHEAT", [HARVEST, WATER]), (WATER, HARVEST))
+        self.assertEqual(_task_order("CARROT", [HARVEST, WATER]), (WATER, HARVEST))
+        self.assertEqual(_task_order("MELON", [HARVEST, WATER]), (WATER, HARVEST))
         bucket = TaskBucket((2, 3), "WHEAT")
         bucket.tasks[WATER] = WaterTask(WATER, PENDING, True, needed=True, turns_until_weed=0, yield_gain=1)
-        bucket.tasks[HARVEST] = HarvestTask(HARVEST, PENDING, True, yield_amount=2)
-        thirsty = TaskBucket((0, 0), "WHEAT")
-        thirsty.tasks[WATER] = WaterTask(WATER, PENDING, True, needed=True, turns_until_weed=0, yield_gain=1)
-        plan = plan_region_routes(_grid(bucket, thirsty), [RegionWorker("Farmer", (2, 2))])
+        bucket.tasks[HARVEST] = HarvestTask(HARVEST, PENDING, True, yield_amount=5)
+        plan = plan_region_routes(_grid(bucket), [RegionWorker("Farmer", (2, 3))])
 
-        ripe = next(visit for visit in plan.worker_routes[0].visits if visit.coord == (2, 3))
-        young = next(visit for visit in plan.worker_routes[0].visits if visit.coord == (0, 0))
-        self.assertEqual(ripe.tasks, (HARVEST,))
-        self.assertEqual(ripe.action_count, 1)
-        self.assertEqual(young.tasks, (WATER,))
-        ripe_actions = [
-            (action.operation, action.coord)
-            for action in plan.worker_routes[0].actions_by_hour
-            if action.coord == (2, 3)
-        ]
-        self.assertEqual(ripe_actions, [("HARVEST", (2, 3))])
-        self.assertNotIn(
-            ("WATER", (2, 3)),
-            [(action.operation, action.coord) for action in plan.worker_routes[0].actions_by_hour],
+        self.assertEqual(plan.worker_routes[0].visits[0].tasks, (WATER, HARVEST))
+        self.assertEqual(plan.worker_routes[0].visits[0].action_count, 2)
+        self.assertEqual(
+            [action.operation for action in plan.worker_routes[0].actions_by_hour],
+            [WATER, HARVEST],
         )
 
     def test_one_tile_has_one_owner(self) -> None:

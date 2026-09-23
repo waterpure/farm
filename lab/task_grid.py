@@ -293,7 +293,10 @@ def _previous_task(previous: TaskGrid | None, position: tuple[int, int], task_ty
 
 def _water_task(world: WorldState, crop: CropState, prior: TaskState | None) -> WaterTask | None:
     gain = water_yield_gain(crop)
-    mandatory = crop.weed_countdown_days == 0
+    # A one-shot plant is gone after today's harvest, so staying alive overnight
+    # is not a reason to water. Extra yield still is, and that stays optional.
+    survival = crop.weed_countdown_days == 0 and not _harvesting_one_shot(crop)
+    mandatory = survival
     turns = _turns_until_weed(world.hour, crop.weed_countdown_days)
     if crop.watered_today:
         if prior is None:
@@ -308,6 +311,8 @@ def _water_task(world: WorldState, crop: CropState, prior: TaskState | None) -> 
             turns_until_weed=turns,
             yield_gain=0,
         )
+    if _harvesting_one_shot(crop) and gain <= 0:
+        return None
     needed = mandatory or gain > 0
     if not needed:
         return None
@@ -520,6 +525,11 @@ def _completed_harvest(prior: TaskState | None) -> HarvestTask | None:
     if prior is None:
         return None
     return HarvestTask(HARVEST, COMPLETED, False, prior.assigned_worker, prior.planned_hour, 0)
+
+
+def _harvesting_one_shot(crop: CropState) -> bool:
+    spec = ENGINE_CROPS[crop.crop]
+    return not spec["ongoing"] and crop.must_harvest
 
 
 def water_yield_gain(crop: CropState) -> int:

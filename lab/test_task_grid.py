@@ -132,10 +132,23 @@ class TaskGridTests(unittest.TestCase):
 
     def test_water_adds_nothing_at_max_yield(self) -> None:
         world = _world("WHEAT", day=4, units=6, dry=1, fertilized_until=4)
-        water = TaskGridBuilder().build(world)[2][3].tasks[WATER]
-        self.assertEqual(water.yield_gain, 0)
-        self.assertEqual(water.yield_gain, _engine_oneshot_gain("WHEAT", 4, 0, 6, 4))
-        self.assertTrue(water.mandatory)
+        crop = world.farm.crops[0]
+        bucket = TaskGridBuilder().build(world)[2][3]
+        self.assertEqual(water_yield_gain(crop), 0)
+        self.assertEqual(water_yield_gain(crop), _engine_oneshot_gain("WHEAT", 4, 0, 6, 4))
+        self.assertIn(HARVEST, bucket.tasks)
+        self.assertNotIn(WATER, bucket.tasks)
+
+    def test_ripe_wheat_below_the_cap_keeps_optional_water(self) -> None:
+        world = _world("WHEAT", day=2, units=4, dry=1)
+        bucket = TaskGridBuilder().build(world)[2][3]
+        water = bucket.tasks[WATER]
+        self.assertIn(HARVEST, bucket.tasks)
+        self.assertEqual(bucket.tasks[HARVEST].yield_amount, 4)
+        self.assertEqual(water.status, PENDING)
+        self.assertFalse(water.mandatory)
+        self.assertEqual(water.yield_gain, 1)
+        self.assertTrue(water.needed)
 
     def test_one_cell_holds_water_and_harvest(self) -> None:
         tiles = _tiles()
@@ -368,7 +381,8 @@ class TaskGridTests(unittest.TestCase):
         tasks = TaskGridBuilder().build(world)[2][3].tasks
         self.assertEqual(set(tasks), {WATER, HARVEST, FERTILIZE})
         self.assertEqual(tasks[HARVEST].yield_amount, 1)
-        self.assertTrue(tasks[WATER].mandatory)
+        self.assertFalse(tasks[WATER].mandatory)
+        self.assertEqual(tasks[WATER].yield_gain, 1)
         self.assertNotIn(COLLECT_FERTILIZER, tasks)
         self.assertNotIn(FEED, tasks)
 

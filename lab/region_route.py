@@ -158,16 +158,18 @@ def _is_must(task: object, kind: str) -> bool:
 
 
 def _task_order(tile_type: str, kinds: list[str]) -> tuple[str, ...]:
-    """Legal order inside one visit.
+    """Legal order inside one visit. This does not decide whether water is worth doing.
 
-    A one-shot crop is gone after harvest, so watering it on the same day does
-    nothing. Ongoing crops stay in the ground, and water still comes first.
+    A one-shot crop disappears when it is harvested, so water has to happen
+    first. Ongoing crops stay in the ground; water still comes first.
     """
 
+    ordered = tuple(sorted(kinds, key=lambda kind: _KIND_RANK[kind]))
     spec = ENGINE_CROPS.get(tile_type)
     one_shot = spec is not None and not spec["ongoing"]
-    kept = [kind for kind in kinds if not (one_shot and kind == WATER and HARVEST in kinds)]
-    return tuple(sorted(kept, key=lambda kind: _KIND_RANK[kind]))
+    if one_shot and WATER in ordered and HARVEST in ordered:
+        return tuple(kind for kind in ordered if kind != HARVEST) + (HARVEST,)
+    return ordered
 
 
 def _best_insertion(
