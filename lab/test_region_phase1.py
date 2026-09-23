@@ -207,6 +207,74 @@ class RegionPhase1Tests(unittest.TestCase):
         at_the_door = agent(_observation(**{**shared, "hour": 2, "hands": [(4, 4)]}))
         self.assertIn(["SELL", "WHEAT", 4], at_the_door["market"])
 
+    def test_hour_zero_keeps_a_wheat_for_each_feed_before_the_new_hand_exists(self) -> None:
+        tiles = _tiles()
+        for spot in ((0, 0), (0, 9), (9, 0), (9, 9)):
+            tiles[spot[1]][spot[0]] = _plant("WHEAT", dry=1)
+        tiles[2][4] = _animal("SHEEP", unfed=1)
+        tiles[6][6] = _animal("SHEEP", unfed=1)
+        agent = make_region_phase1_agent()
+        morning = _observation(
+            tiles,
+            day=1,
+            hour=0,
+            farmer=(0, 0),
+            shed={"WHEAT": 4},
+            inventories=[{"WHEAT": 1}],
+        )
+        opened = agent(morning)
+
+        self.assertEqual(morning["farms"][0]["hands"], [])
+        self.assertIn(["HIRE"], opened["market"])
+        wheat_sales = [order for order in opened["market"] if order[:2] == ["SELL", "WHEAT"]]
+        self.assertEqual(wheat_sales, [["SELL", "WHEAT", 3]])
+        self.assertNotIn(["SELL", "WHEAT", 4], opened["market"])
+
+        appeared = _observation(
+            tiles,
+            day=1,
+            hour=1,
+            farmer=(0, 0),
+            hands=[(4, 3)],
+            shed={"WHEAT": 4},
+            inventories=[{"WHEAT": 1}, {}],
+        )
+        agent(appeared)
+        plan = agent.telemetry["plan"]
+        pickups = [
+            step
+            for route in plan.worker_routes
+            if route.worker_id == "Hand1"
+            for step in route.actions_by_hour
+            if step.operation == "PICKUP"
+        ]
+        self.assertEqual([step.args for step in pickups], [("WHEAT", 1)])
+        self.assertTrue(plan.feasible)
+        self.assertEqual(plan.unfinished_visits, ())
+
+    def test_the_morning_wheat_hold_shrinks_to_the_real_pickup(self) -> None:
+        tiles = _tiles()
+        for spot in ((0, 0), (0, 9), (9, 0), (9, 9)):
+            tiles[spot[1]][spot[0]] = _plant("WHEAT", dry=1)
+        tiles[2][4] = _animal("SHEEP", unfed=1)
+        agent = make_region_phase1_agent()
+        shared = dict(
+            tiles=tiles,
+            day=1,
+            farmer=(0, 0),
+            shed={"WHEAT": 4},
+            inventories=[{"WHEAT": 1}],
+        )
+        agent(_observation(**shared, hour=0))
+        hired = agent(_observation(**{**shared, "hour": 1, "hands": [(4, 3)], "inventories": [{"WHEAT": 1}, {}]}))
+        self.assertIn(["SELL", "WHEAT", 3], hired["market"])
+        self.assertNotIn(["SELL", "WHEAT", 4], hired["market"])
+
+        at_the_door = agent(
+            _observation(**{**shared, "hour": 2, "hands": [(4, 4)], "inventories": [{"WHEAT": 1}, {}]})
+        )
+        self.assertIn(["SELL", "WHEAT", 4], at_the_door["market"])
+
 
 def _moved(position: tuple[int, int], operation: str) -> tuple[int, int]:
     x, y = position

@@ -221,28 +221,33 @@ def _remember_positions(world: Any, state: dict[str, Any], commands: list[list[A
     state["expected_positions"] = expected
 
 
-def _quote_plan(observation: dict[str, Any]) -> RegionRoutePlan | None:
-    """A region plan used only to hold wheat before the day's walk exists.
+def _mandatory_feed_reserve(
+    grid: TaskGrid,
+    origin: tuple[int, int],
+    region_size: int = REGION_SIZE,
+) -> int:
+    """Mandatory feeds in the one square this executor will walk.
 
-    Hour 0 does not store or walk this plan. It counts pickups for the people
-    already on the board, so the morning sale does not take their grain.
+    Hour 0 does not know which of those animals a hand hired this hour will
+    own, so each feed holds one wheat. Wheat already in someone's hands is
+    not subtracted.
     """
 
-    world = parse_world(observation)
-    crew = _crew(world)
-    if not crew:
-        return None
-    grid = build_task_grid(world, None)
-    return plan_region_routes(
-        grid,
-        crew,
-        region_size=REGION_SIZE,
-        origin=_region_origin(grid),
-        start_hour=1,
-        end_hour=23,
-        shed_wheat=_shed_wheat(world),
-        shed_coords=shed_doors(grid.width),
-    )
+    x0, y0 = origin
+    count = 0
+    for x in range(x0, x0 + region_size):
+        for y in range(y0, y0 + region_size):
+            if not (0 <= x < grid.width and 0 <= y < grid.height):
+                continue
+            cell = grid[x][y]
+            if cell is None:
+                continue
+            task = cell.tasks.get(FEED)
+            if task is None or task.task_type != FEED:
+                continue
+            if task.status == PENDING and task.mandatory:
+                count += 1
+    return count
 
 
 def _reserved_pickups(plan: RegionRoutePlan | None, hour: int) -> int:
@@ -291,10 +296,12 @@ def _market(
     route = state["market_route"]
     if route is None:
         return []
-    plan = state.get("plan")
-    if plan is None:
-        plan = _quote_plan(observation)
-    reserved = _reserved_pickups(plan, hour)
+    if hour == 0:
+        world = parse_world(observation)
+        grid = build_task_grid(world, None)
+        reserved = _mandatory_feed_reserve(grid, _region_origin(grid))
+    else:
+        reserved = _reserved_pickups(state.get("plan"), hour)
     orders = _market_orders(observation, route, state["market_state"], commands, hour, reserved)
     if hour != 0:
         orders = [order for order in orders if order[0] != "HIRE"]
