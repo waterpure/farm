@@ -320,8 +320,15 @@ def _previous_task(previous: TaskGrid | None, position: tuple[int, int], task_ty
 
 def _water_task(world: WorldState, crop: CropState, prior: TaskState | None) -> WaterTask | None:
     gain = water_yield_gain(crop)
-    # Survival and yield are separate decisions.  A crop can need mandatory
-    # WATER even when it is already at its production cap.
+    # A one-shot plant disappears after today's harvest.  Once HARVEST is
+    # available, finish the crop directly; do not spend a WATER stop on a
+    # plant whose lifecycle ends in the same visit, even if watering could
+    # have added one more unit.
+    if _harvesting_one_shot(crop):
+        return None
+    # Survival, production, and yield are separate decisions.  A crop can
+    # need mandatory WATER even when it is already at its production cap, but
+    # only while the plant remains or an ongoing production event is due.
     mandatory = crop.must_water
     turns = _turns_until_weed(world.hour, crop.weed_countdown_days)
     if crop.watered_today:
@@ -627,6 +634,9 @@ def _ongoing_water_gain(crop: CropState, spec: dict, cap: int, fertilized: bool)
     production_count = days_since_first // interval + 1
     if production_count > cap:
         return 0
+    # The engine gives one base unit on every scheduled production. Watering
+    # matters here only when fertilizer is active, because then the same
+    # production event is doubled to two units.
     without_water = min(cap, crop.yield_units + 1)
     with_water = min(cap, crop.yield_units + (2 if fertilized else 1))
     return with_water - without_water

@@ -411,6 +411,26 @@ def _remaining_harvests(crop: str, age: int, units: int) -> int:
     return max(0, _int(spec["max_yield"]) - completed) + (1 if units > 0 else 0)
 
 
+def _production_due_tonight(crop: str, age: int) -> bool:
+    """Whether the next daily refresh is an actual production event.
+
+    The engine refreshes plants at the boundary from ``day`` to ``day + 1``.
+    Therefore an observation on day ``d`` must water the crop when
+    ``(d + 1) - planted_day`` reaches a production day, not merely when the
+    current age has reached the crop's first-yield threshold.
+    """
+
+    spec = ENGINE_CROPS[crop]
+    if not spec["ongoing"]:
+        return False
+    interval = max(1, _int(spec["interval"]))
+    since_first = age + 1 - _int(spec["first_yield_day"])
+    if since_first < 0 or since_first % interval != 0:
+        return False
+    production_count = since_first // interval + 1
+    return production_count <= _int(spec["max_yield"])
+
+
 def _days_until_next_production(day: int, placed_day: int, first: int, interval: int) -> int:
     interval = max(1, interval)
     for ahead in range(1, SEASON_DAYS + 1):
@@ -443,7 +463,13 @@ def _crop_state(tile: dict[str, Any], position: tuple[int, int], day: int, step:
     # Survival is independent from yield.  Even a one-shot crop already at
     # its yield cap still needs WATER when the observation says it would turn
     # into a weed tonight.
-    must_water = dies_tonight
+    harvest_removes_plant = mature and not spec["ongoing"]
+    production_due = _production_due_tonight(crop, age)
+    # Survival water is unnecessary when today's HARVEST removes a one-shot
+    # plant. Ongoing crops are handled separately on an actual production
+    # refresh, where watering is needed to realize any active fertilizer
+    # bonus and to honor the daily watering policy.
+    must_water = production_due or (dies_tonight and not harvest_removes_plant)
     fertilized_until = _int(tile.get("fertilized_until_day"), -1)
     fertilized_today = fertilized_until == day + 2
     fertilizer_days = max(0, fertilized_until - day + 1) if fertilized_until >= day else 0

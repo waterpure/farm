@@ -1839,3 +1839,19 @@ LLM 不适合、也不需要参与评测。`.pkl` 若使用，装的是小型策
 - 定向覆盖：上限小麦仍需 mandatory WATER；未达上限且施肥有增益；浇水已足够达到上限；持续作物收获后重新判定；一次性作物收获后任务结束；错过窗口或赛季剩余时间不足不施肥。
 
 剩余风险：WATER/FERTILIZE 的发布状态已按 observation 重算，但 RegionRoute 尚未执行 FERTILIZE，因此本轮没有验证施肥动作会改变真实产量或经济结果；仍需后续单独接通执行链并做收益评测。
+
+## 2026-09-23：修正生产日边界与收获后浇水
+
+用户补充了生产日和一次性作物收获边界，本轮在未改 CARE、RegionRoute、经济决策或扩地的前提下继续收紧 `route14_state.py` / `task_grid.py`：
+
+- 新增 `_production_due_tonight`，按官方引擎的日刷新语义计算：当前 observation 的 `day=d` 要看 `next_day=d+1` 是否满足 `first_yield_day` 与 `interval`，且生产次数尚未超过 `max_yield`。因此番茄 planted day 0 的生产日是当前 day 7；草莓的间隔生产日会在 day 9、day 11 等边界触发，非生产日不继承生产浇水任务。
+- 持续作物在真实生产刷新日生成 mandatory `WATER`，与单纯的增产 `yield_gain` 分开；已有施肥时，`water_yield_gain` 仍按官方“浇水且施肥才翻倍”的收益计算。
+- 一次性作物只要当天已有 `HARVEST`，收获会移除原株，因此不再为保命或额外增产发布 `WATER`，直接完成收获；尚未成熟、没有当天收获任务的一次性作物仍按存活风险和增产窗口判断。
+
+验证：
+
+- `./.venv/bin/python -m unittest discover -s lab -p 'test_*.py'`：285 tests OK。
+- 定向覆盖：番茄真实生产日/非生产日、草莓间隔生产日/非生产日、一次性作物收获后不浇水、持续作物生产日保留 WATER。
+- `python -m py_compile lab/route14_state.py lab/task_grid.py` 与 `git diff --check`：通过。
+
+注意：官方引擎 README 的 ongoing 规则是每个生产事件默认给 1，浇水且施肥时给 2；本轮任务层仍按用户要求在实际生产刷新日把 WATER 作为必需日常任务发布，收益计算没有伪造成“无水完全没有基础产量”。

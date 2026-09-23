@@ -127,33 +127,27 @@ class RegionRouteTests(unittest.TestCase):
         )
         self.assertEqual(route.finish_hour, 12)
 
-    def test_ripe_wheat_below_the_cap_is_harvested_while_dry_water_is_mandatory(self) -> None:
+    def test_ripe_wheat_is_harvested_without_water_when_the_plant_ends(self) -> None:
         world = _world("WHEAT", day=2, units=4, dry=1)
         grid = TaskGridBuilder().build(world)
-        water = grid[2][3].tasks[WATER]
-        self.assertEqual(water.yield_gain, 1)
-        self.assertTrue(water.mandatory)
         self.assertIn(HARVEST, grid[2][3].tasks)
 
         plan = plan_region_routes(grid, [RegionWorker("Farmer", (2, 3))])
 
-        self.assertEqual(plan.worker_routes[0].visits[0].tasks, (WATER, HARVEST))
-        self.assertEqual(plan.worker_routes[0].visits[0].action_count, 2)
+        self.assertEqual(plan.worker_routes[0].visits[0].tasks, (HARVEST,))
+        self.assertEqual(plan.worker_routes[0].visits[0].action_count, 1)
         operations = [action.operation for action in plan.worker_routes[0].actions_by_hour]
-        self.assertEqual(operations[:2], [WATER, HARVEST])
+        self.assertEqual(operations[0], HARVEST)
         self.assertEqual(operations[-1], "PLACE")
-        self.assertEqual(grid[2][3].tasks[WATER].yield_gain, 1)
-        self.assertTrue(grid[2][3].tasks[WATER].mandatory)
 
-    def test_wheat_at_max_yield_is_harvested_with_survival_water_when_dry(self) -> None:
+    def test_wheat_at_max_yield_is_harvested_without_survival_water_when_dry(self) -> None:
         world = _world("WHEAT", day=4, units=6, dry=1, fertilized_until=4)
         grid = TaskGridBuilder().build(world)
-        self.assertIn(WATER, grid[2][3].tasks)
-        self.assertTrue(grid[2][3].tasks[WATER].mandatory)
+        self.assertNotIn(WATER, grid[2][3].tasks)
         self.assertEqual(grid[2][3].tasks[HARVEST].yield_amount, 6)
         plan = plan_region_routes(grid, [RegionWorker("Farmer", (2, 3))])
         operations = [action.operation for action in plan.worker_routes[0].actions_by_hour]
-        self.assertEqual(operations[:2], [WATER, HARVEST])
+        self.assertEqual(operations[0], HARVEST)
         self.assertEqual(plan.worker_routes[0].actions_by_hour[-1].args, ("WHEAT", 6))
 
     def test_one_shot_visit_waters_before_it_harvests(self) -> None:

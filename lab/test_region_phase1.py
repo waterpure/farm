@@ -107,21 +107,16 @@ class RegionPhase1Tests(unittest.TestCase):
         self.assertNotEqual(action["farmer"], ["HARVEST"])
         self.assertEqual(agent.telemetry["planned_workers"], [("Farmer", (0, 2))])
 
-    def test_optional_water_on_a_harvest_tile_is_scheduled_before_the_harvest(self) -> None:
+    def test_one_shot_harvest_does_not_schedule_water_before_the_harvest(self) -> None:
         tiles = _tiles()
         tiles[3][2] = _plant("WHEAT", units=4, dry=1)
         agent = make_region_phase1_agent()
         first = _observation(tiles, day=2, hour=1, farmer=(2, 3))
-        self.assertEqual(agent(first)["farmer"], ["WATER"])
-        water = agent.telemetry["grid"][2][3].tasks["WATER"]
-        self.assertEqual(water.status, SCHEDULED)
-        self.assertTrue(water.mandatory)
-        self.assertEqual(water.yield_gain, 1)
+        self.assertEqual(agent(first)["farmer"], ["HARVEST"])
 
         tiles[3][2]["watered_today"] = True
         second = _observation(tiles, day=2, hour=2, farmer=(2, 3))
-        self.assertEqual(agent(second)["farmer"], ["HARVEST"])
-        self.assertEqual(agent.telemetry["grid"][2][3].tasks["WATER"].status, COMPLETED)
+        self.assertEqual(agent(second)["farmer"], ["EAST"])
 
     def test_engine_steps_land_on_the_squares_the_route_already_named(self) -> None:
         environment = make(
