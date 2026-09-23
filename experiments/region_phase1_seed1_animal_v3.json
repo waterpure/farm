@@ -1,0 +1,1856 @@
+{
+  "seed": 1,
+  "candidate": "region_phase1",
+  "opponent": "starter",
+  "seat": "left",
+  "steps": 720,
+  "final_money": 34009,
+  "reward": 34009.0,
+  "status": "DONE",
+  "animal_orders": {
+    "COW": 15,
+    "SHEEP": 4
+  },
+  "animal_product_sell_orders": {
+    "WOOL": 23,
+    "MILK": 68
+  },
+  "feed_actions": 173,
+  "pickup_wheat_units": 174,
+  "wheat_buy_orders": 29,
+  "events": [
+    {
+      "day": 0,
+      "hour": 1,
+      "kind": "BUY_WHEAT",
+      "count": 2,
+      "money": 2044
+    },
+    {
+      "day": 0,
+      "hour": 1,
+      "kind": "BUY_ANIMAL",
+      "item": "COW",
+      "count": 1,
+      "money": 2044
+    },
+    {
+      "day": 0,
+      "hour": 1,
+      "kind": "BUY_ANIMAL",
+      "item": "SHEEP",
+      "count": 1,
+      "money": 2044
+    },
+    {
+      "day": 0,
+      "hour": 3,
+      "kind": "PICKUP_WHEAT",
+      "count": 1
+    },
+    {
+      "day": 0,
+      "hour": 4,
+      "kind": "PICKUP_WHEAT",
+      "count": 1
+    },
+    {
+      "day": 0,
+      "hour": 7,
+      "kind": "FEED"
+    },
+    {
+      "day": 0,
+      "hour": 12,
+      "kind": "FEED"
+    },
+    {
+      "day": 0,
+      "hour": 23,
+      "kind": "DAY_END",
+      "money": 644,
+      "animals": 2
+    },
+    {
+      "day": 1,
+      "hour": 23,
+      "kind": "DAY_END",
+      "money": 324,
+      "animals": 2
+    },
+    {
+      "day": 2,
+      "hour": 1,
+      "kind": "BUY_WHEAT",
+      "count": 2,
+      "money": 269
+    },
+    {
+      "day": 2,
+      "hour": 2,
+      "kind": "PICKUP_WHEAT",
+      "count": 2
+    },
+    {
+      "day": 2,
+      "hour": 3,
+      "kind": "FEED"
+    },
+    {
+      "day": 2,
+      "hour": 19,
+      "kind": "FEED"
+    },
+    {
+      "day": 2,
+      "hour": 23,
+      "kind": "DAY_END",
+      "money": 269,
+      "animals": 2
+    },
+    {
+      "day": 3,
+      "hour": 23,
+      "kind": "DAY_END",
+      "money": 369,
+      "animals": 2
+    },
+    {
+      "day": 4,
+      "hour": 1,
+      "kind": "BUY_WHEAT",
+      "count": 2,
+      "money": 310
+    },
+    {
+      "day": 4,
+      "hour": 2,
+      "kind": "PICKUP_WHEAT",
+      "count": 1
+    },
+    {
+      "day": 4,
+      "hour": 3,
+      "kind": "PICKUP_WHEAT",
+      "count": 1
+    },
+    {
+      "day": 4,
+      "hour": 4,
+      "kind": "FEED"
+    },
+    {
+      "day": 4,
+      "hour": 22,
+      "kind": "FEED"
+    },
+    {
+      "day": 4,
+      "hour": 23,
+      "kind": "DAY_END",
+      "money": 310,
+      "animals": 2
+    },
+    {
+      "day": 5,
+      "hour": 23,
+      "kind": "DAY_END",
+      "money": 310,
+      "animals": 2
+    },
+    {
+      "day": 6,
+      "hour": 1,
+      "kind": "BUY_WHEAT",
+      "count": 2,
+      "money": 382
+    },
+    {
+      "day": 6,
+      "hour": 2,
+      "kind": "PICKUP_WHEAT",
+      "count": 1
+    },
+    {
+      "day": 6,
+      "hour": 3,
+      "kind": "PICKUP_WHEAT",
+      "count": 1
+    },
+    {
+      "day": 6,
+      "hour": 4,
+      "kind": "FEED"
+    },
+    {
+      "day": 6,
+      "hour": 22,
+      "kind": "FEED"
+    },
+    {
+      "day": 6,
+      "hour": 23,
+      "kind": "DAY_END",
+      "money": 372,
+      "animals": 2
+    },
+    {
+      "day": 7,
+      "hour": 1,
+      "kind": "SELL_ANIMAL_PRODUCT",
+      "item": "WOOL",
+      "count": 1
+    },
+    {
+      "day": 7,
+      "hour": 23,
+      "kind": "DAY_END",
+      "money": 510,
+      "animals": 2
+    },
+    {
+      "day": 8,
+      "hour": 1,
+      "kind": "BUY_WHEAT",
+      "count": 2,
+      "money": 443
+    },
+    {
+      "day": 8,
+      "hour": 2,
+      "kind": "PICKUP_WHEAT",
+      "count": 1
+    },
+    {
+      "day": 8,
+      "hour": 3,
+      "kind": "PICKUP_WHEAT",
+      "count": 1
+    },
+    {
+      "day": 8,
+      "hour": 4,
+      "kind": "FEED"
+    },
+    {
+      "day": 8,
+      "hour": 18,
+      "kind": "FEED"
+    },
+    {
+      "day": 8,
+      "hour": 23,
+      "kind": "DAY_END",
+      "money": 443,
+      "animals": 2
+    },
+    {
+      "day": 9,
+      "hour": 1,
+      "kind": "SELL_ANIMAL_PRODUCT",
+      "item": "MILK",
+      "count": 1
+    },
+    {
+      "day": 9,
+      "hour": 1,
+      "kind": "SELL_WHEAT",
+      "count": 2
+    },
+    {
+      "day": 9,
+      "hour": 23,
+      "kind": "DAY_END",
+      "money": 659,
+      "animals": 2
+    },
+    {
+      "day": 10,
+      "hour": 1,
+      "kind": "BUY_WHEAT",
+      "count": 2,
+      "money": 1029
+    },
+    {
+      "day": 10,
+      "hour": 1,
+      "kind": "SELL_ANIMAL_PRODUCT",
+      "item": "WOOL",
+      "count": 2
+    },
+    {
+      "day": 10,
+      "hour": 2,
+      "kind": "PICKUP_WHEAT",
+      "count": 1
+    },
+    {
+      "day": 10,
+      "hour": 3,
+      "kind": "PICKUP_WHEAT",
+      "count": 1
+    },
+    {
+      "day": 10,
+      "hour": 4,
+      "kind": "FEED"
+    },
+    {
+      "day": 10,
+      "hour": 20,
+      "kind": "FEED"
+    },
+    {
+      "day": 10,
+      "hour": 23,
+      "kind": "DAY_END",
+      "money": 1029,
+      "animals": 2
+    },
+    {
+      "day": 11,
+      "hour": 1,
+      "kind": "SELL_ANIMAL_PRODUCT",
+      "item": "MILK",
+      "count": 1
+    },
+    {
+      "day": 11,
+      "hour": 1,
+      "kind": "BUY_WHEAT",
+      "count": 1,
+      "money": 14723
+    },
+    {
+      "day": 11,
+      "hour": 1,
+      "kind": "BUY_ANIMAL",
+      "item": "COW",
+      "count": 1,
+      "money": 14723
+    },
+    {
+      "day": 11,
+      "hour": 3,
+      "kind": "PICKUP_WHEAT",
+      "count": 1
+    },
+    {
+      "day": 11,
+      "hour": 8,
+      "kind": "FEED"
+    },
+    {
+      "day": 11,
+      "hour": 23,
+      "kind": "DAY_END",
+      "money": 14693,
+      "animals": 3
+    },
+    {
+      "day": 12,
+      "hour": 1,
+      "kind": "BUY_WHEAT",
+      "count": 2,
+      "money": 16887
+    },
+    {
+      "day": 12,
+      "hour": 1,
+      "kind": "BUY_WHEAT",
+      "count": 3,
+      "money": 16887
+    },
+    {
+      "day": 12,
+      "hour": 1,
+      "kind": "BUY_ANIMAL",
+      "item": "COW",
+      "count": 3,
+      "money": 16887
+    },
+    {
+      "day": 12,
+      "hour": 2,
+      "kind": "PICKUP_WHEAT",
+      "count": 5
+    },
+    {
+      "day": 12,
+      "hour": 4,
+      "kind": "FEED"
+    },
+    {
+      "day": 12,
+      "hour": 10,
+      "kind": "FEED"
+    },
+    {
+      "day": 12,
+      "hour": 15,
+      "kind": "FEED"
+    },
+    {
+      "day": 12,
+      "hour": 17,
+      "kind": "FEED"
+    },
+    {
+      "day": 12,
+      "hour": 23,
+      "kind": "FEED"
+    },
+    {
+      "day": 12,
+      "hour": 23,
+      "kind": "DAY_END",
+      "money": 16887,
+      "animals": 6
+    },
+    {
+      "day": 13,
+      "hour": 1,
+      "kind": "BUY_WHEAT",
+      "count": 1,
+      "money": 13636
+    },
+    {
+      "day": 13,
+      "hour": 1,
+      "kind": "SELL_ANIMAL_PRODUCT",
+      "item": "MILK",
+      "count": 1
+    },
+    {
+      "day": 13,
+      "hour": 1,
+      "kind": "SELL_ANIMAL_PRODUCT",
+      "item": "WOOL",
+      "count": 1
+    },
+    {
+      "day": 13,
+      "hour": 1,
+      "kind": "BUY_WHEAT",
+      "count": 8,
+      "money": 13636
+    },
+    {
+      "day": 13,
+      "hour": 1,
+      "kind": "BUY_ANIMAL",
+      "item": "COW",
+      "count": 6,
+      "money": 13636
+    },
+    {
+      "day": 13,
+      "hour": 1,
+      "kind": "BUY_ANIMAL",
+      "item": "SHEEP",
+      "count": 2,
+      "money": 13636
+    },
+    {
+      "day": 13,
+      "hour": 2,
+      "kind": "PICKUP_WHEAT",
+      "count": 3
+    },
+    {
+      "day": 13,
+      "hour": 3,
+      "kind": "PICKUP_WHEAT",
+      "count": 2
+    },
+    {
+      "day": 13,
+      "hour": 3,
+      "kind": "PICKUP_WHEAT",
+      "count": 3
+    },
+    {
+      "day": 13,
+      "hour": 4,
+      "kind": "PICKUP_WHEAT",
+      "count": 1
+    },
+    {
+      "day": 13,
+      "hour": 5,
+      "kind": "FEED"
+    },
+    {
+      "day": 13,
+      "hour": 11,
+      "kind": "FEED"
+    },
+    {
+      "day": 13,
+      "hour": 12,
+      "kind": "FEED"
+    },
+    {
+      "day": 13,
+      "hour": 13,
+      "kind": "FEED"
+    },
+    {
+      "day": 13,
+      "hour": 15,
+      "kind": "FEED"
+    },
+    {
+      "day": 13,
+      "hour": 16,
+      "kind": "FEED"
+    },
+    {
+      "day": 13,
+      "hour": 20,
+      "kind": "FEED"
+    },
+    {
+      "day": 13,
+      "hour": 21,
+      "kind": "FEED"
+    },
+    {
+      "day": 13,
+      "hour": 23,
+      "kind": "DAY_END",
+      "money": 13556,
+      "animals": 14
+    },
+    {
+      "day": 14,
+      "hour": 0,
+      "kind": "FEED"
+    },
+    {
+      "day": 14,
+      "hour": 1,
+      "kind": "BUY_WHEAT",
+      "count": 2,
+      "money": 12281
+    },
+    {
+      "day": 14,
+      "hour": 1,
+      "kind": "BUY_ANIMAL",
+      "item": "COW",
+      "count": 3,
+      "money": 12281
+    },
+    {
+      "day": 14,
+      "hour": 2,
+      "kind": "PICKUP_WHEAT",
+      "count": 6
+    },
+    {
+      "day": 14,
+      "hour": 3,
+      "kind": "PICKUP_WHEAT",
+      "count": 2
+    },
+    {
+      "day": 14,
+      "hour": 4,
+      "kind": "FEED"
+    },
+    {
+      "day": 14,
+      "hour": 7,
+      "kind": "FEED"
+    },
+    {
+      "day": 14,
+      "hour": 9,
+      "kind": "FEED"
+    },
+    {
+      "day": 14,
+      "hour": 12,
+      "kind": "FEED"
+    },
+    {
+      "day": 14,
+      "hour": 14,
+      "kind": "FEED"
+    },
+    {
+      "day": 14,
+      "hour": 16,
+      "kind": "FEED"
+    },
+    {
+      "day": 14,
+      "hour": 17,
+      "kind": "FEED"
+    },
+    {
+      "day": 14,
+      "hour": 21,
+      "kind": "FEED"
+    },
+    {
+      "day": 14,
+      "hour": 23,
+      "kind": "DAY_END",
+      "money": 12281,
+      "animals": 17
+    },
+    {
+      "day": 15,
+      "hour": 1,
+      "kind": "BUY_WHEAT",
+      "count": 9,
+      "money": 12218
+    },
+    {
+      "day": 15,
+      "hour": 1,
+      "kind": "SELL_ANIMAL_PRODUCT",
+      "item": "MILK",
+      "count": 1
+    },
+    {
+      "day": 15,
+      "hour": 2,
+      "kind": "PICKUP_WHEAT",
+      "count": 4
+    },
+    {
+      "day": 15,
+      "hour": 3,
+      "kind": "PICKUP_WHEAT",
+      "count": 5
+    },
+    {
+      "day": 15,
+      "hour": 6,
+      "kind": "FEED"
+    },
+    {
+      "day": 15,
+      "hour": 7,
+      "kind": "FEED"
+    },
+    {
+      "day": 15,
+      "hour": 10,
+      "kind": "FEED"
+    },
+    {
+      "day": 15,
+      "hour": 10,
+      "kind": "FEED"
+    },
+    {
+      "day": 15,
+      "hour": 13,
+      "kind": "FEED"
+    },
+    {
+      "day": 15,
+      "hour": 13,
+      "kind": "FEED"
+    },
+    {
+      "day": 15,
+      "hour": 16,
+      "kind": "FEED"
+    },
+    {
+      "day": 15,
+      "hour": 16,
+      "kind": "FEED"
+    },
+    {
+      "day": 15,
+      "hour": 19,
+      "kind": "FEED"
+    },
+    {
+      "day": 15,
+      "hour": 23,
+      "kind": "DAY_END",
+      "money": 12218,
+      "animals": 17
+    },
+    {
+      "day": 16,
+      "hour": 1,
+      "kind": "BUY_WHEAT",
+      "count": 8,
+      "money": 12361
+    },
+    {
+      "day": 16,
+      "hour": 1,
+      "kind": "SELL_ANIMAL_PRODUCT",
+      "item": "WOOL",
+      "count": 2
+    },
+    {
+      "day": 16,
+      "hour": 2,
+      "kind": "PICKUP_WHEAT",
+      "count": 8
+    },
+    {
+      "day": 16,
+      "hour": 3,
+      "kind": "FEED"
+    },
+    {
+      "day": 16,
+      "hour": 6,
+      "kind": "FEED"
+    },
+    {
+      "day": 16,
+      "hour": 9,
+      "kind": "FEED"
+    },
+    {
+      "day": 16,
+      "hour": 12,
+      "kind": "FEED"
+    },
+    {
+      "day": 16,
+      "hour": 15,
+      "kind": "FEED"
+    },
+    {
+      "day": 16,
+      "hour": 17,
+      "kind": "FEED"
+    },
+    {
+      "day": 16,
+      "hour": 19,
+      "kind": "FEED"
+    },
+    {
+      "day": 16,
+      "hour": 22,
+      "kind": "FEED"
+    },
+    {
+      "day": 16,
+      "hour": 23,
+      "kind": "DAY_END",
+      "money": 12361,
+      "animals": 17
+    },
+    {
+      "day": 17,
+      "hour": 1,
+      "kind": "BUY_WHEAT",
+      "count": 9,
+      "money": 12295
+    },
+    {
+      "day": 17,
+      "hour": 1,
+      "kind": "SELL_ANIMAL_PRODUCT",
+      "item": "MILK",
+      "count": 1
+    },
+    {
+      "day": 17,
+      "hour": 2,
+      "kind": "PICKUP_WHEAT",
+      "count": 5
+    },
+    {
+      "day": 17,
+      "hour": 3,
+      "kind": "PICKUP_WHEAT",
+      "count": 4
+    },
+    {
+      "day": 17,
+      "hour": 4,
+      "kind": "FEED"
+    },
+    {
+      "day": 17,
+      "hour": 7,
+      "kind": "FEED"
+    },
+    {
+      "day": 17,
+      "hour": 7,
+      "kind": "FEED"
+    },
+    {
+      "day": 17,
+      "hour": 10,
+      "kind": "FEED"
+    },
+    {
+      "day": 17,
+      "hour": 10,
+      "kind": "FEED"
+    },
+    {
+      "day": 17,
+      "hour": 13,
+      "kind": "FEED"
+    },
+    {
+      "day": 17,
+      "hour": 13,
+      "kind": "FEED"
+    },
+    {
+      "day": 17,
+      "hour": 16,
+      "kind": "FEED"
+    },
+    {
+      "day": 17,
+      "hour": 19,
+      "kind": "FEED"
+    },
+    {
+      "day": 17,
+      "hour": 23,
+      "kind": "DAY_END",
+      "money": 12295,
+      "animals": 17
+    },
+    {
+      "day": 18,
+      "hour": 1,
+      "kind": "BUY_WHEAT",
+      "count": 8,
+      "money": 12852
+    },
+    {
+      "day": 18,
+      "hour": 2,
+      "kind": "PICKUP_WHEAT",
+      "count": 8
+    },
+    {
+      "day": 18,
+      "hour": 3,
+      "kind": "FEED"
+    },
+    {
+      "day": 18,
+      "hour": 7,
+      "kind": "FEED"
+    },
+    {
+      "day": 18,
+      "hour": 10,
+      "kind": "FEED"
+    },
+    {
+      "day": 18,
+      "hour": 13,
+      "kind": "FEED"
+    },
+    {
+      "day": 18,
+      "hour": 15,
+      "kind": "FEED"
+    },
+    {
+      "day": 18,
+      "hour": 17,
+      "kind": "FEED"
+    },
+    {
+      "day": 18,
+      "hour": 19,
+      "kind": "FEED"
+    },
+    {
+      "day": 18,
+      "hour": 22,
+      "kind": "FEED"
+    },
+    {
+      "day": 18,
+      "hour": 23,
+      "kind": "DAY_END",
+      "money": 12852,
+      "animals": 17
+    },
+    {
+      "day": 19,
+      "hour": 1,
+      "kind": "BUY_WHEAT",
+      "count": 9,
+      "money": 12583
+    },
+    {
+      "day": 19,
+      "hour": 1,
+      "kind": "SELL_ANIMAL_PRODUCT",
+      "item": "MILK",
+      "count": 1
+    },
+    {
+      "day": 19,
+      "hour": 1,
+      "kind": "SELL_ANIMAL_PRODUCT",
+      "item": "WOOL",
+      "count": 1
+    },
+    {
+      "day": 19,
+      "hour": 1,
+      "kind": "BUY_WHEAT",
+      "count": 1,
+      "money": 12583
+    },
+    {
+      "day": 19,
+      "hour": 1,
+      "kind": "BUY_ANIMAL",
+      "item": "COW",
+      "count": 1,
+      "money": 12583
+    },
+    {
+      "day": 19,
+      "hour": 2,
+      "kind": "PICKUP_WHEAT",
+      "count": 6
+    },
+    {
+      "day": 19,
+      "hour": 3,
+      "kind": "PICKUP_WHEAT",
+      "count": 1
+    },
+    {
+      "day": 19,
+      "hour": 3,
+      "kind": "PICKUP_WHEAT",
+      "count": 3
+    },
+    {
+      "day": 19,
+      "hour": 5,
+      "kind": "FEED"
+    },
+    {
+      "day": 19,
+      "hour": 6,
+      "kind": "FEED"
+    },
+    {
+      "day": 19,
+      "hour": 8,
+      "kind": "FEED"
+    },
+    {
+      "day": 19,
+      "hour": 8,
+      "kind": "FEED"
+    },
+    {
+      "day": 19,
+      "hour": 9,
+      "kind": "SELL_ANIMAL_PRODUCT",
+      "item": "MILK",
+      "count": 1
+    },
+    {
+      "day": 19,
+      "hour": 10,
+      "kind": "FEED"
+    },
+    {
+      "day": 19,
+      "hour": 11,
+      "kind": "FEED"
+    },
+    {
+      "day": 19,
+      "hour": 15,
+      "kind": "FEED"
+    },
+    {
+      "day": 19,
+      "hour": 17,
+      "kind": "FEED"
+    },
+    {
+      "day": 19,
+      "hour": 19,
+      "kind": "FEED"
+    },
+    {
+      "day": 19,
+      "hour": 19,
+      "kind": "FEED"
+    },
+    {
+      "day": 19,
+      "hour": 23,
+      "kind": "DAY_END",
+      "money": 12893,
+      "animals": 18
+    },
+    {
+      "day": 20,
+      "hour": 1,
+      "kind": "BUY_WHEAT",
+      "count": 8,
+      "money": 13684
+    },
+    {
+      "day": 20,
+      "hour": 1,
+      "kind": "SELL_ANIMAL_PRODUCT",
+      "item": "WOOL",
+      "count": 2
+    },
+    {
+      "day": 20,
+      "hour": 2,
+      "kind": "PICKUP_WHEAT",
+      "count": 8
+    },
+    {
+      "day": 20,
+      "hour": 3,
+      "kind": "FEED"
+    },
+    {
+      "day": 20,
+      "hour": 6,
+      "kind": "FEED"
+    },
+    {
+      "day": 20,
+      "hour": 8,
+      "kind": "FEED"
+    },
+    {
+      "day": 20,
+      "hour": 12,
+      "kind": "FEED"
+    },
+    {
+      "day": 20,
+      "hour": 14,
+      "kind": "FEED"
+    },
+    {
+      "day": 20,
+      "hour": 17,
+      "kind": "FEED"
+    },
+    {
+      "day": 20,
+      "hour": 19,
+      "kind": "FEED"
+    },
+    {
+      "day": 20,
+      "hour": 22,
+      "kind": "FEED"
+    },
+    {
+      "day": 20,
+      "hour": 23,
+      "kind": "DAY_END",
+      "money": 13684,
+      "animals": 18
+    },
+    {
+      "day": 21,
+      "hour": 1,
+      "kind": "BUY_WHEAT",
+      "count": 10,
+      "money": 13987
+    },
+    {
+      "day": 21,
+      "hour": 1,
+      "kind": "SELL_ANIMAL_PRODUCT",
+      "item": "MILK",
+      "count": 4
+    },
+    {
+      "day": 21,
+      "hour": 1,
+      "kind": "BUY_WHEAT",
+      "count": 1,
+      "money": 13987
+    },
+    {
+      "day": 21,
+      "hour": 1,
+      "kind": "BUY_ANIMAL",
+      "item": "SHEEP",
+      "count": 1,
+      "money": 13987
+    },
+    {
+      "day": 21,
+      "hour": 2,
+      "kind": "PICKUP_WHEAT",
+      "count": 5
+    },
+    {
+      "day": 21,
+      "hour": 3,
+      "kind": "PICKUP_WHEAT",
+      "count": 5
+    },
+    {
+      "day": 21,
+      "hour": 3,
+      "kind": "PICKUP_WHEAT",
+      "count": 1
+    },
+    {
+      "day": 21,
+      "hour": 5,
+      "kind": "FEED"
+    },
+    {
+      "day": 21,
+      "hour": 7,
+      "kind": "FEED"
+    },
+    {
+      "day": 21,
+      "hour": 10,
+      "kind": "FEED"
+    },
+    {
+      "day": 21,
+      "hour": 11,
+      "kind": "FEED"
+    },
+    {
+      "day": 21,
+      "hour": 13,
+      "kind": "FEED"
+    },
+    {
+      "day": 21,
+      "hour": 14,
+      "kind": "FEED"
+    },
+    {
+      "day": 21,
+      "hour": 15,
+      "kind": "FEED"
+    },
+    {
+      "day": 21,
+      "hour": 18,
+      "kind": "FEED"
+    },
+    {
+      "day": 21,
+      "hour": 18,
+      "kind": "FEED"
+    },
+    {
+      "day": 21,
+      "hour": 21,
+      "kind": "FEED"
+    },
+    {
+      "day": 21,
+      "hour": 22,
+      "kind": "FEED"
+    },
+    {
+      "day": 21,
+      "hour": 23,
+      "kind": "DAY_END",
+      "money": 13987,
+      "animals": 19
+    },
+    {
+      "day": 22,
+      "hour": 1,
+      "kind": "BUY_WHEAT",
+      "count": 8,
+      "money": 16141
+    },
+    {
+      "day": 22,
+      "hour": 1,
+      "kind": "SELL_ANIMAL_PRODUCT",
+      "item": "MILK",
+      "count": 7
+    },
+    {
+      "day": 22,
+      "hour": 1,
+      "kind": "SELL_ANIMAL_PRODUCT",
+      "item": "WOOL",
+      "count": 1
+    },
+    {
+      "day": 22,
+      "hour": 2,
+      "kind": "PICKUP_WHEAT",
+      "count": 4
+    },
+    {
+      "day": 22,
+      "hour": 3,
+      "kind": "PICKUP_WHEAT",
+      "count": 4
+    },
+    {
+      "day": 22,
+      "hour": 4,
+      "kind": "FEED"
+    },
+    {
+      "day": 22,
+      "hour": 5,
+      "kind": "FEED"
+    },
+    {
+      "day": 22,
+      "hour": 7,
+      "kind": "FEED"
+    },
+    {
+      "day": 22,
+      "hour": 9,
+      "kind": "FEED"
+    },
+    {
+      "day": 22,
+      "hour": 11,
+      "kind": "FEED"
+    },
+    {
+      "day": 22,
+      "hour": 13,
+      "kind": "FEED"
+    },
+    {
+      "day": 22,
+      "hour": 16,
+      "kind": "FEED"
+    },
+    {
+      "day": 22,
+      "hour": 17,
+      "kind": "FEED"
+    },
+    {
+      "day": 22,
+      "hour": 23,
+      "kind": "DAY_END",
+      "money": 16141,
+      "animals": 19
+    },
+    {
+      "day": 23,
+      "hour": 1,
+      "kind": "BUY_WHEAT",
+      "count": 11,
+      "money": 18662
+    },
+    {
+      "day": 23,
+      "hour": 1,
+      "kind": "SELL_ANIMAL_PRODUCT",
+      "item": "MILK",
+      "count": 7
+    },
+    {
+      "day": 23,
+      "hour": 1,
+      "kind": "SELL_ANIMAL_PRODUCT",
+      "item": "WOOL",
+      "count": 3
+    },
+    {
+      "day": 23,
+      "hour": 2,
+      "kind": "PICKUP_WHEAT",
+      "count": 6
+    },
+    {
+      "day": 23,
+      "hour": 3,
+      "kind": "PICKUP_WHEAT",
+      "count": 5
+    },
+    {
+      "day": 23,
+      "hour": 4,
+      "kind": "FEED"
+    },
+    {
+      "day": 23,
+      "hour": 7,
+      "kind": "FEED"
+    },
+    {
+      "day": 23,
+      "hour": 8,
+      "kind": "FEED"
+    },
+    {
+      "day": 23,
+      "hour": 11,
+      "kind": "FEED"
+    },
+    {
+      "day": 23,
+      "hour": 11,
+      "kind": "FEED"
+    },
+    {
+      "day": 23,
+      "hour": 15,
+      "kind": "FEED"
+    },
+    {
+      "day": 23,
+      "hour": 15,
+      "kind": "FEED"
+    },
+    {
+      "day": 23,
+      "hour": 18,
+      "kind": "FEED"
+    },
+    {
+      "day": 23,
+      "hour": 18,
+      "kind": "FEED"
+    },
+    {
+      "day": 23,
+      "hour": 22,
+      "kind": "FEED"
+    },
+    {
+      "day": 23,
+      "hour": 23,
+      "kind": "DAY_END",
+      "money": 18662,
+      "animals": 19
+    },
+    {
+      "day": 24,
+      "hour": 0,
+      "kind": "FEED"
+    },
+    {
+      "day": 24,
+      "hour": 1,
+      "kind": "BUY_WHEAT",
+      "count": 8,
+      "money": 21491
+    },
+    {
+      "day": 24,
+      "hour": 1,
+      "kind": "SELL_ANIMAL_PRODUCT",
+      "item": "MILK",
+      "count": 7
+    },
+    {
+      "day": 24,
+      "hour": 2,
+      "kind": "PICKUP_WHEAT",
+      "count": 7
+    },
+    {
+      "day": 24,
+      "hour": 3,
+      "kind": "PICKUP_WHEAT",
+      "count": 1
+    },
+    {
+      "day": 24,
+      "hour": 4,
+      "kind": "FEED"
+    },
+    {
+      "day": 24,
+      "hour": 5,
+      "kind": "FEED"
+    },
+    {
+      "day": 24,
+      "hour": 7,
+      "kind": "SELL_ANIMAL_PRODUCT",
+      "item": "WOOL",
+      "count": 1
+    },
+    {
+      "day": 24,
+      "hour": 8,
+      "kind": "FEED"
+    },
+    {
+      "day": 24,
+      "hour": 11,
+      "kind": "FEED"
+    },
+    {
+      "day": 24,
+      "hour": 14,
+      "kind": "FEED"
+    },
+    {
+      "day": 24,
+      "hour": 17,
+      "kind": "FEED"
+    },
+    {
+      "day": 24,
+      "hour": 20,
+      "kind": "FEED"
+    },
+    {
+      "day": 24,
+      "hour": 23,
+      "kind": "FEED"
+    },
+    {
+      "day": 24,
+      "hour": 23,
+      "kind": "DAY_END",
+      "money": 21732,
+      "animals": 19
+    },
+    {
+      "day": 25,
+      "hour": 1,
+      "kind": "BUY_WHEAT",
+      "count": 11,
+      "money": 23567
+    },
+    {
+      "day": 25,
+      "hour": 1,
+      "kind": "SELL_ANIMAL_PRODUCT",
+      "item": "MILK",
+      "count": 7
+    },
+    {
+      "day": 25,
+      "hour": 2,
+      "kind": "PICKUP_WHEAT",
+      "count": 6
+    },
+    {
+      "day": 25,
+      "hour": 3,
+      "kind": "PICKUP_WHEAT",
+      "count": 5
+    },
+    {
+      "day": 25,
+      "hour": 5,
+      "kind": "FEED"
+    },
+    {
+      "day": 25,
+      "hour": 6,
+      "kind": "FEED"
+    },
+    {
+      "day": 25,
+      "hour": 10,
+      "kind": "FEED"
+    },
+    {
+      "day": 25,
+      "hour": 11,
+      "kind": "FEED"
+    },
+    {
+      "day": 25,
+      "hour": 14,
+      "kind": "FEED"
+    },
+    {
+      "day": 25,
+      "hour": 15,
+      "kind": "FEED"
+    },
+    {
+      "day": 25,
+      "hour": 18,
+      "kind": "FEED"
+    },
+    {
+      "day": 25,
+      "hour": 18,
+      "kind": "FEED"
+    },
+    {
+      "day": 25,
+      "hour": 21,
+      "kind": "FEED"
+    },
+    {
+      "day": 25,
+      "hour": 22,
+      "kind": "FEED"
+    },
+    {
+      "day": 25,
+      "hour": 23,
+      "kind": "DAY_END",
+      "money": 23557,
+      "animals": 19
+    },
+    {
+      "day": 26,
+      "hour": 0,
+      "kind": "FEED"
+    },
+    {
+      "day": 26,
+      "hour": 1,
+      "kind": "BUY_WHEAT",
+      "count": 8,
+      "money": 26040
+    },
+    {
+      "day": 26,
+      "hour": 1,
+      "kind": "SELL_ANIMAL_PRODUCT",
+      "item": "MILK",
+      "count": 7
+    },
+    {
+      "day": 26,
+      "hour": 1,
+      "kind": "SELL_ANIMAL_PRODUCT",
+      "item": "WOOL",
+      "count": 2
+    },
+    {
+      "day": 26,
+      "hour": 2,
+      "kind": "PICKUP_WHEAT",
+      "count": 7
+    },
+    {
+      "day": 26,
+      "hour": 3,
+      "kind": "PICKUP_WHEAT",
+      "count": 1
+    },
+    {
+      "day": 26,
+      "hour": 4,
+      "kind": "FEED"
+    },
+    {
+      "day": 26,
+      "hour": 5,
+      "kind": "FEED"
+    },
+    {
+      "day": 26,
+      "hour": 8,
+      "kind": "FEED"
+    },
+    {
+      "day": 26,
+      "hour": 11,
+      "kind": "FEED"
+    },
+    {
+      "day": 26,
+      "hour": 14,
+      "kind": "FEED"
+    },
+    {
+      "day": 26,
+      "hour": 17,
+      "kind": "FEED"
+    },
+    {
+      "day": 26,
+      "hour": 20,
+      "kind": "FEED"
+    },
+    {
+      "day": 26,
+      "hour": 23,
+      "kind": "FEED"
+    },
+    {
+      "day": 26,
+      "hour": 23,
+      "kind": "DAY_END",
+      "money": 26040,
+      "animals": 19
+    },
+    {
+      "day": 27,
+      "hour": 1,
+      "kind": "BUY_WHEAT",
+      "count": 11,
+      "money": 27916
+    },
+    {
+      "day": 27,
+      "hour": 1,
+      "kind": "SELL_ANIMAL_PRODUCT",
+      "item": "MILK",
+      "count": 7
+    },
+    {
+      "day": 27,
+      "hour": 2,
+      "kind": "PICKUP_WHEAT",
+      "count": 6
+    },
+    {
+      "day": 27,
+      "hour": 3,
+      "kind": "PICKUP_WHEAT",
+      "count": 5
+    },
+    {
+      "day": 27,
+      "hour": 4,
+      "kind": "FEED"
+    },
+    {
+      "day": 27,
+      "hour": 8,
+      "kind": "FEED"
+    },
+    {
+      "day": 27,
+      "hour": 8,
+      "kind": "FEED"
+    },
+    {
+      "day": 27,
+      "hour": 11,
+      "kind": "FEED"
+    },
+    {
+      "day": 27,
+      "hour": 11,
+      "kind": "FEED"
+    },
+    {
+      "day": 27,
+      "hour": 14,
+      "kind": "FEED"
+    },
+    {
+      "day": 27,
+      "hour": 15,
+      "kind": "FEED"
+    },
+    {
+      "day": 27,
+      "hour": 16,
+      "kind": "FEED"
+    },
+    {
+      "day": 27,
+      "hour": 18,
+      "kind": "FEED"
+    },
+    {
+      "day": 27,
+      "hour": 22,
+      "kind": "FEED"
+    },
+    {
+      "day": 27,
+      "hour": 23,
+      "kind": "FEED"
+    },
+    {
+      "day": 27,
+      "hour": 23,
+      "kind": "DAY_END",
+      "money": 27916,
+      "animals": 19
+    },
+    {
+      "day": 28,
+      "hour": 1,
+      "kind": "BUY_WHEAT",
+      "count": 6,
+      "money": 31130
+    },
+    {
+      "day": 28,
+      "hour": 1,
+      "kind": "SELL_ANIMAL_PRODUCT",
+      "item": "MILK",
+      "count": 8
+    },
+    {
+      "day": 28,
+      "hour": 1,
+      "kind": "SELL_ANIMAL_PRODUCT",
+      "item": "WOOL",
+      "count": 3
+    },
+    {
+      "day": 28,
+      "hour": 2,
+      "kind": "PICKUP_WHEAT",
+      "count": 4
+    },
+    {
+      "day": 28,
+      "hour": 3,
+      "kind": "PICKUP_WHEAT",
+      "count": 4
+    },
+    {
+      "day": 28,
+      "hour": 4,
+      "kind": "FEED"
+    },
+    {
+      "day": 28,
+      "hour": 5,
+      "kind": "FEED"
+    },
+    {
+      "day": 28,
+      "hour": 7,
+      "kind": "FEED"
+    },
+    {
+      "day": 28,
+      "hour": 9,
+      "kind": "FEED"
+    },
+    {
+      "day": 28,
+      "hour": 11,
+      "kind": "FEED"
+    },
+    {
+      "day": 28,
+      "hour": 13,
+      "kind": "FEED"
+    },
+    {
+      "day": 28,
+      "hour": 16,
+      "kind": "FEED"
+    },
+    {
+      "day": 28,
+      "hour": 17,
+      "kind": "FEED"
+    },
+    {
+      "day": 28,
+      "hour": 23,
+      "kind": "DAY_END",
+      "money": 31130,
+      "animals": 19
+    },
+    {
+      "day": 29,
+      "hour": 1,
+      "kind": "BUY_WHEAT",
+      "count": 11,
+      "money": 34009
+    },
+    {
+      "day": 29,
+      "hour": 1,
+      "kind": "SELL_ANIMAL_PRODUCT",
+      "item": "MILK",
+      "count": 7
+    },
+    {
+      "day": 29,
+      "hour": 1,
+      "kind": "SELL_ANIMAL_PRODUCT",
+      "item": "WOOL",
+      "count": 4
+    },
+    {
+      "day": 29,
+      "hour": 2,
+      "kind": "PICKUP_WHEAT",
+      "count": 6
+    },
+    {
+      "day": 29,
+      "hour": 3,
+      "kind": "PICKUP_WHEAT",
+      "count": 5
+    },
+    {
+      "day": 29,
+      "hour": 4,
+      "kind": "FEED"
+    },
+    {
+      "day": 29,
+      "hour": 7,
+      "kind": "FEED"
+    },
+    {
+      "day": 29,
+      "hour": 8,
+      "kind": "FEED"
+    },
+    {
+      "day": 29,
+      "hour": 11,
+      "kind": "FEED"
+    },
+    {
+      "day": 29,
+      "hour": 12,
+      "kind": "FEED"
+    },
+    {
+      "day": 29,
+      "hour": 15,
+      "kind": "FEED"
+    },
+    {
+      "day": 29,
+      "hour": 16,
+      "kind": "FEED"
+    },
+    {
+      "day": 29,
+      "hour": 18,
+      "kind": "FEED"
+    },
+    {
+      "day": 29,
+      "hour": 19,
+      "kind": "FEED"
+    },
+    {
+      "day": 29,
+      "hour": 22,
+      "kind": "FEED"
+    }
+  ]
+}

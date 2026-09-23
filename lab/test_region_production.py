@@ -351,7 +351,7 @@ class RegionProductionTests(unittest.TestCase):
         agent = make_region_phase1_agent()
         opponent = {"farmer": ["PASS"], "hands": [], "market": []}
         played: list[list] = []
-        for _ in range(5):
+        for _ in range(7):
             current = environment.steps[-1][0].observation
             action = agent(current)
             played.append(_played(action))
@@ -359,10 +359,12 @@ class RegionProductionTests(unittest.TestCase):
         tile = environment.steps[-1][0].observation.farms[0]["tiles"][3][4]
 
         self.assertEqual(played[0], ["PASS"])
-        self.assertEqual(played[1], ["PICKUP", "SHEEP", 1])
-        self.assertEqual(played[2], ["NORTH"])
-        self.assertEqual(played[3], [BUILD_PASTURE])
-        self.assertEqual(played[4], ["PLACE", "SHEEP"])
+        self.assertEqual(played[1], ["PICKUP", "WHEAT", 1])
+        self.assertEqual(played[2], ["PICKUP", "SHEEP", 1])
+        self.assertEqual(played[3], ["NORTH"])
+        self.assertEqual(played[4], [BUILD_PASTURE])
+        self.assertEqual(played[5], ["PLACE", "SHEEP"])
+        self.assertEqual(played[6], ["FEED"])
         self.assertEqual(tile["animal"], "SHEEP")
         self.assertEqual(tile["kind"], "PASTURE")
 
@@ -410,6 +412,7 @@ class RegionProductionTests(unittest.TestCase):
             sheep_grid,
             _crew(sheep_world),
             origin=(0, 0),
+            shed_wheat=7,
             shed_animals=_shed_animals(sheep_world),
         )
         sheep_assignments = _assignments(sheep_plan)

@@ -28,6 +28,7 @@ class SupermarketTask:
     amount: int = 1
     deadline: int = 0
     source_coords: tuple[tuple[int, int], ...] = ()
+    cost: int = 0
 
 
 def derive_supermarket_tasks(
@@ -35,6 +36,9 @@ def derive_supermarket_tasks(
     seeds: Mapping[str, int],
     shed_animals: Mapping[str, int],
     hire_count: int,
+    shed_wheat: int = 0,
+    forecast_wheat: int = 0,
+    wheat_cost: int = 0,
 ) -> list[SupermarketTask]:
     """Hires, animal buys, and seed buys required by this one route.
 
@@ -45,6 +49,9 @@ def derive_supermarket_tasks(
 
     tasks = [SupermarketTask("HIRE", deadline=0) for _ in range(max(0, hire_count))]
     tasks.extend(_animal_tasks(plan, shed_animals))
+    wheat_short, wheat_coords = _wheat_shortage(plan, shed_wheat, forecast_wheat)
+    if wheat_short:
+        tasks.append(SupermarketTask("BUY_PRODUCT", "WHEAT", wheat_short, 0, wheat_coords, int(wheat_cost)))
     tasks.extend(_seed_tasks(plan, seeds))
     return tasks
 
@@ -67,6 +74,7 @@ def schedule_market_queue(
         return MAX_MARKET_ORDERS - int(reserved_slots.get(hour, 0)) - len(queue[hour])
 
     hires = [task for task in tasks if task.operation == "HIRE"]
+    products = [task for task in tasks if task.operation == "BUY_PRODUCT"]
     animals = [task for task in tasks if task.operation == "BUY_ANIMAL"]
     seeds = sorted(
         (task for task in tasks if task.operation == "BUY_SEED"),
@@ -76,6 +84,11 @@ def schedule_market_queue(
         if task.deadline == 0 and room(0) > 0:
             queue[0].append(task)
         # A hire that does not fit is simply not hired. It does not cancel field work.
+    for task in products:
+        if task.deadline == 0 and room(0) > 0:
+            queue[0].append(task)
+        else:
+            failed.append(task)
     for task in animals:
         if task.deadline == 0 and room(0) > 0:
             queue[0].append(task)
@@ -107,7 +120,7 @@ def purchase_cost(tasks: Sequence[SupermarketTask]) -> int:
 
     total = 0
     for task in tasks:
-        total += _unit_price(task) * max(0, int(task.amount))
+        total += _task_cost(task)
     return total
 
 
@@ -118,8 +131,9 @@ def tasks_over_budget(tasks: Sequence[SupermarketTask], budget: int) -> list[Sup
     seeds = [task for task in tasks if task.operation == "BUY_SEED"]
     kept = 0
     refused: list[SupermarketTask] = []
-    for task in [*animals, *seeds]:
-        price = _unit_price(task) * max(0, int(task.amount))
+    products = [task for task in tasks if task.operation == "BUY_PRODUCT"]
+    for task in [*products, *animals, *seeds]:
+        price = _task_cost(task)
         if kept + price <= budget:
             kept += price
         else:
@@ -128,6 +142,10 @@ def tasks_over_budget(tasks: Sequence[SupermarketTask], budget: int) -> list[Sup
 
 
 def _unit_price(task: SupermarketTask) -> int:
+    if task.operation == "BUY_PRODUCT" and task.item == "WHEAT":
+        # The route caller replaces this with the quoted market cost when it
+        # applies its budget.  Keep queue construction price-neutral here.
+        return 0
     if task.operation == "BUY_SEED":
         spec = ENGINE_CROPS.get(task.item) or {}
         return int(spec.get("seed", 0) or 0)
@@ -135,6 +153,37 @@ def _unit_price(task: SupermarketTask) -> int:
         spec = ENGINE_ANIMALS.get(task.item) or {}
         return int(spec.get("cost", 0) or 0)
     return 0
+
+
+def _task_cost(task: SupermarketTask) -> int:
+    if task.cost:
+        return int(task.cost)
+    return _unit_price(task) * max(0, int(task.amount))
+
+
+def _wheat_shortage(
+    plan: RegionRoutePlan, shed_wheat: int, forecast_wheat: int
+) -> tuple[int, tuple[tuple[int, int], ...]]:
+    """Wheat still missing after real shed stock and already-planned buys.
+
+    Worker-held wheat is excluded from the shed total because the route's
+    pickup actions already subtract it from the required draw.
+    """
+
+    required = 0
+    coords: list[tuple[int, int]] = []
+    for route in plan.worker_routes:
+        for action in route.actions_by_hour:
+            if action.operation == "PICKUP" and len(action.args) >= 2 and action.args[0] == "WHEAT":
+                required += int(action.args[1])
+        coords.extend(
+            visit.coord
+            for visit in route.visits
+            if visit.production_kind == "animal" and "FEED" in visit.tasks
+        )
+    # RegionRoute's pickup amount is already net of each worker's carried
+    # wheat, so only the real shed and the morning forecast cover it.
+    return max(0, required - int(shed_wheat) - int(forecast_wheat)), tuple(sorted(set(coords)))
 
 
 def _animal_tasks(plan: RegionRoutePlan, shed_animals: Mapping[str, int]) -> list[SupermarketTask]:

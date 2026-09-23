@@ -1797,3 +1797,24 @@ LLM 不适合、也不需要参与评测。`.pkl` 若使用，装的是小型策
 - 在提交前，须测试包在无网络、限定依赖环境中能通过 `main.py` 加载；PyTorch/NumPy 是否可用不能只凭本机假设。
 - 不要运行 `third_party/v45/reconstruct.py` 去覆盖或改写用户的 agent；它只负责重建本地参考 `third_party/v45/main.py`，且带内部 SHA 断言。
 - 本项目尚无 Git 仓库；若初始化/提交，遵守 Conventional Commits。
+
+## 2026-09-23：条件首日喂养链与买麦闭环（本轮）
+
+用户确认本轮边界：新动物首日 FEED 是策略约束，不是官方 `must_feed` 生存硬约束；已有动物保命 FEED、作物保命 WATER 优先；区域外覆盖留到下一轮；不改晚期动物购买、SELL、价格和盈利公式。
+
+本轮改动：
+
+- `lab/production_plan.py`：动物生产链从 `BUILD -> PLACE` 扩为 `BUILD -> PLACE -> FEED`；条件 FEED 依赖 `PLACE_ANIMAL`，与真实动物的 `must_feed` 分开。
+- `lab/region_route.py`：已有 mandatory 任务有未完成时不启动生产链；生产链整段必须包含条件 FEED；兼容旧内存测试计划缺少 FEED task 的情况。
+- `lab/market_queue.py`：从实际 route 的 `PICKUP WHEAT` 缺口推导 Hour0 `BUY_PRODUCT WHEAT`，校验市场槽位与带坐标的生产链回退；小麦成本纳入预算排序。
+- `lab/region_phase1.py`：早班对条件 FEED 使用规划 forecast；市场队列补 forecast 之外的真实小麦缺口，并将额外买麦纳入现金/仓库空间检查；Hour0 SELL 预留所有当天 route 的 Wheat pickup。
+- `lab/task_grid.py`：新动物落地后，条件 FEED 在重排中继续保持 mandatory，直到 observation 显示 `fed_today=True`。
+
+验证：
+
+- `./.venv/bin/python -m unittest discover -s lab -p 'test_*.py'`：277 tests OK。
+- seed 1 vs starter，720 steps：两边 `DONE`，现金对账误差 0，无 failed unit/market action；region_phase1 final money **34,009**，旧 `route14_phase1` **3,000**。
+- 逐时记录：`experiments/region_phase1_seed1_animal_v3.json`；season 账：`experiments/region_phase1_seed1_animal_v3.jsonl` 与 `_summary.json`。
+- seed1：动物订单 COW 15、SHEEP 4；动物产品销售 WOOL 23、MILK 68；FEED 173 次；Wheat pickup 174 份；BUY_WHEAT 29 次；Day1（引擎 day0）Hour1 买 Wheat 2，未出现 SELL WHEAT 2；Day2（引擎 day1）收工仍有 2 只动物；final money 34,009。
+
+尚存风险：本轮只证明首日条件 FEED 和买麦执行闭环，未证明首日喂养在所有种子上是最优经济选择；区域外任务覆盖、后期动物购买策略仍未处理。下一步应先做单局对照分析，再决定是否保留该策略。

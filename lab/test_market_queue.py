@@ -196,6 +196,33 @@ class MarketQueueTests(unittest.TestCase):
         self.assertEqual(orders["COW"].amount, 1)
         self.assertEqual(orders["COW"].deadline, 0)
 
+    def test_committed_animal_feed_adds_one_hour_zero_wheat_order(self) -> None:
+        route = _plan_with(
+            _worker(
+                [
+                    RouteAction(1, "PICKUP", (4, 4), ("WHEAT", 2)),
+                    RouteAction(2, "PICKUP", (4, 4), ("SHEEP", 1)),
+                    RouteAction(5, "PLACE", (3, 4), ("SHEEP",)),
+                    RouteAction(6, "FEED", (3, 4)),
+                ],
+                [_visit((3, 4), "animal", "SHEEP")],
+            )
+        )
+        tasks = derive_supermarket_tasks(
+            route,
+            {},
+            {"SHEEP": 1},
+            0,
+            shed_wheat=0,
+            forecast_wheat=0,
+            wheat_cost=26,
+        )
+        wheat = [task for task in tasks if task.operation == "BUY_PRODUCT"]
+        self.assertEqual([(task.item, task.amount, task.deadline, task.cost) for task in wheat], [("WHEAT", 2, 0, 26)])
+        queue, failed = schedule_market_queue(tasks, {0: 0})
+        self.assertEqual(failed, [])
+        self.assertEqual(queue[0], wheat)
+
     def test_three_hires_are_three_orders_and_seeds_do_not_take_their_slots(self) -> None:
         hires = [SupermarketTask("HIRE", deadline=0) for _ in range(4)]
         seeds = [SupermarketTask("BUY_SEED", f"SEED{index}", 1, 0, ((index, 0),)) for index in range(5)]

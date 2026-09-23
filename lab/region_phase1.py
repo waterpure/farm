@@ -22,6 +22,7 @@ from .route14_economy import fib_hire_cost
 from .route14_phase1 import (
     MAX_MARKET_ORDERS,
     SALE_RANK,
+    _buy_wheat_cost,
     _market_orders,
     _shed,
     _spawn_door,
@@ -304,20 +305,61 @@ def _plan_for_hires(
             origin=origin,
             start_hour=1,
             end_hour=23,
-            shed_wheat=_morning_route_wheat(world, day_route),
+                shed_wheat=(
+                    _morning_route_wheat(world, day_route)
+                    + _conditional_feed_forecast(grid, origin, blocked)
+                ),
             shed_coords=shed_doors(grid.width),
             shed_animals=offered,
             shed_total=_shed_total(world),
             blocked_production=tuple(sorted(blocked)),
             include_unpaid_production=True,
         )
-        tasks = derive_supermarket_tasks(plan, seeds, real_animals, new_hires)
+        required_pickup_wheat = sum(
+            int(action.args[1])
+            for route in plan.worker_routes
+            for action in route.actions_by_hour
+            if action.operation == "PICKUP"
+            and len(action.args) >= 2
+            and action.args[0] == "WHEAT"
+        )
+        extra_wheat = max(
+            0,
+            required_pickup_wheat
+            - _shed_wheat(world)
+            - int(getattr(day_route, "wheat_buy", 0) or 0),
+        )
+        total_wheat_cost = _buy_wheat_cost(observation, int(getattr(day_route, "wheat_buy", 0) or 0) + extra_wheat)
+        extra_wheat_cost = max(0, total_wheat_cost - _wheat_outlay(day_route))
+        tasks = derive_supermarket_tasks(
+            plan,
+            seeds,
+            real_animals,
+            new_hires,
+            shed_wheat=_shed_wheat(world),
+            forecast_wheat=int(getattr(day_route, "wheat_buy", 0) or 0),
+            wheat_cost=extra_wheat_cost,
+        )
         occupied = _occupied_slots(hour0_slots, leftover_sales, plan)
         queue, failed = schedule_market_queue(tasks, occupied)
         queued = [task for hour_tasks in queue.values() for task in hour_tasks]
         failed = [*failed, *tasks_over_budget(queued, budget)]
+        queued_wheat = sum(
+            int(task.amount)
+            for task in queued
+            if task.operation == "BUY_PRODUCT" and task.item == "WHEAT"
+        )
         if sum(task.amount for task in queued if task.operation == "BUY_ANIMAL") > shed_room:
             failed = [*failed, *[task for task in queued if task.operation == "BUY_ANIMAL"]]
+        elif queued_wheat and queued_wheat > shed_room:
+            failed = [
+                *failed,
+                *[
+                    task
+                    for task in queued
+                    if task.operation == "BUY_PRODUCT" and task.item == "WHEAT"
+                ],
+            ]
         if not failed:
             break
         victim = _lowest_failed_plan(grid, failed)
@@ -401,6 +443,35 @@ def _morning_route_wheat(world: Any, day_route: Any) -> int:
         return real
     planned = max(0, int(getattr(day_route, "wheat_buy", 0) or 0))
     return real + planned
+
+
+def _conditional_feed_forecast(
+    grid: TaskGrid,
+    origin: tuple[int, int],
+    blocked: set[tuple[int, int]],
+) -> int:
+    """Optimistic first-feed units for still-committable animal lines.
+
+    This is planning-only forecast.  The market queue later converts any
+    shortage beyond real shed wheat and the existing morning buy into one
+    explicit BUY_PRODUCT WHEAT order; execution still checks real inventory.
+    """
+
+    x0, y0 = origin
+    total = 0
+    for x in range(x0, x0 + REGION_SIZE):
+        for y in range(y0, y0 + REGION_SIZE):
+            if (x, y) in blocked or not (0 <= x < grid.width and 0 <= y < grid.height):
+                continue
+            cell = grid[x][y]
+            plan = getattr(cell, "production_plan", None) if cell is not None else None
+            if plan is None or getattr(plan, "kind", None) != "animal":
+                continue
+            task = cell.tasks.get(FEED) if cell is not None else None
+            if task is not None and getattr(task, "status", None) != PENDING:
+                continue
+            total += 1
+    return total
 
 
 def _scheduled_production_value(grid: TaskGrid, plan: RegionRoutePlan) -> float:
@@ -949,7 +1020,10 @@ def _market(
         if grid is None:
             world = parse_world(observation)
             grid = build_task_grid(world, None, observation)
-        reserved = _mandatory_feed_reserve(grid, _region_origin(grid))
+        reserved = max(
+            _mandatory_feed_reserve(grid, _region_origin(grid)),
+            _reserved_pickups(state.get("plan"), 0),
+        )
     else:
         reserved = _reserved_pickups(state.get("plan"), hour)
     orders = _market_orders(observation, route, state["market_state"], commands, hour, reserved)

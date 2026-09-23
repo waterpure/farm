@@ -414,7 +414,14 @@ def _tile_actions(kind: str, name: str) -> tuple[PlannedAction, ...]:
     if kind == "crop":
         return (PlannedAction(PLANT, name), PlannedAction(WATER, name))
     structure = BUILD_COOP if ANIMAL_STRUCTURE[name] == "COOP" else BUILD_PASTURE
-    return (PlannedAction(structure), PlannedAction(PLACE_ANIMAL, name))
+    # A committed animal line owns its first feed as part of the same-day
+    # startup chain.  This is a strategy condition, not the engine's
+    # survival/must_feed flag: the animal does not exist until PLACE_ANIMAL.
+    return (
+        PlannedAction(structure),
+        PlannedAction(PLACE_ANIMAL, name),
+        PlannedAction("FEED", name),
+    )
 
 
 def _ledger(observation: dict[str, Any]) -> _Ledger:
@@ -539,6 +546,8 @@ def _write_plan(cell: Any, plan: ProductionPlan) -> None:
             depends_on = PLANT
         elif action.operation == PLACE_ANIMAL and plan.actions:
             depends_on = plan.actions[0].operation
+        elif action.operation == "FEED":
+            depends_on = PLACE_ANIMAL
         cell.tasks[action.operation] = TileTask(
             task_type=action.operation,
             status=PENDING,

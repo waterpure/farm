@@ -1019,6 +1019,12 @@ def _production_pending(cell: object, actions: Sequence[object]) -> bool:
     tasks = getattr(cell, "tasks", {})
     for action in actions:
         task = tasks.get(action.operation)
+        # Older in-memory test grids may predate the conditional first-feed
+        # task.  The real TaskGrid always registers it; treating a missing
+        # legacy entry as pending keeps those plans routeable while the new
+        # chain remains enforced for freshly built grids.
+        if action.operation == FEED and task is None:
+            continue
         if task is None or getattr(task, "status", None) != PENDING:
             return False
     return True
@@ -1042,6 +1048,13 @@ def _add_production_plans(
     chain fits by end_hour and no mandatory visit is pushed out. A skipped
     plan is not unfinished work.
     """
+
+    # Existing survival work is the hard gate for starting a new line.  A
+    # production chain may include its own conditional first FEED, but it must
+    # never consume time that leaves a real mandatory WATER/FEED/HARVEST visit
+    # unfinished.
+    if scored.leftover:
+        return scored
 
     routes = [list(route) for route in scored.routes]
     pending = [

@@ -106,12 +106,13 @@ class ProductionPlanTests(unittest.TestCase):
         self.assertEqual(plan.startup_cash, 0)
         self.assertEqual(
             [(action.operation, action.subject) for action in plan.actions],
-            [(BUILD_PASTURE, ""), (PLACE_ANIMAL, "SHEEP")],
+            [(BUILD_PASTURE, ""), (PLACE_ANIMAL, "SHEEP"), ("FEED", "SHEEP")],
         )
         self.assertEqual(grid[4][4].tasks[PLACE_ANIMAL].depends_on, BUILD_PASTURE)
+        self.assertEqual(grid[4][4].tasks["FEED"].depends_on, PLACE_ANIMAL)
         self.assertNotIn("PICKUP", grid[4][4].tasks)
-        self.assertFalse(can_start_production(plan, 2))
-        self.assertTrue(can_start_production(plan, 3))
+        self.assertFalse(can_start_production(plan, 3))
+        self.assertTrue(can_start_production(plan, 4))
 
     def test_one_seed_can_start_only_one_tile(self) -> None:
         tiles = _tiles()
