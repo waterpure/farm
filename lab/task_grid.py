@@ -228,7 +228,7 @@ def build_task_grid(
     if observation is not None:
         from .production_plan import apply_empty_production_plans
 
-        apply_empty_production_plans(grid, world, observation)
+        apply_empty_production_plans(grid, world, observation, previous)
     return grid
 
 
@@ -252,10 +252,17 @@ def apply_assignments(grid: TaskGrid, world: WorldState, assignments: list[Any])
             continue
         if item.kind not in TILE_JOBS:
             continue
-        if _tile_done(world.farm, item.position, item.kind, item.subject):
-            cell.tasks[item.kind] = TileTask(item.kind, COMPLETED, False, item.assigned_worker, item.planned_hour, item.subject)
+        prior = cell.tasks.get(item.kind)
+        depends_on = prior.depends_on if isinstance(prior, TileTask) else ""
+        subject = item.subject or (prior.subject if isinstance(prior, TileTask) else "")
+        if _tile_done(world.farm, item.position, item.kind, subject):
+            cell.tasks[item.kind] = TileTask(
+                item.kind, COMPLETED, False, item.assigned_worker, item.planned_hour, subject, depends_on
+            )
         else:
-            cell.tasks[item.kind] = TileTask(item.kind, SCHEDULED, False, item.assigned_worker, item.planned_hour, item.subject)
+            cell.tasks[item.kind] = TileTask(
+                item.kind, SCHEDULED, False, item.assigned_worker, item.planned_hour, subject, depends_on
+            )
 
 
 def _open_tile(kind: str, prior: TaskState | None) -> TileTask:

@@ -15,8 +15,8 @@ from functools import lru_cache
 from kaggle_environments.envs.kaggriculture.kaggriculture import ANIMALS as ENGINE_ANIMALS
 from kaggle_environments.envs.kaggriculture.kaggriculture import CROPS as ENGINE_CROPS
 
-from .route14_state import PENDING, shed_doors
-from .task_grid import CARE, FEED, HARVEST, WATER, TaskGrid
+from .route14_state import ANIMAL_NAMES, PENDING, shed_doors
+from .task_grid import CARE, FEED, HARVEST, PLACE_ANIMAL, PLANT, WATER, TaskGrid
 
 
 EXACT_TILES = 10
@@ -32,6 +32,7 @@ class RegionWorker:
     id: str
     coord: tuple[int, int]
     carrying_wheat: int = 0
+    carrying_items: tuple[tuple[str, int], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -44,6 +45,9 @@ class TileVisit:
     tile_type: str
     harvest_product: str | None = None
     harvest_units: int = 0
+    task_args: tuple[tuple, ...] = ()
+    production_kind: str | None = None
+    production_name: str | None = None
 
 
 @dataclass(frozen=True)
@@ -95,6 +99,7 @@ def plan_region_routes(
     shed_wheat: int = 0,
     shed_coords: Sequence[tuple[int, int]] | None = None,
     include_optional: bool = True,
+    shed_animals: dict[str, int] | None = None,
 ) -> RegionRoutePlan:
     """Assign every must-do tile in one square to the given workers.
 
@@ -115,25 +120,30 @@ def plan_region_routes(
         raise ValueError("start_hour must be at or before end_hour")
     if shed_wheat < 0:
         raise ValueError("shed_wheat cannot be negative")
+    animal_stock = _animal_stock(shed_animals)
     doors = tuple(shed_coords) if shed_coords is not None else shed_doors(task_grid.width)
-    pantry = _Pantry(shed_wheat, doors)
+    pantry = _Pantry(shed_wheat, doors, animal_stock)
     visits = _extract_visits(task_grid, region_size, origin)
-    if not visits:
-        return _empty_plan(crew)
-    routes: list[list[TileVisit]] = [[] for _ in crew]
-    leftover: list[TileVisit] = []
-    for visit in sorted(visits, key=_visit_sort):
-        placed = _best_insertion(crew, routes, visit, start_hour, end_hour, pantry)
-        if placed is None:
-            leftover.append(visit)
-            continue
-        worker_index, ordered = placed
-        routes[worker_index] = ordered
-    scored = _search(crew, routes, leftover, start_hour, end_hour, pantry)
-    if include_optional:
-        scored = _add_same_tile_optional_tasks(
-            task_grid, crew, scored, start_hour, end_hour, pantry
-        )
+    if visits:
+        routes: list[list[TileVisit]] = [[] for _ in crew]
+        leftover: list[TileVisit] = []
+        for visit in sorted(visits, key=_visit_sort):
+            placed = _best_insertion(crew, routes, visit, start_hour, end_hour, pantry)
+            if placed is None:
+                leftover.append(visit)
+                continue
+            worker_index, ordered = placed
+            routes[worker_index] = ordered
+        scored = _search(crew, routes, leftover, start_hour, end_hour, pantry)
+        if include_optional:
+            scored = _add_same_tile_optional_tasks(
+                task_grid, crew, scored, start_hour, end_hour, pantry
+            )
+    else:
+        scored = _Score(tuple(tuple() for _ in crew), (), 0, None)
+    scored = _add_production_plans(
+        task_grid, crew, scored, start_hour, end_hour, pantry, region_size, origin
+    )
     return _materialize(crew, scored, start_hour, end_hour, pantry)
 
 
@@ -193,10 +203,11 @@ def _task_order(tile_type: str, kinds: list[str]) -> tuple[str, ...]:
 
 @dataclass(frozen=True)
 class _Pantry:
-    """Wheat still in the shed, and the tiles where a worker can take it."""
+    """Wheat and unplaced animals still in the shed, and the tiles where a worker can take them."""
 
     wheat: int
     doors: tuple[tuple[int, int], ...]
+    animals: tuple[tuple[str, int], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -210,6 +221,7 @@ class _Leg:
     return_door: tuple[int, int] | None = None
     return_travel: int = 0
     deliveries: tuple[tuple[str, int], ...] = ()
+    item_pickups: tuple[tuple[str, int], ...] = ()
 
     @property
     def action_total(self) -> int:
@@ -218,6 +230,7 @@ class _Leg:
             self.travel
             + self.return_travel
             + (1 if self.pickup else 0)
+            + len(self.item_pickups)
             + work
             + len(self.deliveries)
         )
@@ -270,22 +283,90 @@ def _with_return(
     ordered: list[TileVisit],
     field_travel: int,
     doors: Sequence[tuple[int, int]],
+    item_pickups: tuple[tuple[str, int], ...] = (),
 ) -> _Leg:
     deliveries = _deliveries(ordered)
     if not deliveries or not ordered:
-        return _Leg(pickup_door, pickup, tuple(ordered), field_travel)
+        return _Leg(pickup_door, pickup, tuple(ordered), field_travel, item_pickups=item_pickups)
     door, steps = _return_choice(ordered[-1].coord, doors)
-    return _Leg(pickup_door, pickup, tuple(ordered), field_travel, door, steps, deliveries)
+    return _Leg(
+        pickup_door,
+        pickup,
+        tuple(ordered),
+        field_travel,
+        door,
+        steps,
+        deliveries,
+        item_pickups,
+    )
 
 
 def _feed_count(visits: Sequence[TileVisit]) -> int:
     return sum(1 for visit in visits if FEED in visit.tasks)
 
 
+def _carried(worker: RegionWorker, item: str) -> int:
+    """How many of `item` this one person is already holding. Another person's hands do not count."""
+
+    if item == "WHEAT":
+        return max(0, worker.carrying_wheat)
+    return sum(amount for name, amount in worker.carrying_items if name == item and amount > 0)
+
+
+def _animal_stock(shed_animals: dict[str, int] | None) -> tuple[tuple[str, int], ...]:
+    stock: list[tuple[str, int]] = []
+    for name, count in sorted((shed_animals or {}).items()):
+        amount = int(count)
+        if amount < 0:
+            raise ValueError("shed animal count cannot be negative")
+        if amount > 0:
+            stock.append((str(name), amount))
+    return tuple(stock)
+
+
+def _shed_animal_count(pantry: _Pantry, name: str) -> int:
+    return sum(amount for item, amount in pantry.animals if item == name)
+
+
+def _animal_needs(visits: Sequence[TileVisit]) -> dict[str, int]:
+    needs: dict[str, int] = {}
+    for visit in visits:
+        if visit.production_kind != "animal" or not visit.production_name:
+            continue
+        needs[visit.production_name] = needs.get(visit.production_name, 0) + 1
+    return needs
+
+
+def _item_pickups(worker: RegionWorker, visits: Sequence[TileVisit]) -> tuple[tuple[str, int], ...]:
+    """One pickup per animal kind. The count is how many this worker still has to take."""
+
+    needs = _animal_needs(visits)
+    pickups: list[tuple[str, int]] = []
+    for name in sorted(needs):
+        short = needs[name] - _carried(worker, name)
+        if short > 0:
+            pickups.append((name, short))
+    return tuple(pickups)
+
+
+def _within_animals(
+    workers: Sequence[RegionWorker],
+    routes: Sequence[Sequence[TileVisit]],
+    pantry: _Pantry,
+) -> bool:
+    """Shed animals are shared. Animals already in a worker's hands are only theirs."""
+
+    drawn = {name: 0 for name in ANIMAL_NAMES}
+    for worker, route in zip(workers, routes):
+        for name, short in _item_pickups(worker, route):
+            drawn[name] = drawn.get(name, 0) + short
+    return all(drawn.get(name, 0) <= _shed_animal_count(pantry, name) for name in drawn)
+
+
 def _pickup_needed(worker: RegionWorker, visits: Sequence[TileVisit]) -> int:
     """Wheat this worker still has to take for the feeds they already own."""
 
-    return max(0, _feed_count(visits) - max(0, worker.carrying_wheat))
+    return max(0, _feed_count(visits) - _carried(worker, "WHEAT"))
 
 
 def _wheat_draw(workers: Sequence[RegionWorker], routes: Sequence[Sequence[TileVisit]]) -> int:
@@ -301,15 +382,16 @@ def _within_wheat(
 
 
 def _layout(worker: RegionWorker, visits: Sequence[TileVisit], doors: Sequence[tuple[int, int]]) -> _Leg:
-    """Cheapest full walk: start, optional door and one pickup, then the tiles.
+    """Cheapest full walk: start, one shed stop if wheat or an animal is short, then the tiles.
 
-    The door is chosen by that whole walk. A nearer door can lose when the
-    animals sit closer to another door.
+    The door is chosen by that whole walk, including every pickup and the trip
+    back with a harvest. A nearer door can lose when the field sits closer to another door.
     """
 
     items = list(visits)
     pickup = _pickup_needed(worker, items)
-    if pickup <= 0 or not items:
+    animals = _item_pickups(worker, items)
+    if not items or (pickup <= 0 and not animals):
         ordered = _reorder(worker.coord, items)
         travel = _path_moves(worker.coord, [visit.coord for visit in ordered])
         return _with_return(None, 0, ordered, travel, doors)
@@ -317,18 +399,18 @@ def _layout(worker: RegionWorker, visits: Sequence[TileVisit], doors: Sequence[t
     for door in doors:
         ordered = _reorder(door, items)
         travel = _manhattan(worker.coord, door) + _path_moves(door, [visit.coord for visit in ordered])
-        leg = _with_return(door, pickup, ordered, travel, doors)
+        leg = _with_return(door, pickup, ordered, travel, doors, animals)
         key = (leg.action_total, leg.travel + leg.return_travel, door)
         if best is None or key < best[0]:
             best = (key, leg)
     if best is None:
         ordered = _reorder(worker.coord, items)
-        return _with_return(None, pickup, ordered, 10**9, doors)
+        return _with_return(None, pickup, ordered, 10**9, doors, animals)
     return best[1]
 
 
 def _leg_fits(leg: _Leg, start_hour: int, end_hour: int) -> bool:
-    if leg.pickup and leg.door is None:
+    if (leg.pickup or leg.item_pickups) and leg.door is None:
         return False
     if leg.deliveries and leg.return_door is None:
         return False
@@ -675,6 +757,7 @@ def _open_care(task: object) -> bool:
 
 def _with_added_task(visit: TileVisit, kind: str) -> TileVisit:
     ordered = _task_order(visit.tile_type, [*visit.tasks, kind])
+    paired = {task: args for task, args in zip(visit.tasks, visit.task_args)}
     return TileVisit(
         visit.coord,
         ordered,
@@ -682,7 +765,145 @@ def _with_added_task(visit: TileVisit, kind: str) -> TileVisit:
         visit.tile_type,
         visit.harvest_product,
         visit.harvest_units,
+        tuple(paired.get(task, ()) for task in ordered),
+        visit.production_kind,
+        visit.production_name,
     )
+
+
+def _extract_production_visits(
+    grid: TaskGrid,
+    region_size: int,
+    origin: tuple[int, int],
+) -> tuple[TileVisit, ...]:
+    """Empty-tile plans this square can start with a seed or animal it already has.
+
+    A plan that still needs a purchase stays on the grid and is not a visit.
+    The pickup that fetches an animal is not part of the visit; the walk adds it.
+    """
+
+    visits: list[TileVisit] = []
+    x0, y0 = origin
+    for x in range(x0, x0 + region_size):
+        for y in range(y0, y0 + region_size):
+            cell = _cell_at(grid, (x, y))
+            plan = getattr(cell, "production_plan", None) if cell is not None else None
+            if plan is None or int(getattr(plan, "startup_cash", 1) or 0) != 0:
+                continue
+            actions = tuple(getattr(plan, "actions", ()) or ())
+            if not actions or not _production_pending(cell, actions):
+                continue
+            tasks = tuple(action.operation for action in actions)
+            args = tuple(
+                (action.subject,) if action.operation in {PLANT, PLACE_ANIMAL} and action.subject else ()
+                for action in actions
+            )
+            visits.append(
+                TileVisit(
+                    cell.coord,
+                    tasks,
+                    len(tasks),
+                    cell.tile_type,
+                    None,
+                    0,
+                    args,
+                    plan.kind,
+                    plan.name,
+                )
+            )
+    return tuple(visits)
+
+
+def _production_pending(cell: object, actions: Sequence[object]) -> bool:
+    tasks = getattr(cell, "tasks", {})
+    for action in actions:
+        task = tasks.get(action.operation)
+        if task is None or getattr(task, "status", None) != PENDING:
+            return False
+    return True
+
+
+def _add_production_plans(
+    grid: TaskGrid,
+    workers: Sequence[RegionWorker],
+    scored: _Score,
+    start_hour: int,
+    end_hour: int,
+    pantry: _Pantry,
+    region_size: int,
+    origin: tuple[int, int],
+) -> _Score:
+    """Try each committed plan after the mandatory route is fixed.
+
+    The cheapest extra walk goes first. A plan is kept only when its whole
+    chain fits by end_hour and no mandatory visit is pushed out. A skipped
+    plan is not unfinished work.
+    """
+
+    routes = [list(route) for route in scored.routes]
+    pending = [
+        visit
+        for visit in _extract_production_visits(grid, region_size, origin)
+        if all(visit.coord not in {item.coord for item in route} for route in routes)
+    ]
+    while pending:
+        choice: tuple[tuple, int, int, list[TileVisit]] | None = None
+        for index, visit in enumerate(pending):
+            money = _production_money(grid, visit)
+            for worker_index, worker in enumerate(workers):
+                trial = [list(route) for route in routes]
+                trial[worker_index] = trial[worker_index] + [visit]
+                if not _within_wheat(workers, trial, pantry) or not _within_animals(workers, trial, pantry):
+                    continue
+                old = _layout(worker, routes[worker_index], pantry.doors)
+                new = _layout(worker, trial[worker_index], pantry.doors)
+                if not _production_fits(worker, new, start_hour, end_hour):
+                    continue
+                extra = new.action_total - old.action_total
+                key = (extra, -money, visit.coord[1], visit.coord[0], worker.id)
+                if choice is None or key < choice[0]:
+                    choice = (key, worker_index, index, list(new.visits))
+        if choice is None:
+            break
+        _, worker_index, index, ordered = choice
+        routes[worker_index] = ordered
+        pending.pop(index)
+    return _Score(tuple(tuple(route) for route in routes), scored.leftover, *_route_totals(workers, routes, start_hour, end_hour, pantry))
+
+
+def _production_money(grid: TaskGrid, visit: TileVisit) -> float:
+    cell = _cell_at(grid, visit.coord)
+    plan = getattr(cell, "production_plan", None) if cell is not None else None
+    if plan is None:
+        return 0.0
+    return float(getattr(plan, "money_per_day", 0.0) or 0.0)
+
+
+def _production_fits(worker: RegionWorker, leg: _Leg, start_hour: int, end_hour: int) -> bool:
+    if not _leg_fits(leg, start_hour, end_hour):
+        return False
+    _, _, _, blocked = _expand(worker.coord, leg, start_hour, end_hour)
+    return not blocked
+
+
+def _route_totals(
+    workers: Sequence[RegionWorker],
+    routes: Sequence[Sequence[TileVisit]],
+    start_hour: int,
+    end_hour: int,
+    pantry: _Pantry,
+) -> tuple[int, int | None]:
+    moves = 0
+    finish: int | None = None
+    for worker, route in zip(workers, routes):
+        leg = _layout(worker, route, pantry.doors)
+        _, route_moves, route_finish, blocked = _expand(worker.coord, leg, start_hour, end_hour)
+        if blocked:
+            raise RuntimeError("a stored route does not fit in the day")
+        moves += route_moves
+        if route_finish is not None:
+            finish = route_finish if finish is None else max(finish, route_finish)
+    return moves, finish
 
 
 def _expand(
@@ -696,7 +917,7 @@ def _expand(
     hour = start_hour
     position = start
     visits = leg.visits
-    if leg.pickup:
+    if leg.pickup or leg.item_pickups:
         if leg.door is None:
             return (), 0, None, visits
         while position != leg.door:
@@ -706,10 +927,16 @@ def _expand(
             actions.append(RouteAction(hour, operation))
             hour += 1
             moves += 1
-        if hour > end_hour:
-            return tuple(actions), moves, _finish(actions), visits
-        actions.append(RouteAction(hour, "PICKUP", leg.door, ("WHEAT", leg.pickup)))
-        hour += 1
+        if leg.pickup:
+            if hour > end_hour:
+                return tuple(actions), moves, _finish(actions), visits
+            actions.append(RouteAction(hour, "PICKUP", leg.door, ("WHEAT", leg.pickup)))
+            hour += 1
+        for item, count in leg.item_pickups:
+            if hour > end_hour:
+                return tuple(actions), moves, _finish(actions), visits
+            actions.append(RouteAction(hour, "PICKUP", leg.door, (item, count)))
+            hour += 1
     for index, visit in enumerate(visits):
         cursor = position
         walked: list[RouteAction] = []
@@ -725,11 +952,13 @@ def _expand(
             return tuple(actions), moves, _finish(actions), tuple(visits[index:])
         task_actions: list[RouteAction] = []
         task_hour = hour
-        for kind in visit.tasks:
+        for task_index, kind in enumerate(visit.tasks):
             if task_hour > end_hour:
                 blocked = True
                 break
-            task_actions.append(RouteAction(task_hour, kind, visit.coord))
+            args = visit.task_args[task_index] if task_index < len(visit.task_args) else ()
+            operation = "PLACE" if kind == PLACE_ANIMAL else kind
+            task_actions.append(RouteAction(task_hour, operation, visit.coord, tuple(args)))
             task_hour += 1
         if blocked:
             return tuple(actions), moves, _finish(actions), tuple(visits[index:])

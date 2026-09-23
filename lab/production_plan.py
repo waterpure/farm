@@ -7,7 +7,7 @@ This module does not send anyone to plant, build, or pick an animal up.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any
 
 from .route14_economy import (
@@ -22,7 +22,7 @@ from .route14_economy import (
     line_startup_cost,
     remaining_days,
 )
-from .route14_state import COMPLETED, PENDING, WorldState
+from .route14_state import COMPLETED, PENDING, SCHEDULED, WorldState
 from .task_grid import (
     BUILD_COOP,
     BUILD_PASTURE,
@@ -127,21 +127,40 @@ def choose_production_plan(
     return _commit(eligible[0])
 
 
-def apply_empty_production_plans(grid: TaskGrid, world: WorldState, observation: dict[str, Any]) -> None:
+def apply_empty_production_plans(
+    grid: TaskGrid,
+    world: WorldState,
+    observation: dict[str, Any],
+    previous: TaskGrid | None = None,
+) -> None:
     """Write at most one production chain onto each empty tile.
 
     Nearer shed doors are filled first, so the better line takes the shorter
     walk. Each committed line spends its seed, animal, or cash before the next tile.
+    A plan already scheduled by a route stays that plan until it is finished.
     """
 
     books = _ledger(observation)
+    _hold_scheduled_resources(previous, books)
     lands = [
         land
         for land in world.farm.lands
         if land.empty and not land.weed and land.plantable
     ]
     lands.sort(key=lambda land: (land.door_distance, land.position[1], land.position[0]))
+    frozen: set[tuple[int, int]] = set()
     for land in lands:
+        previous_cell = _cell(previous, land.position) if previous is not None else None
+        if _scheduled_plan(previous_cell) is None:
+            continue
+        cell = _cell(grid, land.position)
+        if cell is None:
+            continue
+        _restore_frozen(cell, previous_cell)
+        frozen.add(land.position)
+    for land in lands:
+        if land.position in frozen:
+            continue
         cell = _cell(grid, land.position)
         if cell is None:
             continue
@@ -298,12 +317,54 @@ def _clear_pending_production(cell: Any) -> None:
         if kind not in _PRODUCTION_KINDS:
             continue
         task = cell.tasks[kind]
-        if task.status == COMPLETED:
+        if task.status in {COMPLETED, SCHEDULED}:
             continue
         if kind == WATER and not isinstance(task, TileTask):
             continue
         del cell.tasks[kind]
     cell.production_plan = None
+
+
+def _scheduled_plan(cell: Any) -> ProductionPlan | None:
+    """The plan whose chain a route has already accepted. Pending plans may be replaced."""
+
+    plan = getattr(cell, "production_plan", None) if cell is not None else None
+    if plan is None:
+        return None
+    for action in plan.actions:
+        task = cell.tasks.get(action.operation)
+        if task is not None and task.status == SCHEDULED:
+            return plan
+    return None
+
+
+def _restore_frozen(cell: Any, previous_cell: Any) -> None:
+    plan = previous_cell.production_plan
+    cell.production_plan = plan
+    for action in plan.actions:
+        prior = previous_cell.tasks.get(action.operation)
+        if prior is not None:
+            cell.tasks[action.operation] = replace(prior)
+
+
+def _hold_scheduled_resources(previous: TaskGrid | None, ledger: _Ledger) -> None:
+    """A scheduled sowing or placement already owns its seed or animal."""
+
+    if previous is None:
+        return
+    for x in range(previous.width):
+        for y in range(previous.height):
+            cell = previous[x][y]
+            if cell is None:
+                continue
+            plant = cell.tasks.get(PLANT)
+            if plant is not None and plant.status == SCHEDULED and plant.subject:
+                if ledger.seeds.get(plant.subject, 0) > 0:
+                    ledger.seeds[plant.subject] -= 1
+            place = cell.tasks.get(PLACE_ANIMAL)
+            if place is not None and place.status == SCHEDULED and place.subject:
+                if ledger.animals.get(place.subject, 0) > 0:
+                    ledger.animals[place.subject] -= 1
 
 
 def _write_plan(cell: Any, plan: ProductionPlan) -> None:

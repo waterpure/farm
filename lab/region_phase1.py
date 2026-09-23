@@ -12,13 +12,25 @@ from typing import Any
 
 from .region_route import RegionRoutePlan, RegionWorker, plan_region_routes
 from .route14_phase1 import _market_orders, choose_day_route
-from .route14_state import PENDING, SCHEDULED, TaskAssignment, parse_world, settle_tasks, shed_doors, worker_name
-from .task_grid import CARE, FEED, HARVEST, WATER, TaskGrid, apply_assignments, build_task_grid
+from .route14_state import ANIMAL_NAMES, PENDING, SCHEDULED, TaskAssignment, parse_world, settle_tasks, shed_doors, worker_name
+from .task_grid import (
+    BUILD_COOP,
+    BUILD_PASTURE,
+    CARE,
+    FEED,
+    HARVEST,
+    PLACE_ANIMAL,
+    PLANT,
+    WATER,
+    TaskGrid,
+    apply_assignments,
+    build_task_grid,
+)
 
 
 REGION_SIZE = 5
 MAX_REGION_WORKERS = 4
-FIELD_OPERATIONS = {WATER, FEED, CARE, HARVEST}
+FIELD_OPERATIONS = {WATER, FEED, CARE, HARVEST, PLANT, BUILD_COOP, BUILD_PASTURE, PLACE_ANIMAL}
 _MOVES = {
     "NORTH": (0, -1),
     "SOUTH": (0, 1),
@@ -68,6 +80,7 @@ def make_region_phase1_agent():
                 end_hour=23,
                 shed_wheat=_shed_wheat(world),
                 shed_coords=shed_doors(grid.width),
+                shed_animals=_shed_animals(world),
             )
             apply_assignments(grid, world, _assignments(plan))
             state["plan"] = plan
@@ -128,6 +141,13 @@ def _crew(world: Any) -> list[RegionWorker]:
             worker_name(worker.actor),
             worker.coord,
             int(worker.carrying.get("WHEAT", 0) or 0),
+            tuple(
+                sorted(
+                    (name, int(amount))
+                    for name, amount in worker.carrying.items()
+                    if name != "WHEAT" and int(amount or 0) > 0
+                )
+            ),
         )
         for worker in world.farm.workers[:MAX_REGION_WORKERS]
     ]
@@ -156,7 +176,7 @@ def _reopen_scheduled(grid: TaskGrid) -> None:
 
 
 def _region_origin(grid: TaskGrid) -> tuple[int, int]:
-    coords = _must_coords(grid)
+    coords = _must_coords(grid) or _plan_coords(grid)
     if not coords:
         return (0, 0)
     origin_x = min(coord[0] for coord in coords)
@@ -165,6 +185,17 @@ def _region_origin(grid: TaskGrid) -> tuple[int, int]:
         min(origin_x, max(0, grid.width - REGION_SIZE)),
         min(origin_y, max(0, grid.height - REGION_SIZE)),
     )
+
+
+def _plan_coords(grid: TaskGrid) -> list[tuple[int, int]]:
+    coords: list[tuple[int, int]] = []
+    for x in range(grid.width):
+        for y in range(grid.height):
+            cell = grid[x][y]
+            if cell is None or cell.production_plan is None:
+                continue
+            coords.append(cell.coord)
+    return coords
 
 
 def _must_coords(grid: TaskGrid) -> list[tuple[int, int]]:
@@ -197,25 +228,43 @@ def _assignments(plan: RegionRoutePlan) -> list[TaskAssignment]:
         }
         visit_at = {visit.coord: visit for visit in route.visits}
         for action in route.actions_by_hour:
-            if action.operation not in FIELD_OPERATIONS or action.coord is None:
+            visit = visit_at.get(action.coord) if action.coord is not None else None
+            kind, subject = _assignment_kind(action, visit)
+            if kind not in FIELD_OPERATIONS or action.coord is None:
                 continue
             drop_hour = None
-            if action.operation == HARVEST:
-                visit = visit_at.get(action.coord)
+            if kind == HARVEST:
                 product = visit.harvest_product if visit is not None else None
                 if product:
                     drop_hour = place_hour.get(product)
             assigned.append(
                 TaskAssignment(
-                    kind=action.operation,
+                    kind=kind,
                     position=action.coord,
                     assigned_worker=route.worker_id,
                     planned_hour=action.hour,
                     planned_drop_hour=drop_hour,
                     planned_sell_hour=drop_hour,
+                    subject=subject,
                 )
             )
     return assigned
+
+
+def _assignment_kind(action: Any, visit: Any) -> tuple[str, str]:
+    if (
+        action.operation == "PLACE"
+        and len(action.args) == 1
+        and str(action.args[0]) in ANIMAL_NAMES
+    ):
+        return PLACE_ANIMAL, str(action.args[0])
+    if action.operation == PLANT:
+        return PLANT, str(action.args[0]) if action.args else ""
+    if action.operation == WATER and visit is not None and visit.production_kind == "crop":
+        return WATER, str(visit.production_name or "")
+    if action.operation in {BUILD_COOP, BUILD_PASTURE}:
+        return action.operation, ""
+    return action.operation, ""
 
 
 def _commands(world: Any, state: dict[str, Any], hour: int) -> tuple[list[Any], list[list[Any]]]:
@@ -292,6 +341,15 @@ def _reserved_pickups(plan: RegionRoutePlan | None, hour: int) -> int:
                 continue
             reserved += int(action.args[1])
     return reserved
+
+
+def _shed_animals(world: Any) -> dict[str, int]:
+    """Animals sitting in the shed right now. A sheep in someone's hands is not included."""
+
+    inventory = getattr(world.farm, "inventory", None)
+    if inventory is None:
+        return {}
+    return {name: int(inventory.shed.get(name, 0) or 0) for name in ANIMAL_NAMES}
 
 
 def _shed_wheat(world: Any) -> int:
