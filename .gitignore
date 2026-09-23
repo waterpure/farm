@@ -3,3 +3,4 @@
 __pycache__/
 *.pyc
 experiments/v45_worker_diagnosis_v1.jsonl
+/README.md
