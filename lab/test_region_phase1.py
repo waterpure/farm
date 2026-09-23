@@ -291,6 +291,86 @@ class RegionPhase1Tests(unittest.TestCase):
         self.assertIn(["SELL", "WHEAT", 6], unloaded["market"])
         self.assertNotIn(["SELL", "WHEAT", 10], unloaded["market"])
 
+    def test_each_harvest_remembers_the_hour_its_goods_are_placed(self) -> None:
+        tiles = _tiles()
+        tiles[4][4] = _plant("WHEAT", planted_day=-2, units=5)
+        tiles[4][3] = _plant("WHEAT", planted_day=-2, units=2)
+        tiles[3][4] = _animal("COW", units=4, fed=True)
+        tiles[4][2] = _animal("SHEEP", unfed=1)
+        agent = make_region_phase1_agent()
+        agent(
+            _observation(
+                tiles,
+                day=0,
+                hour=1,
+                farmer=(4, 4),
+                hands=[(2, 4)],
+                shed={"WHEAT": 1},
+            )
+        )
+        world = agent.telemetry["world"]
+        plan = agent.telemetry["plan"]
+        places = {
+            (route.worker_id, action.args[0]): action.hour
+            for route in plan.worker_routes
+            for action in route.actions_by_hour
+            if action.operation == "PLACE" and action.args
+        }
+        harvest_hours = {
+            (route.worker_id, action.coord): action.hour
+            for route in plan.worker_routes
+            for action in route.actions_by_hour
+            if action.operation == "HARVEST"
+        }
+        wheats = [crop for crop in world.farm.crops if crop.crop == "WHEAT"]
+        cow = next(animal for animal in world.farm.animals if animal.animal == "COW")
+        sheep = next(animal for animal in world.farm.animals if animal.animal == "SHEEP")
+
+        self.assertEqual(len(wheats), 2)
+        for crop in wheats:
+            self.assertEqual(crop.planned_harvest_hour, harvest_hours[(crop.harvest_worker, crop.position)])
+            self.assertEqual(crop.planned_drop_hour, places[(crop.harvest_worker, "WHEAT")])
+            self.assertEqual(crop.planned_sell_hour, crop.planned_drop_hour)
+        self.assertEqual(wheats[0].planned_drop_hour, wheats[1].planned_drop_hour)
+        self.assertEqual(cow.planned_harvest_hour, harvest_hours[(cow.harvest_worker, cow.position)])
+        self.assertEqual(cow.planned_drop_hour, places[(cow.harvest_worker, "MILK")])
+        self.assertEqual(cow.planned_sell_hour, cow.planned_drop_hour)
+        self.assertNotEqual(cow.planned_drop_hour, wheats[0].planned_drop_hour)
+        self.assertIsNone(sheep.planned_drop_hour)
+        self.assertIsNone(sheep.planned_sell_hour)
+        self.assertIsNotNone(sheep.planned_feed_hour)
+        for task in world.farm.tasks:
+            if task.kind != "HARVEST":
+                self.assertIsNone(task.planned_drop_hour)
+                self.assertIsNone(task.planned_sell_hour)
+                continue
+            holder = next(
+                (
+                    item
+                    for item in (*world.farm.crops, *world.farm.animals)
+                    if item.position == task.position and item.planned_harvest_hour is not None
+                ),
+                None,
+            )
+            self.assertIsNotNone(holder)
+            self.assertEqual(task.planned_hour, holder.planned_harvest_hour)
+            self.assertEqual(task.planned_drop_hour, holder.planned_drop_hour)
+            self.assertEqual(task.planned_sell_hour, holder.planned_sell_hour)
+
+    def test_a_finished_harvest_keeps_its_unload_hour(self) -> None:
+        tiles = _tiles()
+        tiles[4][4] = _plant("WHEAT", planted_day=-2, units=6)
+        agent = make_region_phase1_agent()
+        agent(_observation(tiles, day=0, hour=1, farmer=(4, 4)))
+        wheat = agent.telemetry["world"].farm.crops[0]
+        self.assertEqual((wheat.planned_harvest_hour, wheat.planned_drop_hour, wheat.planned_sell_hour), (1, 2, 2))
+
+        tiles[4][4] = None
+        agent(_observation(tiles, day=0, hour=2, farmer=(4, 4)))
+        done = next(task for task in agent.telemetry["world"].farm.tasks if task.kind == "HARVEST")
+        self.assertEqual(done.status, COMPLETED)
+        self.assertEqual((done.planned_hour, done.planned_drop_hour, done.planned_sell_hour), (1, 2, 2))
+
 
 def _moved(position: tuple[int, int], operation: str) -> tuple[int, int]:
     x, y = position

@@ -12,7 +12,7 @@ from typing import Any
 
 from .region_route import RegionRoutePlan, RegionWorker, plan_region_routes
 from .route14_phase1 import _market_orders, choose_day_route
-from .route14_state import PENDING, SCHEDULED, TaskAssignment, parse_world, shed_doors, worker_name
+from .route14_state import PENDING, SCHEDULED, TaskAssignment, parse_world, settle_tasks, shed_doors, worker_name
 from .task_grid import FEED, HARVEST, WATER, TaskGrid, apply_assignments, build_task_grid
 
 
@@ -40,6 +40,8 @@ def make_region_phase1_agent():
         "needs_replan": False,
         "market_route": None,
         "market_state": {"wheat_bought": False},
+        "tasks": [],
+        "world": None,
     }
 
     def agent(observation: dict[str, Any], configuration: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -72,6 +74,9 @@ def make_region_phase1_agent():
             state["routes_by_worker_id"] = {route.worker_id: route for route in plan.worker_routes}
             state["planned_workers"] = [(worker.id, worker.coord) for worker in crew]
         state["grid"] = grid
+        settle_tasks(world.farm, _assignments(state["plan"]), state["tasks"])
+        state["tasks"] = list(world.farm.tasks)
+        state["world"] = world
         farmer, hands = _commands(world, state, hour)
         _remember_positions(world, state, [farmer, *hands])
         return {
@@ -95,6 +100,8 @@ def _reset_day(state: dict[str, Any], day: int) -> None:
     state["needs_replan"] = False
     state["market_route"] = None
     state["market_state"] = {"wheat_bought": False}
+    state["tasks"] = []
+    state["world"] = None
 
 
 def _hour_zero(observation: dict[str, Any], state: dict[str, Any]) -> dict[str, Any]:
@@ -179,17 +186,33 @@ def _must_coords(grid: TaskGrid) -> list[tuple[int, int]]:
 
 
 def _assignments(plan: RegionRoutePlan) -> list[TaskAssignment]:
+    """Schedule each field job, and remember which hour a harvest is unloaded."""
+
     assigned: list[TaskAssignment] = []
     for route in plan.worker_routes:
+        place_hour = {
+            str(action.args[0]): action.hour
+            for action in route.actions_by_hour
+            if action.operation == "PLACE" and action.args
+        }
+        visit_at = {visit.coord: visit for visit in route.visits}
         for action in route.actions_by_hour:
             if action.operation not in FIELD_OPERATIONS or action.coord is None:
                 continue
+            drop_hour = None
+            if action.operation == HARVEST:
+                visit = visit_at.get(action.coord)
+                product = visit.harvest_product if visit is not None else None
+                if product:
+                    drop_hour = place_hour.get(product)
             assigned.append(
                 TaskAssignment(
                     kind=action.operation,
                     position=action.coord,
                     assigned_worker=route.worker_id,
                     planned_hour=action.hour,
+                    planned_drop_hour=drop_hour,
+                    planned_sell_hour=drop_hour,
                 )
             )
     return assigned
