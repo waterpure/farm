@@ -9,13 +9,17 @@ from lab.region_phase1 import (
     _choose_crew,
     _feasible_hire_counts,
     _hire_cost_for_count,
+    _morning_route_wheat,
     _plan_for_hires,
+    _spendable,
+    _take_stock,
     make_region_phase1_agent,
 )
 from lab.region_route import RegionRoutePlan
 from lab.route14_phase1 import MAX_MARKET_ORDERS, SALE_RANK, DayRoute
 from lab.route14_state import parse_world
-from lab.task_grid import WATER, TaskBucket, TaskGrid, WaterTask
+from lab.task_grid import FEED, WATER, TaskBucket, TaskGrid, WaterTask, build_task_grid
+from lab.test_route14_phase1 import _animal
 from lab.test_region_production import _crop_plan
 from lab.test_route14_phase1 import _observation, _plant, _tiles
 
@@ -67,6 +71,56 @@ def _dry_square() -> list[list]:
 
 
 class CrewSizeTests(unittest.TestCase):
+    def test_morning_forecast_wheat_feeds_animals_without_overallocating(self) -> None:
+        tiles = _tiles()
+        tiles[4][2] = _animal("SHEEP", unfed=1)
+        tiles[3][2] = _animal("SHEEP", unfed=1)
+        observation = _observation(tiles, day=1, money=5000, farmer=(4, 4))
+        world = parse_world(observation)
+        grid = build_task_grid(world)
+        route = _legacy(wheat_buy=2, wheat_cost=50)
+
+        self.assertEqual(_morning_route_wheat(world, route), 2)
+        chosen = _plan_for_hires(observation, world, grid, route, 0)
+        self.assertTrue(chosen.feasible)
+        assert chosen.plan is not None
+        actions = [action for worker in chosen.plan.worker_routes for action in worker.actions_by_hour]
+        pickups = [action for action in actions if action.operation == "PICKUP" and action.args[:1] == ("WHEAT",)]
+        feeds = [action for action in actions if action.operation == FEED]
+
+        self.assertEqual(sum(int(action.args[1]) for action in pickups), 2)
+        self.assertEqual(len(feeds), 2)
+        self.assertEqual(sum(int(action.args[1]) for action in pickups), len(feeds))
+
+    def test_morning_route_does_not_invent_wheat_without_a_forecast(self) -> None:
+        tiles = _tiles()
+        tiles[4][2] = _animal("SHEEP", unfed=1)
+        observation = _observation(tiles, day=1, money=5000, farmer=(4, 4))
+        world = parse_world(observation)
+        grid = build_task_grid(world)
+        chosen = _plan_for_hires(observation, world, grid, _legacy(wheat_buy=0), 0)
+
+        self.assertTrue(chosen.feasible)
+        assert chosen.plan is not None
+        actions = [action for worker in chosen.plan.worker_routes for action in worker.actions_by_hour]
+        self.assertFalse(any(action.operation == "PICKUP" and action.args[:1] == ("WHEAT",) for action in actions))
+        self.assertFalse(any(action.operation == FEED for action in actions))
+
+    def test_execution_stock_only_allows_real_wheat_pickups(self) -> None:
+        tiles = _tiles()
+        observation = _observation(tiles, shed={}, farmer=(4, 4))
+        world = parse_world(observation)
+        stock = _spendable(world)
+
+        self.assertFalse(_take_stock(["PICKUP", "WHEAT", 1], stock))
+        self.assertEqual(stock["wheat"], 0)
+
+        observation = _observation(tiles, shed={"WHEAT": 1}, farmer=(4, 4))
+        stock = _spendable(parse_world(observation))
+        self.assertTrue(_take_stock(["PICKUP", "WHEAT", 1], stock))
+        self.assertEqual(stock["wheat"], 0)
+        self.assertFalse(_take_stock(["PICKUP", "WHEAT", 1], stock))
+
     def test_hire_prices_rise_one_hand_at_a_time(self) -> None:
         self.assertEqual(_hire_cost_for_count(0, 0), 0)
         self.assertEqual(_hire_cost_for_count(0, 1), 1)

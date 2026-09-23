@@ -215,7 +215,8 @@ class RegionPhase1Tests(unittest.TestCase):
         self.assertNotIn(["SELL", "WHEAT", 4], action["market"])
 
         at_the_door = agent(_observation(**{**shared, "hour": 2, "hands": [(4, 4)]}))
-        self.assertIn(["SELL", "WHEAT", 4], at_the_door["market"])
+        self.assertIn(["SELL", "WHEAT", 3], at_the_door["market"])
+        self.assertNotIn(["SELL", "WHEAT", 4], at_the_door["market"])
 
     def test_hour_zero_keeps_a_wheat_for_each_feed_before_the_new_hand_exists(self) -> None:
         tiles = _tiles()
@@ -283,7 +284,8 @@ class RegionPhase1Tests(unittest.TestCase):
         at_the_door = agent(
             _observation(**{**shared, "hour": 2, "hands": [(4, 4)], "inventories": [{"WHEAT": 1}, {}]})
         )
-        self.assertIn(["SELL", "WHEAT", 4], at_the_door["market"])
+        self.assertIn(["SELL", "WHEAT", 3], at_the_door["market"])
+        self.assertNotIn(["SELL", "WHEAT", 4], at_the_door["market"])
 
     def test_wheat_placed_this_hour_is_sold_this_hour(self) -> None:
         tiles = _tiles()

@@ -304,7 +304,7 @@ def _plan_for_hires(
             origin=origin,
             start_hour=1,
             end_hour=23,
-            shed_wheat=_shed_wheat(world),
+            shed_wheat=_morning_route_wheat(world, day_route),
             shed_coords=shed_doors(grid.width),
             shed_animals=offered,
             shed_total=_shed_total(world),
@@ -385,6 +385,22 @@ def _wheat_outlay(day_route: Any) -> int:
     if int(getattr(day_route, "start_hour", 0) or 0) != 0:
         return 0
     return int(getattr(day_route, "wheat_cost", 0) or 0)
+
+
+def _morning_route_wheat(world: Any, day_route: Any) -> int:
+    """Forecast Wheat available to the Hour 1 morning route.
+
+    The planned purchase only enlarges the route's pantry forecast. The route
+    still derives its exact pickup from mandatory FEED visits and each worker's
+    carried Wheat, so a purchase cannot create extra feed work. Later replans
+    use the real observation directly and do not call this helper.
+    """
+
+    real = _shed_wheat(world)
+    if int(getattr(day_route, "start_hour", 0) or 0) != 0:
+        return real
+    planned = max(0, int(getattr(day_route, "wheat_buy", 0) or 0))
+    return real + planned
 
 
 def _scheduled_production_value(grid: TaskGrid, plan: RegionRoutePlan) -> float:
@@ -763,15 +779,20 @@ def _commands(world: Any, state: dict[str, Any], hour: int) -> tuple[list[Any], 
     return farmer, hands
 
 
-def _spendable(world: Any) -> dict[str, dict[str, int]]:
-    """A copy of the seeds and shed animals this hour may spend. The farm is not edited."""
+def _spendable(world: Any) -> dict[str, Any]:
+    """A copy of real stock this hour's commands may spend.
+
+    Morning route planning may forecast a successful Wheat purchase, but
+    execution only spends Wheat that is present in the current observation.
+    """
 
     inventory = getattr(world.farm, "inventory", None)
     if inventory is None:
-        return {"seeds": {}, "animals": {}}
+        return {"seeds": {}, "animals": {}, "wheat": 0}
     return {
         "seeds": {str(name): int(amount or 0) for name, amount in inventory.seeds.items()},
         "animals": {name: int(inventory.shed.get(name, 0) or 0) for name in ANIMAL_NAMES},
+        "wheat": int(inventory.shed.get("WHEAT", 0) or 0),
     }
 
 
@@ -779,7 +800,7 @@ def _action_for(
     worker_id: str,
     state: dict[str, Any],
     hour: int,
-    stock: dict[str, dict[str, int]],
+    stock: dict[str, Any],
 ) -> list[Any]:
     route = state["routes_by_worker_id"].get(worker_id)
     if route is None:
@@ -795,8 +816,8 @@ def _action_for(
     return ["PASS"]
 
 
-def _take_stock(command: list[Any], stock: dict[str, dict[str, int]]) -> bool:
-    """A plant needs a seed. An animal pickup needs the animal in the shed."""
+def _take_stock(command: list[Any], stock: dict[str, Any]) -> bool:
+    """Validate and reserve one command against this hour's real stock."""
 
     if command[0] == PLANT:
         seed = str(command[1]) if len(command) > 1 else ""
@@ -810,6 +831,12 @@ def _take_stock(command: list[Any], stock: dict[str, dict[str, int]]) -> bool:
         if stock["animals"].get(name, 0) < amount:
             return False
         stock["animals"][name] -= amount
+        return True
+    if command[0] == "PICKUP" and len(command) >= 3 and str(command[1]) == "WHEAT":
+        amount = int(command[2])
+        if stock.get("wheat", 0) < amount:
+            return False
+        stock["wheat"] -= amount
         return True
     return True
 
@@ -853,11 +880,12 @@ def _mandatory_feed_reserve(
 
 
 def _reserved_pickups(plan: RegionRoutePlan | None, hour: int) -> int:
-    """Wheat this region's plan still takes from the shed after this hour.
+    """Wheat this region's plan still takes from the shed at/after this hour.
 
     The sale list is not the old day route. A worker may be sent to an animal
-    the old route gave to someone who already had wheat. Until that pickup
-    happens, the shed grain has to stay.
+    the old route gave to someone who already had wheat. The engine runs unit
+    actions before the market, so a pickup scheduled for this hour must also
+    stay out of this hour's SELL order.
     """
 
     if plan is None:
@@ -865,7 +893,7 @@ def _reserved_pickups(plan: RegionRoutePlan | None, hour: int) -> int:
     reserved = 0
     for route in plan.worker_routes:
         for action in route.actions_by_hour:
-            if action.hour <= hour or action.operation != "PICKUP" or len(action.args) < 2:
+            if action.hour < hour or action.operation != "PICKUP" or len(action.args) < 2:
                 continue
             if action.args[0] != "WHEAT":
                 continue

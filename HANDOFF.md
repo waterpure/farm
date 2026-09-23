@@ -196,6 +196,18 @@
 
 **下一位：** 不要报名。评测只打 1 局，不要再跑 20 颗种子，除非用户明确说要。打完把这一局的记录推进 `main`。不要加肥料、拾粪、新的照料、买地，不要重写卖货，不要做对手建模。下一刀只处理：牲畜已经饿了一天时，早上买来的麦必须留着并在当天喂下去，不能下一时辰卖掉；卖瓜之后不要再买一群活不到出毛的牲畜。先不要改每天收入的公式。
 
+## 0.43 2026-09-23：早班 forecast Wheat 接入 RegionRoute，实际 Pickup 仍只认真实库存
+
+**改动范围。** 用户明确授权只修小麦资源闭环，没有改 TaskGrid、生产盈利公式、晚期动物购买、SELL 策略、市场定价、CrewCandidate 排名、买地或空地组合。`lab/region_phase1.py` 的 `_plan_for_hires()` 现在把「真实 Shed Wheat + Hour0 已确定的 `day_route.wheat_buy`」作为 Hour1 morning route 的 pantry forecast；forecast 只帮助 RegionRoute 排现有 mandatory FEED，不会凭 `wheat_buy` 额外生成喂粮或 Pickup。中途 position divergence / resource failure 重排仍只传 `_shed_wheat(world)` 的真实观察。
+
+执行边界也补齐：`_spendable()` 记录真实 Shed Wheat，`_take_stock()` 对 `PICKUP WHEAT N` 做共享库存扣减；买麦失败时不把 forecast 当真货发送，沿用已有 `force_replan`。另外修正 `_reserved_pickups()` 的时序：引擎先执行 unit phase 再跑 market，因此当前时辰就要 Pickup 的 Wheat 也必须从当前 SELL 数量中预留。第一次整季冒烟发现了这一点，随后只修了这个同小时 reserve 边界，没有加独立的 `protected_wheat` 机制。
+
+**验证。** `./.venv/bin/python -m unittest discover -s lab -p 'test_*.py'`：276 个测试全部通过。新增覆盖 morning forecast 生成 Pickup/Feed、没有 forecast 不凭空喂、真实执行库存校验；原有同小时/后续 Wheat SELL 断言同步到引擎时序。
+
+**seed 1 单局 v2。** 对手 `starter`，720 steps，逐时记录在 `experiments/region_phase1_seed1_animal_v2.json`，共 719 个小时动作、29 个收工日记录。Day1 Hour0 `BUY_WHEAT 2`，Hour1 `PICKUP_WHEAT 2`，随后完成 2 次 `FEED`；Day1 没有 `SELL WHEAT 2`。Day2 收工仍有 2 只动物。全季 `FEED` 205 次、Pickup Wheat 205 份、BUY_WHEAT 订单 24 次；动物产品卖单为 `WOOL 101`、`MILK 27`、`EGG 0`。终局现金和奖励均为 **30,407**，状态 `DONE`。这只证明本阶段资源闭环在该局跑通，不证明晚期动物购买或整季策略已经最优。
+
+**下一位：** 不要报名，不要多 seed/联赛。保留 v2 记录，不覆盖 v1。后续若继续，只能在新的用户授权和新的可审核方案下处理剩余动物购买/现金问题；本阶段的 forecast/真实 observation 边界不要回退。
+
 ## 0.5 第 14 条路线：给下一位 agent 的完整脉络（2026-09-20 晚）
 
 **只读冻结 V45。** 不要改 `third_party/v45/main.py`。当前候选是独立执行器 `route14`：`lab/route14_economy.py`、`lab/route14_hub.py`、`lab/route14_agent.py`、协议 `docs/ROUTE14_PROTOCOL_V1.md`。runner：`route14` vs `v45_base`。默认 seed 0、一局、hour 23 逐日对照表。不报名、不 112 联赛，除非用户另说。
