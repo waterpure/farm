@@ -12,6 +12,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from functools import lru_cache
 
+from kaggle_environments.envs.kaggriculture.kaggriculture import ANIMALS as ENGINE_ANIMALS
 from kaggle_environments.envs.kaggriculture.kaggriculture import CROPS as ENGINE_CROPS
 
 from .route14_state import PENDING, shed_doors
@@ -41,6 +42,8 @@ class TileVisit:
     tasks: tuple[str, ...]
     action_count: int
     tile_type: str
+    harvest_product: str | None = None
+    harvest_units: int = 0
 
 
 @dataclass(frozen=True)
@@ -155,7 +158,8 @@ def _extract_visits(
             if not kinds:
                 continue
             tasks = _task_order(cell.tile_type, kinds)
-            visits.append(TileVisit(cell.coord, tasks, len(tasks), cell.tile_type))
+            product, units = _harvest_cargo(cell.tile_type, cell.tasks.get(HARVEST), tasks)
+            visits.append(TileVisit(cell.coord, tasks, len(tasks), cell.tile_type, product, units))
     return tuple(visits)
 
 
@@ -192,17 +196,81 @@ class _Pantry:
 
 @dataclass(frozen=True)
 class _Leg:
-    """One shed stop, if wheat is short, then the tile visits in walk order."""
+    """Field walk, then one return to the shed when the worker is carrying a harvest."""
 
     door: tuple[int, int] | None
     pickup: int
     visits: tuple[TileVisit, ...]
     travel: int
+    return_door: tuple[int, int] | None = None
+    return_travel: int = 0
+    deliveries: tuple[tuple[str, int], ...] = ()
 
     @property
     def action_total(self) -> int:
         work = sum(visit.action_count for visit in self.visits)
-        return self.travel + (1 if self.pickup else 0) + work
+        return (
+            self.travel
+            + self.return_travel
+            + (1 if self.pickup else 0)
+            + work
+            + len(self.deliveries)
+        )
+
+
+def _harvest_cargo(tile_type: str, harvest: object, tasks: tuple[str, ...]) -> tuple[str | None, int]:
+    """Goods this visit puts in the worker's hands. Animals yield wool, milk, or eggs."""
+
+    if HARVEST not in tasks or harvest is None:
+        return None, 0
+    units = int(getattr(harvest, "yield_amount", 0) or 0)
+    if units <= 0:
+        return None, 0
+    animal = ENGINE_ANIMALS.get(tile_type)
+    product = str(animal["product"]) if animal is not None else tile_type
+    return product, units
+
+
+def _deliveries(visits: Sequence[TileVisit]) -> tuple[tuple[str, int], ...]:
+    """One unload per product, in the order the route first picked that product up."""
+
+    totals: dict[str, int] = {}
+    order: list[str] = []
+    for visit in visits:
+        product = visit.harvest_product
+        if not product or visit.harvest_units <= 0:
+            continue
+        if product not in totals:
+            order.append(product)
+            totals[product] = 0
+        totals[product] += visit.harvest_units
+    return tuple((product, totals[product]) for product in order)
+
+
+def _return_choice(
+    last: tuple[int, int],
+    doors: Sequence[tuple[int, int]],
+) -> tuple[tuple[int, int] | None, int]:
+    """Cheapest door from the last field tile. The visit order is already fixed."""
+
+    if not doors:
+        return None, 10**9
+    door = min(doors, key=lambda item: (_manhattan(last, item), item))
+    return door, _manhattan(last, door)
+
+
+def _with_return(
+    pickup_door: tuple[int, int] | None,
+    pickup: int,
+    ordered: list[TileVisit],
+    field_travel: int,
+    doors: Sequence[tuple[int, int]],
+) -> _Leg:
+    deliveries = _deliveries(ordered)
+    if not deliveries or not ordered:
+        return _Leg(pickup_door, pickup, tuple(ordered), field_travel)
+    door, steps = _return_choice(ordered[-1].coord, doors)
+    return _Leg(pickup_door, pickup, tuple(ordered), field_travel, door, steps, deliveries)
 
 
 def _feed_count(visits: Sequence[TileVisit]) -> int:
@@ -238,23 +306,26 @@ def _layout(worker: RegionWorker, visits: Sequence[TileVisit], doors: Sequence[t
     pickup = _pickup_needed(worker, items)
     if pickup <= 0 or not items:
         ordered = _reorder(worker.coord, items)
-        return _Leg(None, 0, tuple(ordered), _path_moves(worker.coord, [visit.coord for visit in ordered]))
-    best: tuple[tuple[int, int, tuple[int, int]], _Leg] | None = None
-    work = sum(visit.action_count for visit in items)
+        travel = _path_moves(worker.coord, [visit.coord for visit in ordered])
+        return _with_return(None, 0, ordered, travel, doors)
+    best: tuple[tuple[int, int, int, tuple[int, int]], _Leg] | None = None
     for door in doors:
         ordered = _reorder(door, items)
         travel = _manhattan(worker.coord, door) + _path_moves(door, [visit.coord for visit in ordered])
-        leg = _Leg(door, pickup, tuple(ordered), travel)
-        key = (travel + 1 + work, travel, door)
+        leg = _with_return(door, pickup, ordered, travel, doors)
+        key = (leg.action_total, leg.travel + leg.return_travel, door)
         if best is None or key < best[0]:
             best = (key, leg)
     if best is None:
-        return _Leg(None, pickup, tuple(_reorder(worker.coord, items)), 10**9)
+        ordered = _reorder(worker.coord, items)
+        return _with_return(None, pickup, ordered, 10**9, doors)
     return best[1]
 
 
 def _leg_fits(leg: _Leg, start_hour: int, end_hour: int) -> bool:
     if leg.pickup and leg.door is None:
+        return False
+    if leg.deliveries and leg.return_door is None:
         return False
     if leg.action_total == 0:
         return True
@@ -560,6 +631,22 @@ def _expand(
         moves += len(walked)
         hour = task_hour
         position = visit.coord
+    if not leg.deliveries:
+        return tuple(actions), moves, _finish(actions), ()
+    if leg.return_door is None:
+        return tuple(actions), moves, _finish(actions), visits
+    while position != leg.return_door:
+        if hour > end_hour:
+            return tuple(actions), moves, _finish(actions), visits
+        position, operation = _step_toward(position, leg.return_door)
+        actions.append(RouteAction(hour, operation))
+        hour += 1
+        moves += 1
+    for product, units in leg.deliveries:
+        if hour > end_hour:
+            return tuple(actions), moves, _finish(actions), visits
+        actions.append(RouteAction(hour, "PLACE", leg.return_door, (product, units)))
+        hour += 1
     return tuple(actions), moves, _finish(actions), ()
 
 

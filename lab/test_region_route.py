@@ -37,9 +37,9 @@ from lab.task_grid import (
 from lab.test_task_grid import _world
 
 
-def _harvest(x: int, y: int, tile: str = "WHEAT") -> TaskBucket:
+def _harvest(x: int, y: int, tile: str = "WHEAT", units: int = 1) -> TaskBucket:
     bucket = TaskBucket((x, y), tile)
-    bucket.tasks[HARVEST] = HarvestTask(HARVEST, PENDING, True, yield_amount=1)
+    bucket.tasks[HARVEST] = HarvestTask(HARVEST, PENDING, True, yield_amount=units)
     return bucket
 
 
@@ -93,21 +93,27 @@ class RegionRouteTests(unittest.TestCase):
         plan = plan_region_routes(grid, [RegionWorker("Farmer", (0, 0))])
 
         self.assertTrue(plan.feasible)
-        self.assertEqual(plan.total_move_count, 2)
+        self.assertEqual(plan.total_move_count, 8)
         self.assertEqual(plan.unfinished_visits, ())
         route = plan.worker_routes[0]
         self.assertEqual(
-            [(action.hour, action.operation, action.coord) for action in route.actions_by_hour],
+            [(action.hour, action.operation, action.coord, action.args) for action in route.actions_by_hour],
             [
-                (1, "HARVEST", (0, 0)),
-                (2, "EAST", None),
-                (3, "HARVEST", (1, 0)),
-                (4, "EAST", None),
-                (5, "HARVEST", (2, 0)),
+                (1, "HARVEST", (0, 0), ()),
+                (2, "EAST", None, ()),
+                (3, "HARVEST", (1, 0), ()),
+                (4, "EAST", None, ()),
+                (5, "HARVEST", (2, 0), ()),
+                (6, "EAST", None, ()),
+                (7, "EAST", None, ()),
+                (8, "SOUTH", None, ()),
+                (9, "SOUTH", None, ()),
+                (10, "SOUTH", None, ()),
+                (11, "SOUTH", None, ()),
+                (12, "PLACE", (4, 4), ("WHEAT", 3)),
             ],
         )
-        self.assertNotIn("GO_TO", [action.operation for action in route.actions_by_hour])
-        self.assertEqual(route.finish_hour, 5)
+        self.assertEqual(route.finish_hour, 12)
 
     def test_ripe_wheat_below_the_cap_is_harvested_while_the_water_stays_optional(self) -> None:
         world = _world("WHEAT", day=2, units=4, dry=1)
@@ -120,10 +126,10 @@ class RegionRouteTests(unittest.TestCase):
         plan = plan_region_routes(grid, [RegionWorker("Farmer", (2, 3))])
 
         self.assertEqual(plan.worker_routes[0].visits[0].tasks, (HARVEST,))
-        self.assertEqual(
-            [action.operation for action in plan.worker_routes[0].actions_by_hour],
-            [HARVEST],
-        )
+        operations = [action.operation for action in plan.worker_routes[0].actions_by_hour]
+        self.assertEqual(operations[0], HARVEST)
+        self.assertNotIn(WATER, operations)
+        self.assertEqual(operations[-1], "PLACE")
         self.assertEqual(grid[2][3].tasks[WATER].yield_gain, 1)
         self.assertFalse(grid[2][3].tasks[WATER].mandatory)
 
@@ -133,10 +139,10 @@ class RegionRouteTests(unittest.TestCase):
         self.assertNotIn(WATER, grid[2][3].tasks)
         self.assertEqual(grid[2][3].tasks[HARVEST].yield_amount, 6)
         plan = plan_region_routes(grid, [RegionWorker("Farmer", (2, 3))])
-        self.assertEqual(
-            [action.operation for action in plan.worker_routes[0].actions_by_hour],
-            [HARVEST],
-        )
+        operations = [action.operation for action in plan.worker_routes[0].actions_by_hour]
+        self.assertEqual(operations[0], HARVEST)
+        self.assertNotIn(WATER, operations)
+        self.assertEqual(plan.worker_routes[0].actions_by_hour[-1].args, ("WHEAT", 6))
 
     def test_one_shot_visit_waters_before_it_harvests(self) -> None:
         self.assertEqual(_task_order("WHEAT", [HARVEST, WATER]), (WATER, HARVEST))
@@ -149,10 +155,11 @@ class RegionRouteTests(unittest.TestCase):
 
         self.assertEqual(plan.worker_routes[0].visits[0].tasks, (WATER, HARVEST))
         self.assertEqual(plan.worker_routes[0].visits[0].action_count, 2)
-        self.assertEqual(
-            [action.operation for action in plan.worker_routes[0].actions_by_hour],
-            [WATER, HARVEST],
-        )
+        self.assertEqual(plan.worker_routes[0].visits[0].harvest_product, "WHEAT")
+        self.assertEqual(plan.worker_routes[0].visits[0].harvest_units, 5)
+        operations = [action.operation for action in plan.worker_routes[0].actions_by_hour]
+        self.assertEqual(operations[:2], [WATER, HARVEST])
+        self.assertEqual(plan.worker_routes[0].actions_by_hour[-1].args, ("WHEAT", 5))
 
     def test_one_tile_has_one_owner(self) -> None:
         bucket = TaskBucket((2, 3), "WHEAT")
@@ -164,7 +171,7 @@ class RegionRouteTests(unittest.TestCase):
         self.assertEqual(_owners(plan), {(2, 3): "Farmer"})
         self.assertEqual(plan.worker_routes[1].visits, ())
         self.assertEqual(plan.worker_routes[1].move_count, 0)
-        self.assertEqual(plan.total_move_count, 0)
+        self.assertEqual(plan.total_move_count, 3)
 
     def test_an_ongoing_crop_keeps_water_before_harvest_in_the_same_visit(self) -> None:
         bucket = TaskBucket((1, 1), "TOMATO")
@@ -176,10 +183,10 @@ class RegionRouteTests(unittest.TestCase):
         visit = plan.worker_routes[0].visits[0]
         self.assertEqual(visit.tasks, (WATER, HARVEST))
         self.assertEqual(visit.action_count, 2)
-        self.assertEqual(
-            [action.operation for action in plan.worker_routes[0].actions_by_hour],
-            [WATER, HARVEST],
-        )
+        self.assertEqual(visit.harvest_product, "TOMATO")
+        operations = [action.operation for action in plan.worker_routes[0].actions_by_hour]
+        self.assertEqual(operations[:2], [WATER, HARVEST])
+        self.assertEqual(plan.worker_routes[0].actions_by_hour[-1].args, ("TOMATO", 1))
 
     def test_feed_and_harvest_on_one_animal_stay_together(self) -> None:
         bucket = TaskBucket((3, 4), "SHEEP")
@@ -190,10 +197,11 @@ class RegionRouteTests(unittest.TestCase):
         plan = plan_region_routes(_grid(bucket), [RegionWorker("Farmer", (3, 4), carrying_wheat=1)])
 
         self.assertEqual(plan.worker_routes[0].visits[0].tasks, (FEED, HARVEST))
-        self.assertEqual(
-            [action.operation for action in plan.worker_routes[0].actions_by_hour],
-            [FEED, HARVEST],
-        )
+        self.assertEqual(plan.worker_routes[0].visits[0].harvest_product, "WOOL")
+        operations = [action.operation for action in plan.worker_routes[0].actions_by_hour]
+        self.assertEqual(operations[:2], [FEED, HARVEST])
+        places = [action for action in plan.worker_routes[0].actions_by_hour if action.operation == "PLACE"]
+        self.assertEqual([(action.args) for action in places], [("WOOL", 1)])
 
     def test_optional_water_and_already_assigned_work_are_left_out(self) -> None:
         optional = TaskBucket((0, 1), "WHEAT")
@@ -218,7 +226,7 @@ class RegionRouteTests(unittest.TestCase):
         plan = plan_region_routes(grid, workers)
 
         self.assertTrue(plan.feasible)
-        self.assertEqual(plan.total_move_count, 5)
+        self.assertEqual(plan.total_move_count, 8)
         self.assertEqual(_owners(plan)[(4, 0)], _owners(plan)[(4, 1)])
         self.assertEqual(plan.worker_routes[1].move_count, 0)
 
@@ -234,13 +242,13 @@ class RegionRouteTests(unittest.TestCase):
         alone = plan_region_routes(_grid(*tiles), [workers[0]])
 
         self.assertTrue(plan.feasible)
-        self.assertEqual(plan.total_move_count, 4)
-        self.assertLess(plan.total_move_count, alone.total_move_count)
+        self.assertEqual(plan.total_move_count, 16)
+        self.assertFalse(alone.feasible)
         owners = _owners(plan)
         self.assertEqual(owners[(0, 0)], "A")
-        self.assertEqual(owners[(0, 4)], "B")
-        self.assertEqual(owners[(4, 0)], "C")
+        self.assertEqual(owners[(0, 4)], "A")
         self.assertEqual(owners[(4, 4)], "D")
+        self.assertEqual(plan.worker_routes[1].visits, ())
         self.assertEqual(len(owners), 5)
 
     def test_two_workers_finish_the_corners_in_fewer_steps_than_one(self) -> None:
@@ -251,10 +259,8 @@ class RegionRouteTests(unittest.TestCase):
             [RegionWorker("A", (0, 0)), RegionWorker("B", (4, 4))],
         )
 
-        self.assertTrue(one.feasible)
+        self.assertFalse(one.feasible)
         self.assertTrue(two.feasible)
-        self.assertEqual(one.total_move_count, 16)
-        self.assertLess(two.total_move_count, one.total_move_count)
         owners = _owners(two)
         self.assertEqual(owners[(0, 0)], "A")
         self.assertEqual(owners[(4, 4)], "B")
@@ -284,21 +290,20 @@ class RegionRouteTests(unittest.TestCase):
         )
 
         self.assertFalse(plan.feasible)
-        self.assertEqual([visit.coord for visit in plan.unfinished_visits], [(1, 0)])
-        self.assertEqual(
-            [(action.hour, action.operation) for action in plan.worker_routes[0].actions_by_hour],
-            [(1, "HARVEST")],
-        )
+        self.assertEqual([visit.coord for visit in plan.unfinished_visits], [(0, 0), (1, 0)])
+        self.assertEqual(plan.worker_routes[0].actions_by_hour, ())
 
     def test_more_than_ten_tiles_still_returns_a_route(self) -> None:
         tiles = [_harvest(index % 5, index // 5) for index in range(11)]
         plan = plan_region_routes(_grid(*tiles), [RegionWorker("Farmer", (0, 0))])
 
-        self.assertEqual(len(plan.worker_routes[0].visits), 11)
-        self.assertTrue(plan.feasible)
-        self.assertLessEqual(plan.total_move_count, 12)
-        self.assertLessEqual(plan.finish_hour, 23)
-        self.assertEqual(plan.unfinished_visits, ())
+        carried = plan.worker_routes[0].visits
+        self.assertEqual(len(carried) + len(plan.unfinished_visits), 11)
+        self.assertGreater(len(carried), 0)
+        self.assertLessEqual(plan.finish_hour or 0, 23)
+        places = [action for action in plan.worker_routes[0].actions_by_hour if action.operation == "PLACE"]
+        self.assertEqual([(action.args) for action in places], [("WHEAT", len(carried))])
+        self.assertGreater(places[0].hour, max(action.hour for action in plan.worker_routes[0].actions_by_hour if action.operation == "HARVEST"))
 
     def test_a_full_five_by_five_with_four_workers_stays_feasible(self) -> None:
         tiles = [_harvest(x, y) for y in range(5) for x in range(5)]
@@ -327,7 +332,8 @@ class RegionRouteTests(unittest.TestCase):
         )
 
         self.assertEqual(set(_owners(plan)), {(5, 0)})
-        self.assertEqual(plan.total_move_count, 0)
+        self.assertEqual(plan.total_move_count, 4)
+        self.assertEqual(plan.worker_routes[0].actions_by_hour[-1].args, ("WHEAT", 1))
 
     def test_a_dropped_tile_is_picked_up_after_another_plot_moves(self) -> None:
         coords = [(0, 0), (1, 0), (2, 0), (3, 0), (0, 1), (0, 2)]
@@ -336,7 +342,7 @@ class RegionRouteTests(unittest.TestCase):
         routes: list[list] = [[], []]
         dropped: list[tuple[int, int]] = []
         for visit in sorted(_extract_visits(grid, 5, (0, 0)), key=_visit_sort):
-            placed = _best_insertion(workers, routes, visit, 1, 6)
+            placed = _best_insertion(workers, routes, visit, 1, 12)
             if placed is None:
                 dropped.append(visit.coord)
             else:
@@ -344,7 +350,7 @@ class RegionRouteTests(unittest.TestCase):
 
         self.assertIn((0, 1), dropped)
         self.assertIn((0, 2), dropped)
-        plan = plan_region_routes(grid, workers, end_hour=6)
+        plan = plan_region_routes(grid, workers, end_hour=16)
         self.assertTrue(plan.feasible)
         self.assertEqual(plan.unfinished_visits, ())
         self.assertEqual(set(_owners(plan)), set(coords))
@@ -469,20 +475,20 @@ class RegionRouteTests(unittest.TestCase):
             ],
         )
         self.assertEqual(route.move_count, 3)
+        self.assertNotIn("PLACE", [action.operation for action in route.actions_by_hour])
 
     def test_counting_the_pickup_pushes_a_full_day_past_hour_23(self) -> None:
         buckets = [_feed(x, 0) for x in range(5)] + [_feed(x, 4) for x in range(5)]
-        buckets[0] = _feed_and_harvest(0, 0)
         grid = _grid(*buckets)
         short = plan_region_routes(
             grid,
-            [RegionWorker("Farmer", (4, 4))],
+            [RegionWorker("Farmer", (4, 3))],
             shed_wheat=10,
             shed_coords=shed_doors(10),
         )
         loaded = plan_region_routes(
             grid,
-            [RegionWorker("Farmer", (4, 4), carrying_wheat=10)],
+            [RegionWorker("Farmer", (4, 3), carrying_wheat=10)],
             shed_wheat=0,
             shed_coords=shed_doors(10),
         )
@@ -522,3 +528,89 @@ class RegionRouteTests(unittest.TestCase):
         self.assertEqual(_owners(plan)[(0, 0)], "B")
         self.assertEqual(_pickups(plan), [])
         self.assertTrue(plan.feasible)
+
+    def test_three_harvests_come_home_once(self) -> None:
+        plan = plan_region_routes(
+            _grid(_harvest(1, 1), _harvest(1, 2), _harvest(2, 2)),
+            [RegionWorker("Farmer", (4, 4))],
+        )
+        actions = plan.worker_routes[0].actions_by_hour
+        harvests = [index for index, action in enumerate(actions) if action.operation == "HARVEST"]
+        places = [action for action in actions if action.operation == "PLACE"]
+
+        self.assertTrue(plan.feasible)
+        self.assertEqual(len(harvests), 3)
+        self.assertEqual(places[-1].args, ("WHEAT", 3))
+        self.assertEqual(len(places), 1)
+        self.assertGreater(actions.index(places[0]), harvests[-1])
+        self.assertNotIn("DROP", [action.operation for action in actions])
+
+    def test_the_same_product_is_unloaded_once(self) -> None:
+        plan = plan_region_routes(
+            _grid(_harvest(1, 1, "WHEAT", 3), _harvest(1, 2, "WHEAT", 2), _harvest(2, 2, "COW", 4)),
+            [RegionWorker("Farmer", (4, 4))],
+        )
+        actions = plan.worker_routes[0].actions_by_hour
+        places = [action.args for action in actions if action.operation == "PLACE"]
+        last_harvest = max(index for index, action in enumerate(actions) if action.operation == "HARVEST")
+
+        self.assertTrue(plan.feasible)
+        self.assertCountEqual(places, [("WHEAT", 5), ("MILK", 4)])
+        self.assertGreater(min(index for index, action in enumerate(actions) if action.operation == "PLACE"), last_harvest)
+
+    def test_animals_unload_wool_milk_and_eggs(self) -> None:
+        plan = plan_region_routes(
+            _grid(_harvest(1, 1, "SHEEP", 1), _harvest(1, 2, "COW", 4), _harvest(2, 2, "GOOSE", 2)),
+            [RegionWorker("Farmer", (4, 4))],
+        )
+        places = [action.args for action in plan.worker_routes[0].actions_by_hour if action.operation == "PLACE"]
+
+        self.assertCountEqual(places, [("WOOL", 1), ("MILK", 4), ("EGG", 2)])
+
+    def test_a_harvest_that_cannot_be_unloaded_today_stays_in_the_field(self) -> None:
+        late = plan_region_routes(
+            _grid(_harvest(2, 4)),
+            [RegionWorker("Farmer", (2, 4))],
+            start_hour=21,
+            end_hour=23,
+        )
+        home = plan_region_routes(
+            _grid(_harvest(2, 4)),
+            [RegionWorker("Farmer", (2, 4))],
+            end_hour=4,
+        )
+
+        self.assertFalse(late.feasible)
+        self.assertEqual([visit.coord for visit in late.unfinished_visits], [(2, 4)])
+        self.assertEqual(late.worker_routes[0].actions_by_hour, ())
+        self.assertEqual(
+            [(action.hour, action.operation, action.args) for action in home.worker_routes[0].actions_by_hour],
+            [
+                (1, "HARVEST", ()),
+                (2, "EAST", ()),
+                (3, "EAST", ()),
+                (4, "PLACE", ("WHEAT", 1)),
+            ],
+        )
+
+    def test_the_person_already_hauling_keeps_the_next_field(self) -> None:
+        plan = plan_region_routes(
+            _grid(_harvest(0, 0), _harvest(0, 2)),
+            [RegionWorker("A", (1, 2)), RegionWorker("B", (0, 0))],
+        )
+
+        self.assertEqual(_owners(plan)[(0, 0)], "B")
+        self.assertEqual(_owners(plan)[(0, 2)], "B")
+        self.assertEqual(plan.worker_routes[0].visits, ())
+
+    def test_feed_wheat_is_not_unloaded_with_the_harvest(self) -> None:
+        plan = plan_region_routes(
+            _grid(_feed_and_harvest(2, 4)),
+            [RegionWorker("Farmer", (4, 4), carrying_wheat=3)],
+            shed_wheat=0,
+            shed_coords=shed_doors(10),
+        )
+        places = [action.args for action in plan.worker_routes[0].actions_by_hour if action.operation == "PLACE"]
+
+        self.assertEqual(places, [("WOOL", 1)])
+        self.assertEqual(_pickups(plan), [])

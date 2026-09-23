@@ -55,9 +55,9 @@ class RegionPhase1Tests(unittest.TestCase):
 
     def test_two_workers_act_from_their_own_routes(self) -> None:
         tiles = _tiles()
-        tiles[0][0] = _plant("WHEAT", planted_day=-2, units=6)
-        tiles[0][2] = _plant("WHEAT", planted_day=-2, units=6)
-        observation = _observation(tiles, day=0, hour=1, farmer=(0, 0), hands=[(2, 0)])
+        tiles[4][4] = _plant("WHEAT", planted_day=-2, units=6)
+        tiles[5][5] = _plant("WHEAT", planted_day=-2, units=6)
+        observation = _observation(tiles, day=0, hour=1, farmer=(4, 4), hands=[(5, 5)])
         action = make_region_phase1_agent()(observation)
 
         self.assertEqual(action["farmer"], ["HARVEST"])
@@ -85,7 +85,7 @@ class RegionPhase1Tests(unittest.TestCase):
 
         tiles[0][0] = None
         second = _observation(tiles, day=0, hour=2, farmer=(0, 0))
-        self.assertEqual(agent(second)["farmer"], ["PASS"])
+        self.assertEqual(agent(second)["farmer"], ["EAST"])
         self.assertEqual(agent.telemetry["grid"][0][0].tasks["HARVEST"].status, COMPLETED)
         self.assertFalse(agent.telemetry["needs_replan"])
 
@@ -274,6 +274,22 @@ class RegionPhase1Tests(unittest.TestCase):
             _observation(**{**shared, "hour": 2, "hands": [(4, 4)], "inventories": [{"WHEAT": 1}, {}]})
         )
         self.assertIn(["SELL", "WHEAT", 4], at_the_door["market"])
+
+    def test_wheat_placed_this_hour_is_sold_this_hour(self) -> None:
+        tiles = _tiles()
+        tiles[4][4] = _plant("WHEAT", planted_day=-2, units=6)
+        agent = make_region_phase1_agent()
+        agent(_observation(tiles, day=0, hour=0, farmer=(4, 4), inventories=[{"WHEAT": 4}]))
+        harvested = agent(_observation(tiles, day=0, hour=1, farmer=(4, 4), inventories=[{"WHEAT": 4}]))
+        self.assertEqual(harvested["farmer"], ["HARVEST"])
+        self.assertNotIn(["SELL", "WHEAT", 6], harvested["market"])
+
+        tiles[4][4] = None
+        unloaded = agent(_observation(_copy_tiles(tiles), day=0, hour=2, farmer=(4, 4), inventories=[{"WHEAT": 10}]))
+
+        self.assertEqual(unloaded["farmer"], ["PLACE", "WHEAT", 6])
+        self.assertIn(["SELL", "WHEAT", 6], unloaded["market"])
+        self.assertNotIn(["SELL", "WHEAT", 10], unloaded["market"])
 
 
 def _moved(position: tuple[int, int], operation: str) -> tuple[int, int]:
