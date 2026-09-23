@@ -16,7 +16,7 @@ from lab.region_route import (
     _visit_sort,
     plan_region_routes,
 )
-from lab.route14_state import PENDING, SCHEDULED
+from lab.route14_state import PENDING, SCHEDULED, shed_doors
 from lab.task_grid import (
     TaskGridBuilder,
     CARE,
@@ -41,6 +41,33 @@ def _harvest(x: int, y: int, tile: str = "WHEAT") -> TaskBucket:
     bucket = TaskBucket((x, y), tile)
     bucket.tasks[HARVEST] = HarvestTask(HARVEST, PENDING, True, yield_amount=1)
     return bucket
+
+
+def _feed(x: int, y: int) -> TaskBucket:
+    bucket = TaskBucket((x, y), "SHEEP")
+    bucket.tasks[FEED] = FeedTask(FEED, PENDING, True)
+    return bucket
+
+
+def _feed_and_harvest(x: int, y: int) -> TaskBucket:
+    bucket = _feed(x, y)
+    bucket.tasks[HARVEST] = HarvestTask(HARVEST, PENDING, True, yield_amount=1)
+    return bucket
+
+
+def _actions(plan, worker_id: str | None = None):
+    routes = plan.worker_routes
+    if worker_id is not None:
+        routes = [route for route in routes if route.worker_id == worker_id]
+    return [action for route in routes for action in route.actions_by_hour]
+
+
+def _pickups(plan):
+    return [action for action in _actions(plan) if action.operation == "PICKUP"]
+
+
+def _feeds(plan):
+    return [action for action in _actions(plan) if action.operation == "FEED"]
 
 
 def _grid(*buckets: TaskBucket) -> TaskGrid:
@@ -160,7 +187,7 @@ class RegionRouteTests(unittest.TestCase):
         bucket.tasks[HARVEST] = HarvestTask(HARVEST, PENDING, True, yield_amount=1)
         bucket.tasks[CARE] = CareTask(CARE, PENDING, False)
         bucket.tasks[COLLECT_FERTILIZER] = CollectFertilizerTask(COLLECT_FERTILIZER, PENDING, False, fertilizer_ready=True)
-        plan = plan_region_routes(_grid(bucket), [RegionWorker("Farmer", (3, 4))])
+        plan = plan_region_routes(_grid(bucket), [RegionWorker("Farmer", (3, 4), carrying_wheat=1)])
 
         self.assertEqual(plan.worker_routes[0].visits[0].tasks, (FEED, HARVEST))
         self.assertEqual(
@@ -365,3 +392,133 @@ class RegionRouteTests(unittest.TestCase):
                 grid,
                 [RegionWorker(str(index), (0, 0)) for index in range(5)],
             )
+
+    def test_one_feed_picks_up_wheat_before_walking_to_the_animal(self) -> None:
+        plan = plan_region_routes(
+            _grid(_feed(2, 4)),
+            [RegionWorker("Farmer", (4, 4))],
+            shed_wheat=1,
+            shed_coords=shed_doors(10),
+        )
+
+        self.assertTrue(plan.feasible)
+        pickups = _pickups(plan)
+        self.assertEqual(len(pickups), 1)
+        self.assertEqual(pickups[0].args, ("WHEAT", 1))
+        self.assertEqual(pickups[0].coord, (4, 4))
+        self.assertLess(pickups[0].hour, _feeds(plan)[0].hour)
+
+    def test_three_feeds_are_one_pickup_of_three(self) -> None:
+        plan = plan_region_routes(
+            _grid(_feed(2, 4), _feed(2, 3), _feed(2, 2)),
+            [RegionWorker("Farmer", (4, 4))],
+            shed_wheat=3,
+            shed_coords=shed_doors(10),
+        )
+
+        pickups = _pickups(plan)
+        self.assertEqual(len(pickups), 1)
+        self.assertEqual(pickups[0].args, ("WHEAT", 3))
+        self.assertEqual(len(_feeds(plan)), 3)
+        self.assertTrue(plan.feasible)
+
+    def test_wheat_already_in_hand_skips_the_shed(self) -> None:
+        plan = plan_region_routes(
+            _grid(_feed(2, 4), _feed(2, 3)),
+            [RegionWorker("Farmer", (4, 4), carrying_wheat=2)],
+            shed_wheat=0,
+            shed_coords=shed_doors(10),
+        )
+
+        self.assertEqual(_pickups(plan), [])
+        self.assertEqual(len(_feeds(plan)), 2)
+        self.assertTrue(plan.feasible)
+        self.assertNotIn("PICKUP", [action.operation for action in _actions(plan)])
+
+    def test_a_partial_armful_picks_up_only_the_shortage(self) -> None:
+        plan = plan_region_routes(
+            _grid(_feed(2, 4), _feed(2, 3), _feed(2, 2)),
+            [RegionWorker("Farmer", (4, 4), carrying_wheat=1)],
+            shed_wheat=2,
+            shed_coords=shed_doors(10),
+        )
+
+        pickups = _pickups(plan)
+        self.assertEqual(len(pickups), 1)
+        self.assertEqual(pickups[0].args, ("WHEAT", 2))
+        self.assertEqual(len(_feeds(plan)), 3)
+
+    def test_two_feeds_from_the_shed_door_take_six_hours(self) -> None:
+        plan = plan_region_routes(
+            _grid(_feed(2, 4), _feed(2, 3)),
+            [RegionWorker("Hand1", (4, 4))],
+            shed_wheat=2,
+            shed_coords=shed_doors(10),
+        )
+        route = plan.worker_routes[0]
+
+        self.assertEqual(
+            [(action.hour, action.operation, action.coord, action.args) for action in route.actions_by_hour],
+            [
+                (1, "PICKUP", (4, 4), ("WHEAT", 2)),
+                (2, "WEST", None, ()),
+                (3, "WEST", None, ()),
+                (4, "FEED", (2, 4), ()),
+                (5, "NORTH", None, ()),
+                (6, "FEED", (2, 3), ()),
+            ],
+        )
+        self.assertEqual(route.move_count, 3)
+
+    def test_counting_the_pickup_pushes_a_full_day_past_hour_23(self) -> None:
+        buckets = [_feed(x, 0) for x in range(5)] + [_feed(x, 4) for x in range(5)]
+        buckets[0] = _feed_and_harvest(0, 0)
+        grid = _grid(*buckets)
+        short = plan_region_routes(
+            grid,
+            [RegionWorker("Farmer", (4, 4))],
+            shed_wheat=10,
+            shed_coords=shed_doors(10),
+        )
+        loaded = plan_region_routes(
+            grid,
+            [RegionWorker("Farmer", (4, 4), carrying_wheat=10)],
+            shed_wheat=0,
+            shed_coords=shed_doors(10),
+        )
+
+        self.assertFalse(short.feasible)
+        self.assertTrue(short.unfinished_visits)
+        self.assertTrue(loaded.feasible)
+        self.assertEqual(loaded.finish_hour, 23)
+        self.assertEqual(_pickups(loaded), [])
+
+    def test_shared_shed_wheat_is_not_promised_twice(self) -> None:
+        animals = _grid(_feed(0, 0), _feed(1, 0), _feed(2, 0))
+        workers = [RegionWorker("A", (4, 4)), RegionWorker("B", (5, 4))]
+        doors = shed_doors(10)
+        enough = plan_region_routes(animals, workers, shed_wheat=3, shed_coords=doors)
+        short = plan_region_routes(animals, workers, shed_wheat=2, shed_coords=doors)
+
+        self.assertTrue(enough.feasible)
+        self.assertEqual(len(_feeds(enough)), 3)
+        self.assertEqual(sum(action.args[1] for action in _pickups(enough)), 3)
+        self.assertFalse(short.feasible)
+        self.assertLess(len(_feeds(short)), 3)
+        self.assertLessEqual(sum(action.args[1] for action in _pickups(short)), 2)
+        self.assertEqual(sum(action.args[1] for action in _pickups(short)), len(_feeds(short)))
+
+    def test_the_worker_who_already_holds_wheat_gets_the_animal(self) -> None:
+        plan = plan_region_routes(
+            _grid(_feed(0, 0)),
+            [
+                RegionWorker("A", (0, 1)),
+                RegionWorker("B", (3, 0), carrying_wheat=1),
+            ],
+            shed_wheat=5,
+            shed_coords=shed_doors(10),
+        )
+
+        self.assertEqual(_owners(plan)[(0, 0)], "B")
+        self.assertEqual(_pickups(plan), [])
+        self.assertTrue(plan.feasible)

@@ -12,7 +12,7 @@ from typing import Any
 
 from .region_route import RegionRoutePlan, RegionWorker, plan_region_routes
 from .route14_phase1 import _market_orders, _reserved_wheat, choose_day_route
-from .route14_state import PENDING, SCHEDULED, TaskAssignment, parse_world, worker_name
+from .route14_state import PENDING, SCHEDULED, TaskAssignment, parse_world, shed_doors, worker_name
 from .task_grid import FEED, HARVEST, WATER, TaskGrid, apply_assignments, build_task_grid
 
 
@@ -64,6 +64,8 @@ def make_region_phase1_agent():
                 origin=origin,
                 start_hour=hour,
                 end_hour=23,
+                shed_wheat=_shed_wheat(world),
+                shed_coords=shed_doors(grid.width),
             )
             apply_assignments(grid, world, _assignments(plan))
             state["plan"] = plan
@@ -115,7 +117,11 @@ def _crew(world: Any) -> list[RegionWorker]:
     """The first four people already standing on the board, farmer first."""
 
     return [
-        RegionWorker(worker_name(worker.actor), worker.coord)
+        RegionWorker(
+            worker_name(worker.actor),
+            worker.coord,
+            int(worker.carrying.get("WHEAT", 0) or 0),
+        )
         for worker in world.farm.workers[:MAX_REGION_WORKERS]
     ]
 
@@ -202,7 +208,7 @@ def _action_for(worker_id: str, state: dict[str, Any], hour: int) -> list[Any]:
         return ["PASS"]
     for action in route.actions_by_hour:
         if action.hour == hour:
-            return [action.operation]
+            return [action.operation, *action.args]
     return ["PASS"]
 
 
@@ -213,6 +219,15 @@ def _remember_positions(world: Any, state: dict[str, Any], commands: list[list[A
             continue
         expected[worker_name(worker.actor)] = _after(worker.coord, str(command[0]))
     state["expected_positions"] = expected
+
+
+def _shed_wheat(world: Any) -> int:
+    """Wheat sitting in the shed right now, not a forecast of later stock."""
+
+    inventory = getattr(world.farm, "inventory", None)
+    if inventory is None:
+        return 0
+    return int(inventory.shed.get("WHEAT", 0) or 0)
 
 
 def _after(coord: tuple[int, int], operation: str) -> tuple[int, int]:

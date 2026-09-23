@@ -14,7 +14,7 @@ from functools import lru_cache
 
 from kaggle_environments.envs.kaggriculture.kaggriculture import CROPS as ENGINE_CROPS
 
-from .route14_state import PENDING
+from .route14_state import PENDING, shed_doors
 from .task_grid import FEED, HARVEST, WATER, TaskGrid
 
 
@@ -30,6 +30,7 @@ class RegionWorker:
 
     id: str
     coord: tuple[int, int]
+    carrying_wheat: int = 0
 
 
 @dataclass(frozen=True)
@@ -49,6 +50,7 @@ class RouteAction:
     hour: int
     operation: str
     coord: tuple[int, int] | None = None
+    args: tuple = ()
 
     def __str__(self) -> str:
         if self.coord is None:
@@ -87,13 +89,17 @@ def plan_region_routes(
     start_hour: int = 1,
     end_hour: int = 23,
     origin: tuple[int, int] = (0, 0),
+    shed_wheat: int = 0,
+    shed_coords: Sequence[tuple[int, int]] | None = None,
 ) -> RegionRoutePlan:
     """Assign every must-do tile in one square to the given workers.
 
     The square starts at `origin` and runs `region_size` cells on both axes.
     The default square is the corner `[0, 5)`. Each tile has one owner.
     Among plans that finish every visit by `end_hour`, fewer steps win, then
-    an earlier last hour.
+    an earlier last hour. A feed is only assigned when that worker can hold
+    enough wheat, picking up the shortage once from `shed_wheat` before the
+    field walk.
     """
 
     crew = tuple(workers)
@@ -103,20 +109,24 @@ def plan_region_routes(
         raise ValueError("region_size must be positive")
     if start_hour > end_hour:
         raise ValueError("start_hour must be at or before end_hour")
+    if shed_wheat < 0:
+        raise ValueError("shed_wheat cannot be negative")
+    doors = tuple(shed_coords) if shed_coords is not None else shed_doors(task_grid.width)
+    pantry = _Pantry(shed_wheat, doors)
     visits = _extract_visits(task_grid, region_size, origin)
     if not visits:
         return _empty_plan(crew)
     routes: list[list[TileVisit]] = [[] for _ in crew]
     leftover: list[TileVisit] = []
     for visit in sorted(visits, key=_visit_sort):
-        placed = _best_insertion(crew, routes, visit, start_hour, end_hour)
+        placed = _best_insertion(crew, routes, visit, start_hour, end_hour, pantry)
         if placed is None:
             leftover.append(visit)
             continue
         worker_index, ordered = placed
         routes[worker_index] = ordered
-    scored = _search(crew, routes, leftover, start_hour, end_hour)
-    return _materialize(crew, scored, start_hour, end_hour)
+    scored = _search(crew, routes, leftover, start_hour, end_hour, pantry)
+    return _materialize(crew, scored, start_hour, end_hour, pantry)
 
 
 def _visit_sort(visit: TileVisit) -> tuple[int, int, tuple[str, ...]]:
@@ -172,28 +182,137 @@ def _task_order(tile_type: str, kinds: list[str]) -> tuple[str, ...]:
     return ordered
 
 
+@dataclass(frozen=True)
+class _Pantry:
+    """Wheat still in the shed, and the tiles where a worker can take it."""
+
+    wheat: int
+    doors: tuple[tuple[int, int], ...]
+
+
+@dataclass(frozen=True)
+class _Leg:
+    """One shed stop, if wheat is short, then the tile visits in walk order."""
+
+    door: tuple[int, int] | None
+    pickup: int
+    visits: tuple[TileVisit, ...]
+    travel: int
+
+    @property
+    def action_total(self) -> int:
+        work = sum(visit.action_count for visit in self.visits)
+        return self.travel + (1 if self.pickup else 0) + work
+
+
+def _feed_count(visits: Sequence[TileVisit]) -> int:
+    return sum(1 for visit in visits if FEED in visit.tasks)
+
+
+def _pickup_needed(worker: RegionWorker, visits: Sequence[TileVisit]) -> int:
+    """Wheat this worker still has to take for the feeds they already own."""
+
+    return max(0, _feed_count(visits) - max(0, worker.carrying_wheat))
+
+
+def _wheat_draw(workers: Sequence[RegionWorker], routes: Sequence[Sequence[TileVisit]]) -> int:
+    return sum(_pickup_needed(worker, route) for worker, route in zip(workers, routes))
+
+
+def _within_wheat(
+    workers: Sequence[RegionWorker],
+    routes: Sequence[Sequence[TileVisit]],
+    pantry: _Pantry,
+) -> bool:
+    return _wheat_draw(workers, routes) <= pantry.wheat
+
+
+def _layout(worker: RegionWorker, visits: Sequence[TileVisit], doors: Sequence[tuple[int, int]]) -> _Leg:
+    """Cheapest full walk: start, optional door and one pickup, then the tiles.
+
+    The door is chosen by that whole walk. A nearer door can lose when the
+    animals sit closer to another door.
+    """
+
+    items = list(visits)
+    pickup = _pickup_needed(worker, items)
+    if pickup <= 0 or not items:
+        ordered = _reorder(worker.coord, items)
+        return _Leg(None, 0, tuple(ordered), _path_moves(worker.coord, [visit.coord for visit in ordered]))
+    best: tuple[tuple[int, int, tuple[int, int]], _Leg] | None = None
+    work = sum(visit.action_count for visit in items)
+    for door in doors:
+        ordered = _reorder(door, items)
+        travel = _manhattan(worker.coord, door) + _path_moves(door, [visit.coord for visit in ordered])
+        leg = _Leg(door, pickup, tuple(ordered), travel)
+        key = (travel + 1 + work, travel, door)
+        if best is None or key < best[0]:
+            best = (key, leg)
+    if best is None:
+        return _Leg(None, pickup, tuple(_reorder(worker.coord, items)), 10**9)
+    return best[1]
+
+
+def _leg_fits(leg: _Leg, start_hour: int, end_hour: int) -> bool:
+    if leg.pickup and leg.door is None:
+        return False
+    if leg.action_total == 0:
+        return True
+    return start_hour + leg.action_total - 1 <= end_hour
+
+
+def _prepare(
+    worker: RegionWorker,
+    visits: Sequence[TileVisit],
+    doors: Sequence[tuple[int, int]],
+    start_hour: int,
+    end_hour: int,
+) -> tuple[_Leg, tuple[TileVisit, ...]]:
+    """Keep the longest prefix that still fits once the pickup is counted."""
+
+    items = list(visits)
+    if not items:
+        return _Leg(None, 0, (), 0), ()
+    full = _layout(worker, items, doors)
+    if _leg_fits(full, start_hour, end_hour):
+        return full, ()
+    ordered = list(full.visits)
+    for length in range(len(ordered) - 1, -1, -1):
+        leg = _layout(worker, ordered[:length], doors)
+        if _leg_fits(leg, start_hour, end_hour):
+            kept = {visit.coord for visit in leg.visits}
+            pending = tuple(visit for visit in ordered if visit.coord not in kept)
+            return leg, pending
+    return _Leg(None, 0, (), 0), tuple(ordered)
+
+
 def _best_insertion(
     workers: Sequence[RegionWorker],
     routes: list[list[TileVisit]],
     visit: TileVisit,
     start_hour: int,
     end_hour: int,
+    pantry: _Pantry | None = None,
 ) -> tuple[int, list[TileVisit]] | None:
-    """Cheapest worker after the route is reordered, not a splice into the old order."""
+    """Cheapest worker after the route is reordered, including a wheat stop."""
 
+    if pantry is None:
+        pantry = _Pantry(0, shed_doors(10))
     best: tuple[tuple[int, int], int, list[TileVisit]] | None = None
+    drawn = _wheat_draw(workers, routes)
     for worker_index, worker in enumerate(workers):
         current = routes[worker_index]
-        old_order = _reorder(worker.coord, current)
-        new_order = _reorder(worker.coord, current + [visit])
-        if not _fits(worker.coord, new_order, start_hour, end_hour):
+        trial = current + [visit]
+        if drawn - _pickup_needed(worker, current) + _pickup_needed(worker, trial) > pantry.wheat:
             continue
-        old_cost = _path_moves(worker.coord, [item.coord for item in old_order])
-        new_cost = _path_moves(worker.coord, [item.coord for item in new_order])
-        extra_move = new_cost - old_cost
-        key = (extra_move + visit.action_count, worker_index)
+        old = _layout(worker, current, pantry.doors)
+        new = _layout(worker, trial, pantry.doors)
+        if not _fits(worker, trial, pantry.doors, start_hour, end_hour):
+            continue
+        extra = new.action_total - old.action_total
+        key = (extra, worker_index)
         if best is None or key < best[0]:
-            best = (key, worker_index, new_order)
+            best = (key, worker_index, list(new.visits))
     if best is None:
         return None
     return best[1], best[2]
@@ -222,10 +341,11 @@ def _search(
     leftover: list[TileVisit],
     start_hour: int,
     end_hour: int,
+    pantry: _Pantry,
 ) -> "_Score":
-    current = _score(workers, routes, leftover, start_hour, end_hour)
+    current = _score(workers, routes, leftover, start_hour, end_hour, pantry)
     for _ in range(_MAX_ROUNDS):
-        improved = _improve_once(workers, current, start_hour, end_hour)
+        improved = _improve_once(workers, current, start_hour, end_hour, pantry)
         if improved is None:
             break
         current = improved
@@ -237,6 +357,7 @@ def _improve_once(
     current: "_Score",
     start_hour: int,
     end_hour: int,
+    pantry: _Pantry,
 ) -> "_Score | None":
     """Put a dropped tile back before moving or swapping work between people.
 
@@ -248,8 +369,10 @@ def _improve_once(
     for visit in current.leftover:
         for target in range(len(workers)):
             trial = _place(routes, target, visit)
+            if not _within_wheat(workers, trial, pantry):
+                continue
             remaining = [item for item in current.leftover if item.coord != visit.coord]
-            scored = _score(workers, trial, remaining, start_hour, end_hour)
+            scored = _score(workers, trial, remaining, start_hour, end_hour, pantry)
             if len(scored.leftover) < len(current.leftover):
                 return scored
     for source, worker_route in enumerate(routes):
@@ -258,7 +381,9 @@ def _improve_once(
                 if target == source:
                     continue
                 trial = _move(routes, source, target, visit)
-                scored = _score(workers, trial, list(current.leftover), start_hour, end_hour)
+                if not _within_wheat(workers, trial, pantry):
+                    continue
+                scored = _score(workers, trial, list(current.leftover), start_hour, end_hour, pantry)
                 if scored.key < current.key:
                     return scored
     for left in range(len(workers)):
@@ -266,7 +391,9 @@ def _improve_once(
             for first in routes[left]:
                 for second in routes[right]:
                     trial = _swap(routes, left, right, first, second)
-                    scored = _score(workers, trial, list(current.leftover), start_hour, end_hour)
+                    if not _within_wheat(workers, trial, pantry):
+                        continue
+                    scored = _score(workers, trial, list(current.leftover), start_hour, end_hour, pantry)
                     if scored.key < current.key:
                         return scored
     return None
@@ -325,21 +452,23 @@ def _score(
     leftover: list[TileVisit],
     start_hour: int,
     end_hour: int,
+    pantry: _Pantry,
 ) -> _Score:
     ordered: list[tuple[TileVisit, ...]] = []
     moves = 0
     finish: int | None = None
     still_open = list(leftover)
     for worker, route in zip(workers, routes):
-        arranged = _reorder(worker.coord, route)
-        actions, route_moves, route_finish, pending = _expand(worker.coord, arranged, start_hour, end_hour)
-        if pending:
-            still_open.extend(pending)
-            arranged = tuple(visit for visit in arranged if visit not in pending)
-        else:
-            arranged = tuple(arranged)
+        leg, pending = _prepare(worker, route, pantry.doors, start_hour, end_hour)
+        actions, route_moves, route_finish, blocked = _expand(worker.coord, leg, start_hour, end_hour)
         del actions
-        ordered.append(arranged)
+        if blocked:
+            still_open.extend(blocked)
+            kept = tuple(visit for visit in leg.visits if visit not in blocked)
+        else:
+            kept = leg.visits
+        still_open.extend(pending)
+        ordered.append(kept)
         moves += route_moves
         if route_finish is not None:
             finish = route_finish if finish is None else max(finish, route_finish)
@@ -366,16 +495,21 @@ def _order_coords(
     return tuple(_two_opt(start, _nearest_insertion(start, points)))
 
 
-def _fits(start: tuple[int, int], visits: list[TileVisit], start_hour: int, end_hour: int) -> bool:
-    actions = _path_moves(start, [visit.coord for visit in visits]) + sum(visit.action_count for visit in visits)
-    if actions == 0:
-        return True
-    return start_hour + actions - 1 <= end_hour
+def _fits(
+    worker: RegionWorker,
+    visits: Sequence[TileVisit],
+    doors: Sequence[tuple[int, int]],
+    start_hour: int,
+    end_hour: int,
+) -> bool:
+    """True when the shed stop, the walk, and the jobs all finish by end_hour."""
+
+    return _leg_fits(_layout(worker, visits, doors), start_hour, end_hour)
 
 
 def _expand(
     start: tuple[int, int],
-    visits: list[TileVisit],
+    leg: _Leg,
     start_hour: int,
     end_hour: int,
 ) -> tuple[tuple[RouteAction, ...], int, int | None, tuple[TileVisit, ...]]:
@@ -383,6 +517,21 @@ def _expand(
     moves = 0
     hour = start_hour
     position = start
+    visits = leg.visits
+    if leg.pickup:
+        if leg.door is None:
+            return (), 0, None, visits
+        while position != leg.door:
+            if hour > end_hour:
+                return tuple(actions), moves, _finish(actions), visits
+            position, operation = _step_toward(position, leg.door)
+            actions.append(RouteAction(hour, operation))
+            hour += 1
+            moves += 1
+        if hour > end_hour:
+            return tuple(actions), moves, _finish(actions), visits
+        actions.append(RouteAction(hour, "PICKUP", leg.door, ("WHEAT", leg.pickup)))
+        hour += 1
     for index, visit in enumerate(visits):
         cursor = position
         walked: list[RouteAction] = []
@@ -425,17 +574,19 @@ def _materialize(
     scored: _Score,
     start_hour: int,
     end_hour: int,
+    pantry: _Pantry,
 ) -> RegionRoutePlan:
     plans: list[WorkerRoutePlan] = []
     for worker, visits in zip(workers, scored.routes):
-        actions, moves, finish, pending = _expand(worker.coord, list(visits), start_hour, end_hour)
-        if pending:
+        leg, pending = _prepare(worker, visits, pantry.doors, start_hour, end_hour)
+        actions, moves, finish, blocked = _expand(worker.coord, leg, start_hour, end_hour)
+        if pending or blocked:
             raise RuntimeError("a stored route does not fit in the day")
         plans.append(
             WorkerRoutePlan(
                 worker.id,
                 worker.coord,
-                visits,
+                leg.visits,
                 actions,
                 moves,
                 finish,

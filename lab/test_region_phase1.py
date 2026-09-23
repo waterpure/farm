@@ -8,7 +8,7 @@ from kaggle_environments import make
 
 from lab.region_phase1 import make_region_phase1_agent
 from lab.route14_state import COMPLETED, SCHEDULED
-from lab.test_route14_phase1 import _observation, _plant, _tiles
+from lab.test_route14_phase1 import _animal, _observation, _plant, _tiles
 
 
 def _copy_tiles(tiles: list[list]) -> list[list]:
@@ -145,6 +145,35 @@ class RegionPhase1Tests(unittest.TestCase):
         self.assertEqual(trace[1][1], (4, 4))
         self.assertEqual(trace[3][1], (2, 4))
         self.assertIsNone(environment.steps[-1][0].observation.farms[0]["tiles"][4][2])
+
+    def test_the_engine_marks_the_animal_fed_after_pickup(self) -> None:
+        environment = make(
+            "kaggriculture",
+            configuration={"episodeSteps": 8, "seed": 1},
+            debug=True,
+        )
+        environment.reset()
+        observation = environment.steps[0][0].observation
+        farm = observation.farms[0]
+        animal = _animal("SHEEP", unfed=1)
+        animal["pending_care_bonus"] = 0
+        animal["fertilizer_available"] = False
+        farm["tiles"][4][3] = animal
+        farm["money"] = 0
+        observation.private["shed"]["WHEAT"] = 1
+        agent = make_region_phase1_agent()
+        opponent = {"farmer": ["PASS"], "hands": [], "market": []}
+        played: list[list] = []
+        for _ in range(4):
+            action = agent(environment.steps[-1][0].observation)
+            played.append(list(action["farmer"]))
+            environment.step([action, opponent])
+
+        self.assertEqual(played[0], ["PASS"])
+        self.assertEqual(played[1], ["PICKUP", "WHEAT", 1])
+        self.assertEqual(played[2], ["WEST"])
+        self.assertEqual(played[3], ["FEED"])
+        self.assertTrue(environment.steps[-1][0].observation.farms[0]["tiles"][4][3]["fed_today"])
 
 
 def _moved(position: tuple[int, int], operation: str) -> tuple[int, int]:
