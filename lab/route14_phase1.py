@@ -201,7 +201,11 @@ def field_tasks(observation: dict[str, Any]) -> list[FieldTask]:
                     tasks.append(FieldTask(WATER, cell.coord, "", 0, crop.crop))
                 elif kind == FEED:
                     animal = animals.get(cell.coord)
-                    if animal is None or not animal.must_feed:
+                    # The task grid owns the policy boundary: every live
+                    # animal not fed in this observation needs today's feed.
+                    # ``animal.must_feed`` is only the official escape-risk
+                    # flag and deliberately does not encode daily production.
+                    if animal is None or not getattr(task, "mandatory", False):
                         continue
                     tasks.append(FieldTask(FEED, cell.coord, "", 0, animal.animal))
                 else:

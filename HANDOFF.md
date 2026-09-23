@@ -1879,3 +1879,29 @@ LLM 不适合、也不需要参与评测。`.pkl` 若使用，装的是小型策
 - 本局没有 TOMATO/STRAWBERRY 销售，收入主要来自 MELON、MILK、WOOL；应继续审计种植选择是否过度集中于甜瓜和动物线。
 - 47 次收肥只实际施肥 3 次，说明大部分肥料在当前 observation 下没有被判断为能增加本季可售产量，最终作为肥料卖出；下一轮可比较“卖肥”与“保留肥料等待下一茬”的机会成本，并检查施肥任务是否出现得太晚。
 - 406 个移动小时、226 个 PASS 小时，且无失败动作；后续更有价值的优化方向是减少路线回 shed/重复移动、改进雇工与动物购买时机，而不是放宽 FERTILIZE 判定。
+
+## 2026-09-23：把畜类 FEED 从“逃跑前保命”改为“每天生产维护”
+
+用户指出购买动物时按每天喂食/CARE 估算，但执行层实际上只在 `consecutive_unfed >= 1` 后喂，造成规划与真实路线错配。此次只沿 TaskGrid 主线修正 FEED 的策略语义，没有改晚期动物购买、SELL、价格、作物盈利公式或扩地。
+
+改动：
+
+- `lab/task_grid.py::_feed_task`：只要真实 observation 显示活着的动物 `fed_today=False`，就生成 `mandatory=True` 的当天 FEED；`animal.must_feed` 仍只表示官方连续断粮/逃跑风险，不再承担每日生产策略。
+- `lab/route14_phase1.py::field_tasks`：不再二次读取 `animal.must_feed`，改以 TaskGrid 的 `FeedTask.mandatory` 为准，避免任务图发布了每日 FEED 但旧执行器把它过滤掉。
+- `lab/test_task_grid.py`、`lab/test_route14_phase1.py`：覆盖 `consecutive_unfed=0` 但当天未喂仍必须 FEED、已喂 observation 结算为 COMPLETED，以及 phase1 从任务图读取两只未喂动物。
+
+验证：
+
+- `./.venv/bin/python -m unittest discover -s lab -p 'test_*.py'`：**286 tests OK**。
+- `seed=1`、对手 `starter`、`720 steps`，独立记录：`experiments/region_phase1_daily_feed_seed1.jsonl` 与 `experiments/region_phase1_daily_feed_seed1_summary.json`。
+- 本局 `DONE`，final money **36,568**，sell revenue **67,822**，total spend **34,254**，cash reconciliation error **0**，failed unit/market actions **0**。
+- 与同一肥料路线、改动前 seed1 记录的 final money **31,598** 相比，本轮增加 **4,970**。这不是纯粹的喂食边际收益：每天 FEED 改变了可执行路线、动物存活和后续购买组合，因此只能作为整局结果解释，不能拆成单一因果金额。
+- 本局实际动作：`FEED=439`、`PICKUP WHEAT=439`、`FERTILIZE=2`（均在 day2，较上一版 day5/day9/day13 更早但次数更少）、`COLLECT_FERTILIZER=72`、`HARVEST=135`、`PLANT=27`、`CARE=89`；市场买入小麦 439 份，没有 `SELL WHEAT`。
+- Day2 收工仍有 **2 只动物**，说明首日买入的牛/羊没有因“只隔天喂”而断粮逃跑。终局动物数为 **25**。
+- 现金结构：MELON **18,212**、MILK **7,092**、WOOL **36,017**、CARROT **70**、FERTILIZER **6,431**；TOMATO/STRAWBERRY 仍为 0。路线成本为 **730 moves / 194 PASS**，比改动前肥料路线的 406 moves / 226 PASS 更偏向移动，说明每天喂食解决了生产错配，但暴露出回 shed/动物访问成本。
+
+尚存风险与下一步：
+
+- 本轮没有放宽 FERTILIZE 判定，也没有改变作物选择，因此肥料“收得多、施得少”、持续作物为 0、晚买动物净收益仍未单独 A/B；当前新路线只在 day2 施肥 2 次，不能宣称肥料利用率已优化。
+- 每天 FEED 会增加小麦和移动需求；虽然本局资源闭环没有失败，但 439 份小麦和 730 移动小时说明需要下一轮固定动物/作物组合，比较“每天 FEED + CARE + 施肥”与“卖肥/少养畜”的机会成本。
+- 下一刀应先用同一 TaskGrid 计划做固定路线 A/B：记录每种动物的买入、每日小麦、CARE/FEED 工时、产出销售和移动回 shed 次数；再决定是否优化收肥同格访问、雇工人数和持续作物配比。不要把本轮 final money 直接归因于单一改动。

@@ -286,7 +286,9 @@ class TaskGridTests(unittest.TestCase):
         tiles[1][1] = _animal("SHEEP", unfed=0)
         hour4 = parse_world(_observation(tiles, day=3, hour=4))
         grid = TaskGridBuilder().build(hour4)
-        self.assertFalse(grid[1][1].tasks[FEED].mandatory)
+        # Daily feed is a production requirement even before the official
+        # escape-risk counter reaches one missed day.
+        self.assertTrue(grid[1][1].tasks[FEED].mandatory)
         grid.schedule(1, 1, FEED, "Hand1", 6)
         grid.schedule(1, 1, CARE, "Hand2", 7)
         still = TaskGridBuilder().build(hour4, grid)
@@ -512,7 +514,13 @@ class TaskGridTests(unittest.TestCase):
         tasks = field_tasks(observation)
         self.assertEqual(
             sorted((task.kind, task.target) for task in tasks),
-            [("FEED", (1, 1)), ("HARVEST", (2, 4)), ("WATER", (2, 3)), ("WATER", (2, 4))],
+            [
+                ("FEED", (1, 1)),
+                ("FEED", (2, 1)),
+                ("HARVEST", (2, 4)),
+                ("WATER", (2, 3)),
+                ("WATER", (2, 4)),
+            ],
         )
 
 

@@ -95,12 +95,15 @@ class Route14Phase1Tests(unittest.TestCase):
         self.assertEqual(waters, [(0, 0)])
         self.assertEqual(harvests, [(2, 0)])
 
-    def test_feed_is_mandatory_only_after_a_missed_day(self) -> None:
+    def test_feed_is_mandatory_for_every_unfed_animal(self) -> None:
         tiles = _tiles()
         tiles[0][0] = _animal("SHEEP", unfed=1)
         tiles[0][1] = _animal("SHEEP", unfed=0)
         tasks = field_tasks(_observation(tiles, day=3))
-        self.assertEqual([task.target for task in tasks if task.kind == "FEED"], [(0, 0)])
+        self.assertEqual(
+            [task.target for task in tasks if task.kind == "FEED"],
+            [(0, 0), (1, 0)],
+        )
 
     def test_sale_hour_is_the_drop_hour(self) -> None:
         tiles = _tiles()

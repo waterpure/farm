@@ -529,11 +529,12 @@ def _ongoing_fertilizer_gain(crop: CropState, spec: dict, days_remaining: int) -
 
 def _feed_task(animal: AnimalState, prior: TaskState | None) -> FeedTask:
     status, worker, hour = _done_or_open(animal.fed_today, prior)
-    # A newly placed animal carries a conditional first-feed commitment from
-    # its production chain.  Once the animal exists, keep that commitment as
-    # mandatory across replans even though the engine still reports
-    # consecutive_unfed == 0.  It disappears after the real observation shows
-    # fed_today=True.
+    # FEED is a daily production task, not only an escape-prevention task.
+    # The engine's ``must_feed`` flag intentionally remains the official
+    # consecutive-unfed/escape signal, but a live animal that has not been fed
+    # in *this* observation must still enter the hard route.  A newly placed
+    # animal also carries its conditional first-feed commitment across replans
+    # until the observation proves that it was fed.
     conditional = (
         isinstance(prior, TileTask)
         and prior.depends_on == PLACE_ANIMAL
@@ -546,7 +547,7 @@ def _feed_task(animal: AnimalState, prior: TaskState | None) -> FeedTask:
     return FeedTask(
         FEED,
         status,
-        animal.must_feed or conditional,
+        (not animal.fed_today) or conditional,
         worker,
         hour,
         animal.fed_today,
