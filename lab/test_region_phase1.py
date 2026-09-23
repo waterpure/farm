@@ -7,6 +7,7 @@ import unittest
 from kaggle_environments import make
 
 from lab.region_phase1 import make_region_phase1_agent
+from lab.route14_phase1 import _reserved_wheat
 from lab.route14_state import COMPLETED, SCHEDULED
 from lab.test_route14_phase1 import _animal, _observation, _plant, _tiles
 
@@ -174,6 +175,37 @@ class RegionPhase1Tests(unittest.TestCase):
         self.assertEqual(played[2], ["WEST"])
         self.assertEqual(played[3], ["FEED"])
         self.assertTrue(environment.steps[-1][0].observation.farms[0]["tiles"][4][3]["fed_today"])
+
+    def test_later_pickups_stay_out_of_the_wheat_sale(self) -> None:
+        tiles = _tiles()
+        tiles[2][4] = _animal("SHEEP", unfed=1)
+        agent = make_region_phase1_agent()
+        shared = dict(
+            tiles=tiles,
+            day=1,
+            farmer=(0, 0),
+            hands=[(4, 3)],
+            shed={"WHEAT": 4},
+            inventories=[{"WHEAT": 1}, {}],
+        )
+        agent(_observation(**shared, hour=0))
+        action = agent(_observation(**shared, hour=1))
+
+        pickups = [
+            step
+            for route in agent.telemetry["plan"].worker_routes
+            if route.worker_id == "Hand1"
+            for step in route.actions_by_hour
+            if step.operation == "PICKUP"
+        ]
+        self.assertEqual([(step.hour, step.args) for step in pickups], [(2, ("WHEAT", 1))])
+        old_route = agent.telemetry["market_route"]
+        self.assertEqual(_reserved_wheat(old_route, [0] * len(old_route.actors)), 0)
+        self.assertIn(["SELL", "WHEAT", 3], action["market"])
+        self.assertNotIn(["SELL", "WHEAT", 4], action["market"])
+
+        at_the_door = agent(_observation(**{**shared, "hour": 2, "hands": [(4, 4)]}))
+        self.assertIn(["SELL", "WHEAT", 4], at_the_door["market"])
 
 
 def _moved(position: tuple[int, int], operation: str) -> tuple[int, int]:

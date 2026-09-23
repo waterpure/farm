@@ -11,7 +11,7 @@ from __future__ import annotations
 from typing import Any
 
 from .region_route import RegionRoutePlan, RegionWorker, plan_region_routes
-from .route14_phase1 import _market_orders, _reserved_wheat, choose_day_route
+from .route14_phase1 import _market_orders, choose_day_route
 from .route14_state import PENDING, SCHEDULED, TaskAssignment, parse_world, shed_doors, worker_name
 from .task_grid import FEED, HARVEST, WATER, TaskGrid, apply_assignments, build_task_grid
 
@@ -221,6 +221,51 @@ def _remember_positions(world: Any, state: dict[str, Any], commands: list[list[A
     state["expected_positions"] = expected
 
 
+def _quote_plan(observation: dict[str, Any]) -> RegionRoutePlan | None:
+    """A region plan used only to hold wheat before the day's walk exists.
+
+    Hour 0 does not store or walk this plan. It counts pickups for the people
+    already on the board, so the morning sale does not take their grain.
+    """
+
+    world = parse_world(observation)
+    crew = _crew(world)
+    if not crew:
+        return None
+    grid = build_task_grid(world, None)
+    return plan_region_routes(
+        grid,
+        crew,
+        region_size=REGION_SIZE,
+        origin=_region_origin(grid),
+        start_hour=1,
+        end_hour=23,
+        shed_wheat=_shed_wheat(world),
+        shed_coords=shed_doors(grid.width),
+    )
+
+
+def _reserved_pickups(plan: RegionRoutePlan | None, hour: int) -> int:
+    """Wheat this region's plan still takes from the shed after this hour.
+
+    The sale list is not the old day route. A worker may be sent to an animal
+    the old route gave to someone who already had wheat. Until that pickup
+    happens, the shed grain has to stay.
+    """
+
+    if plan is None:
+        return 0
+    reserved = 0
+    for route in plan.worker_routes:
+        for action in route.actions_by_hour:
+            if action.hour <= hour or action.operation != "PICKUP" or len(action.args) < 2:
+                continue
+            if action.args[0] != "WHEAT":
+                continue
+            reserved += int(action.args[1])
+    return reserved
+
+
 def _shed_wheat(world: Any) -> int:
     """Wheat sitting in the shed right now, not a forecast of later stock."""
 
@@ -246,7 +291,10 @@ def _market(
     route = state["market_route"]
     if route is None:
         return []
-    reserved = _reserved_wheat(route, [0] * max(1, len(route.actors)))
+    plan = state.get("plan")
+    if plan is None:
+        plan = _quote_plan(observation)
+    reserved = _reserved_pickups(plan, hour)
     orders = _market_orders(observation, route, state["market_state"], commands, hour, reserved)
     if hour != 0:
         orders = [order for order in orders if order[0] != "HIRE"]
