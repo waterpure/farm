@@ -17,6 +17,16 @@ def _copy_tiles(tiles: list[list]) -> list[list]:
 
 
 class RegionPhase1Tests(unittest.TestCase):
+    def test_fixed_land_day_keeps_day5_and_day6_orders_out_when_cash_is_short(self) -> None:
+        # These are deliberately morning-only checks: the experiment hook must
+        # not emit an unaffordable BUY_LAND order just because a day was named.
+        for target in (5, 6):
+            agent = make_region_phase1_agent(land_purchase_day=target)
+            observation = _observation(_tiles(), day=target, hour=0, money=500, farmer=(4, 4))
+            action = agent(observation)
+            self.assertNotIn(["BUY_LAND"], action["market"])
+            self.assertFalse(agent.telemetry["land_ordered"])
+
     def test_a_hand_is_planned_from_the_coordinate_where_it_actually_appeared(self) -> None:
         tiles = _tiles()
         for spot in ((0, 0), (0, 9), (9, 0), (9, 9)):
@@ -377,6 +387,24 @@ class RegionPhase1Tests(unittest.TestCase):
         done = next(task for task in agent.telemetry["world"].farm.tasks if task.kind == "HARVEST")
         self.assertEqual(done.status, COMPLETED)
         self.assertEqual((done.planned_hour, done.planned_drop_hour, done.planned_sell_hour), (1, 2, 2))
+
+    def test_new_empty_tile_can_start_a_seeded_chain_before_the_next_day(self) -> None:
+        tiles = _tiles()
+        tiles[0][0] = _plant("WHEAT", planted_day=-2, units=6)
+        agent = make_region_phase1_agent()
+        agent(_observation(tiles, day=0, hour=1, money=0, farmer=(0, 0)))
+
+        tiles[0][0] = None
+        replanned = _observation(tiles, day=0, hour=2, money=0, farmer=(0, 0))
+        replanned["private"]["seeds"] = {"MELON": 1}
+        action = agent(replanned)
+
+        self.assertTrue(agent.telemetry["needs_replan"])
+        self.assertEqual(action["farmer"], ["PLANT", "MELON"])
+        self.assertEqual(
+            tuple(item.operation for item in agent.telemetry["plan"].worker_routes[0].actions_by_hour[:2]),
+            ("PLANT", "WATER"),
+        )
 
     def test_care_shifts_the_recorded_unload_hour(self) -> None:
         tiles = _tiles()

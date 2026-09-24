@@ -19,10 +19,15 @@ from .route14_state import ANIMAL_NAMES, PENDING, SHED_CAPACITY, shed_doors
 from .task_grid import CARE, COLLECT_FERTILIZER, FEED, FERTILIZE, HARVEST, PLACE_ANIMAL, PLANT, WATER, TaskGrid
 
 
+# Held-Karp remains the default for the original 5×5 route.  The expanded
+# planner switches to a smaller exact threshold at call time; this keeps the
+# established 25-tile behavior unchanged while bounding 50-tile replans.
 EXACT_TILES = 10
+_ACTIVE_EXACT_TILES = EXACT_TILES
 MUST_KINDS = (WATER, FEED, CARE, COLLECT_FERTILIZER, FERTILIZE, HARVEST)
 _KIND_RANK = {FERTILIZE: 0, WATER: 1, FEED: 2, CARE: 3, COLLECT_FERTILIZER: 4, HARVEST: 5}
 _MAX_ROUNDS = 24
+MAX_ROUTE_WORKERS = 8
 
 
 @dataclass(frozen=True)
@@ -115,9 +120,14 @@ def plan_region_routes(
     field walk.
     """
 
+    global _ACTIVE_EXACT_TILES
+    active_exact = 6 if region_size >= 10 else EXACT_TILES
+    if active_exact != _ACTIVE_EXACT_TILES:
+        _order_coords.cache_clear()
+        _ACTIVE_EXACT_TILES = active_exact
     crew = tuple(workers)
-    if not 1 <= len(crew) <= 4:
-        raise ValueError("region routes take 1 to 4 workers")
+    if not 1 <= len(crew) <= MAX_ROUTE_WORKERS:
+        raise ValueError(f"region routes take 1 to {MAX_ROUTE_WORKERS} workers")
     if region_size < 1:
         raise ValueError("region_size must be positive")
     if start_hour > end_hour:
@@ -982,7 +992,7 @@ def _order_coords(
     coords: tuple[tuple[int, int], ...],
 ) -> tuple[tuple[int, int], ...]:
     points = list(coords)
-    if len(points) <= EXACT_TILES:
+    if len(points) <= _ACTIVE_EXACT_TILES:
         return tuple(_held_karp(start, points))
     return tuple(_two_opt(start, _nearest_insertion(start, points)))
 
@@ -1220,6 +1230,13 @@ def _add_production_plans(
         for visit in _extract_production_visits(grid, region_size, origin, blocked, include_unpaid)
         if all(visit.coord not in {item.coord for item in route} for route in routes)
     ]
+    if region_size >= 10 and len(pending) > 12:
+        # The first expanded-day implementation must remain bounded.  The
+        # production ledger has already ranked the candidates globally; keep
+        # only the best short list here instead of evaluating every empty tile
+        # against every worker with a full route simulation.
+        pending.sort(key=lambda visit: (-_production_money(grid, visit), visit.coord[1], visit.coord[0]))
+        pending = pending[:12]
     while pending:
         choice: tuple[tuple, int, int, list[TileVisit]] | None = None
         for index, visit in enumerate(pending):

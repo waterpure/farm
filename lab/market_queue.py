@@ -74,6 +74,7 @@ def schedule_market_queue(
         return MAX_MARKET_ORDERS - int(reserved_slots.get(hour, 0)) - len(queue[hour])
 
     hires = [task for task in tasks if task.operation == "HIRE"]
+    land = [task for task in tasks if task.operation == "BUY_LAND"]
     products = [task for task in tasks if task.operation == "BUY_PRODUCT"]
     animals = [task for task in tasks if task.operation == "BUY_ANIMAL"]
     seeds = sorted(
@@ -84,6 +85,11 @@ def schedule_market_queue(
         if task.deadline == 0 and room(0) > 0:
             queue[0].append(task)
         # A hire that does not fit is simply not hired. It does not cancel field work.
+    for task in land:
+        if task.deadline == 0 and room(0) > 0:
+            queue[0].append(task)
+        else:
+            failed.append(task)
     for task in products:
         if task.deadline == 0 and room(0) > 0:
             queue[0].append(task)
@@ -112,6 +118,8 @@ def engine_order(task: SupermarketTask) -> list:
 
     if task.operation == "HIRE":
         return ["HIRE"]
+    if task.operation == "BUY_LAND":
+        return ["BUY_LAND"]
     return [task.operation, task.item, int(task.amount)]
 
 

@@ -7,6 +7,7 @@ import unittest
 from lab.market_queue import (
     SupermarketTask,
     derive_supermarket_tasks,
+    engine_order,
     schedule_market_queue,
 )
 from lab.production_plan import PlannedAction, ProductionPlan
@@ -93,6 +94,13 @@ def _worker(actions: list[RouteAction], visits: list[TileVisit] | None = None) -
 
 
 class MarketQueueTests(unittest.TestCase):
+    def test_buy_land_is_an_atomic_hour_zero_order(self) -> None:
+        land = SupermarketTask("BUY_LAND", deadline=0)
+        queue, failed = schedule_market_queue([land], {0: 0})
+        self.assertEqual(failed, [])
+        self.assertEqual(queue[0], [land])
+        self.assertEqual(engine_order(land), ["BUY_LAND"])
+
     def test_hires_fill_the_least_crowded_door_in_nwse_order(self) -> None:
         world = parse_world(_observation(_tiles(), farmer=(4, 4)))
         crew = _predicted_crew(world, 3, 10)

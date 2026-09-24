@@ -570,14 +570,14 @@ class RegionRouteTests(unittest.TestCase):
         self.assertEqual(placed[0], 1)
         self.assertEqual([visit.coord for visit in placed[1]], [visit.coord for visit in _reorder(workers[1].coord, routes[1] + [added])])
 
-    def test_worker_count_outside_one_to_four_is_rejected(self) -> None:
+    def test_worker_count_outside_one_to_eight_is_rejected(self) -> None:
         grid = _grid(_harvest(0, 0))
         with self.assertRaises(ValueError):
             plan_region_routes(grid, [])
         with self.assertRaises(ValueError):
             plan_region_routes(
                 grid,
-                [RegionWorker(str(index), (0, 0)) for index in range(5)],
+                [RegionWorker(str(index), (0, 0)) for index in range(9)],
             )
 
     def test_one_feed_picks_up_wheat_before_walking_to_the_animal(self) -> None:

@@ -16,9 +16,11 @@ from .market_queue import (
     engine_order,
     schedule_market_queue,
     tasks_over_budget,
+    purchase_cost,
+    SupermarketTask,
 )
 from .region_route import RegionRoutePlan, RegionWorker, plan_region_routes
-from .route14_economy import fib_hire_cost
+from .route14_economy import fib_hire_cost, next_land_cost
 from .route14_phase1 import (
     MAX_MARKET_ORDERS,
     SALE_RANK,
@@ -50,6 +52,7 @@ from .task_grid import (
     HARVEST,
     PLACE_ANIMAL,
     PLANT,
+    TILE_JOBS,
     WATER,
     TaskGrid,
     apply_assignments,
@@ -58,7 +61,10 @@ from .task_grid import (
 
 
 REGION_SIZE = 5
-MAX_REGION_WORKERS = 4
+EXPANDED_REGION_SIZE = 10
+NORMAL_REGION_WORKERS = 4
+HARVEST_SURGE_WORKERS = 6
+MAX_REGION_WORKERS = 8
 FIELD_OPERATIONS = {WATER, FEED, CARE, COLLECT_FERTILIZER, FERTILIZE, HARVEST, PLANT, BUILD_COOP, BUILD_PASTURE, PLACE_ANIMAL}
 _MOVES = {
     "NORTH": (0, -1),
@@ -68,7 +74,7 @@ _MOVES = {
 }
 
 
-def make_region_phase1_agent():
+def make_region_phase1_agent(land_purchase_day: int | None = None):
     """Hour 0 hires, buys, and writes the day. Later hours play that plan."""
 
     state: dict[str, Any] = {
@@ -87,6 +93,10 @@ def make_region_phase1_agent():
         "crew_candidates": (),
         "tasks": [],
         "world": None,
+        "owned_tiles": None,
+        "land_purchase_day": land_purchase_day,
+        "land_ordered": False,
+        "land_bought": False,
     }
 
     def agent(observation: dict[str, Any], configuration: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -101,14 +111,30 @@ def make_region_phase1_agent():
         crew = _crew(world)
         grid = build_task_grid(world, state["grid"], observation)
         forced = bool(state.pop("force_replan", False))
-        state["needs_replan"] = forced or (state["plan"] is not None and _diverged(crew, state))
+        owned_tiles = _owned_tile_count(grid)
+        state["needs_replan"] = forced or (
+            state["plan"] is not None
+            and (
+                (
+                    state.get("owned_tiles") is not None
+                    and owned_tiles != state["owned_tiles"]
+                )
+                or _diverged(crew, state)
+                or _new_pending_tasks_need_route(
+                    grid,
+                    state["plan"],
+                    world,
+                    _released_tiles(state.get("world"), world),
+                )
+            )
+        )
         if state["plan"] is None or state["needs_replan"]:
             _reopen_scheduled(grid)
             origin = _region_origin(grid)
             plan = plan_region_routes(
                 grid,
                 crew,
-                region_size=REGION_SIZE,
+                region_size=_planning_region_size(grid),
                 origin=origin,
                 start_hour=hour,
                 end_hour=23,
@@ -117,12 +143,16 @@ def make_region_phase1_agent():
                 shed_animals=_shed_animals(world),
                 shed_fertilizer=_shed_fertilizer(world),
                 shed_total=_shed_total(world),
+                include_unpaid_production=True,
             )
             apply_assignments(grid, world, _assignments(plan))
             state["plan"] = plan
             state["routes_by_worker_id"] = {route.worker_id: route for route in plan.worker_routes}
             state["planned_workers"] = [(worker.id, worker.coord) for worker in crew]
         state["grid"] = grid
+        state["owned_tiles"] = owned_tiles
+        if len(_unlocked_quadrants(observation)) > 1:
+            state["land_bought"] = True
         settle_tasks(world.farm, _assignments(state["plan"]), state["tasks"])
         state["tasks"] = list(world.farm.tasks)
         state["world"] = world
@@ -155,6 +185,9 @@ def _reset_day(state: dict[str, Any], day: int) -> None:
     state["force_replan"] = False
     state["tasks"] = []
     state["world"] = None
+    state["owned_tiles"] = None
+    state["land_ordered"] = False
+    state["land_bought"] = False
 
 
 def _hour_zero(observation: dict[str, Any], state: dict[str, Any]) -> dict[str, Any]:
@@ -180,7 +213,12 @@ def _hour_zero(observation: dict[str, Any], state: dict[str, Any]) -> dict[str, 
     state["planned_workers"] = [(worker.id, worker.coord) for worker in crew]
     state["expected_positions"] = {worker.id: worker.coord for worker in crew}
     state["market_queue"] = queue
+    if _should_queue_land_purchase(observation, world, grid, state):
+        queue.setdefault(0, []).append(SupermarketTask("BUY_LAND", deadline=0))
+        state["market_queue"] = queue
+        state["land_ordered"] = True
     state["world"] = world
+    state["owned_tiles"] = _owned_tile_count(grid)
     hand_count = max(0, len(world.farm.workers) - 1)
     farmer = ["PASS"]
     hands = [["PASS"] for _ in range(hand_count)]
@@ -249,9 +287,21 @@ def _choose_crew(
 ) -> tuple[CrewCandidate, tuple[tuple[int, int, float, int], ...]]:
     """Rank finished days. A crew that cannot actually be hired is left out."""
 
+    max_workers = _daily_worker_limit(grid)
+    hire_counts = _feasible_hire_counts(world, max_workers)
+    if max_workers == MAX_REGION_WORKERS:
+        # The expanded contract is "as many as today's market/cash can fit,
+        # up to eight".  Try the largest crew first and stop at the first
+        # feasible queue; evaluating every smaller crew repeats the global
+        # 50-tile route search for no decision benefit.
+        for new_hires in hire_counts:
+            candidate = _plan_for_hires(observation, world, grid, day_route, new_hires, max_workers)
+            if candidate.feasible and candidate.plan is not None:
+                return candidate, ((candidate.new_hires, candidate.mandatory_unfinished, candidate.production_value, candidate.hire_cost),)
+        raise RuntimeError("the morning did not write a route")
     candidates = [
-        _plan_for_hires(observation, world, grid, day_route, new_hires)
-        for new_hires in _feasible_hire_counts(world)
+        _plan_for_hires(observation, world, grid, day_route, new_hires, max_workers)
+        for new_hires in hire_counts
     ]
     feasible = [candidate for candidate in candidates if candidate.feasible and candidate.plan is not None]
     if not feasible:
@@ -265,11 +315,35 @@ def _choose_crew(
     return best, summary
 
 
-def _feasible_hire_counts(world: Any) -> list[int]:
+def _feasible_hire_counts(world: Any, max_workers: int = NORMAL_REGION_WORKERS) -> list[int]:
     """Zero new hands through as many as still fit beside the people already here."""
 
-    present = min(len(_crew(world)), MAX_REGION_WORKERS)
-    return list(range(MAX_REGION_WORKERS - present + 1))
+    present = min(len(_crew(world)), max_workers)
+    # After expansion the operating contract is a fixed eight-person global
+    # crew.  Trying every smaller crew repeatedly re-runs the expensive
+    # 50-tile route search and can spend more time evaluating plans than the
+    # season itself.  The pre-expansion 4/6-person comparison remains intact.
+    if max_workers == MAX_REGION_WORKERS:
+        target = max(0, max_workers - present)
+        return list(range(target, -1, -1))
+    return list(range(max_workers - present + 1))
+
+
+def _daily_worker_limit(grid: TaskGrid) -> int:
+    """Allow a short harvest surge only when a large wave is due today."""
+
+    harvests = 0
+    for x in range(grid.width):
+        for y in range(grid.height):
+            cell = grid[x][y]
+            if cell is None:
+                continue
+            task = cell.tasks.get(HARVEST)
+            if task is not None and task.status == PENDING and getattr(task, "mandatory", False):
+                harvests += 1
+    if _planning_region_size(grid) == EXPANDED_REGION_SIZE:
+        return MAX_REGION_WORKERS
+    return HARVEST_SURGE_WORKERS if harvests >= 12 else NORMAL_REGION_WORKERS
 
 
 def _plan_for_hires(
@@ -278,6 +352,7 @@ def _plan_for_hires(
     grid: TaskGrid,
     day_route: Any,
     new_hires: int,
+    max_workers: int = NORMAL_REGION_WORKERS,
 ) -> CrewCandidate:
     """Write one crew's route and purchases. This does not pick the winner.
 
@@ -286,7 +361,7 @@ def _plan_for_hires(
     """
 
     hire_cost = _hire_cost_for_count(_already_hired(observation), new_hires)
-    crew = _predicted_crew(world, new_hires, grid.width)
+    crew = _predicted_crew(world, new_hires, grid.width, max_workers)
     hour0_slots, leftover_sales = _opening_market(observation, day_route, grid)
     if new_hires > MAX_MARKET_ORDERS - hour0_slots or hire_cost > _hire_cash(world, day_route):
         return _rejected(new_hires, crew, hire_cost)
@@ -299,12 +374,14 @@ def _plan_for_hires(
     shed_room = _animal_room(observation, day_route, grid, world)
     queue: dict[int, list[Any]] = {hour: [] for hour in range(24)}
     plan: RegionRoutePlan | None = None
-    for _ in range(REGION_SIZE * REGION_SIZE + 1):
+    region_size = _planning_region_size(grid)
+    attempts = 16 if region_size >= EXPANDED_REGION_SIZE else region_size * region_size + 1
+    for _ in range(attempts):
         offered = _virtual_animals(grid, real_animals, blocked, origin)
         plan = plan_region_routes(
             grid,
             crew,
-            region_size=REGION_SIZE,
+            region_size=region_size,
             origin=origin,
             start_hour=1,
             end_hour=23,
@@ -463,8 +540,9 @@ def _conditional_feed_forecast(
 
     x0, y0 = origin
     total = 0
-    for x in range(x0, x0 + REGION_SIZE):
-        for y in range(y0, y0 + REGION_SIZE):
+    region_size = _planning_region_size(grid)
+    for x in range(x0, x0 + region_size):
+        for y in range(y0, y0 + region_size):
             if (x, y) in blocked or not (0 <= x < grid.width and 0 <= y < grid.height):
                 continue
             cell = grid[x][y]
@@ -511,7 +589,7 @@ def _predicted_crew(
     world: Any,
     hire_count: int,
     board_size: int,
-    max_workers: int = MAX_REGION_WORKERS,
+    max_workers: int = NORMAL_REGION_WORKERS,
 ) -> list[RegionWorker]:
     """People already here, plus each new hire on the official birth tile.
 
@@ -709,7 +787,7 @@ def _without_tasks(queue: dict[int, list[Any]], failed: list[Any]) -> dict[int, 
 
 
 def _crew(world: Any) -> list[RegionWorker]:
-    """The first four people already standing on the board, farmer first."""
+    """All currently active people, farmer first, up to the global cap."""
 
     return [
         RegionWorker(
@@ -740,6 +818,74 @@ def _diverged(crew: list[RegionWorker], state: dict[str, Any]) -> bool:
     return any(actual[worker_id] != coord for worker_id, coord in expected.items())
 
 
+def _released_tiles(previous_world: Any, world: Any) -> set[tuple[int, int]]:
+    """Return tiles that became empty since the preceding observation."""
+
+    if previous_world is None:
+        return set()
+    old_positions = {
+        item.position for item in (*previous_world.farm.crops, *previous_world.farm.animals)
+    }
+    current_occupied = {
+        item.position for item in (*world.farm.crops, *world.farm.animals, *world.farm.buildings)
+    }
+    return {
+        land.position
+        for land in world.farm.lands
+        if land.empty and not land.weed and land.position in old_positions and land.position not in current_occupied
+    }
+
+
+def _new_pending_tasks_need_route(
+    grid: TaskGrid,
+    plan: RegionRoutePlan,
+    world: Any,
+    released: set[tuple[int, int]],
+) -> bool:
+    """Detect work that appeared after the morning route was written.
+
+    A harvest can turn a crop tile into an empty land tile during the same
+    day.  ``build_task_grid`` then publishes a fresh PLANT/WATER chain, but a
+    route that was already materialized will never visit that coordinate
+    unless we explicitly replan from the current worker positions.  Compare
+    pending grid tasks with the visits/actions already owned by the route;
+    this keeps the forecast/observation boundary while allowing an immediate
+    post-harvest continuation.
+    """
+
+    planned: set[tuple[tuple[int, int], str]] = set()
+    for route in plan.worker_routes:
+        for visit in route.visits:
+            for task in visit.tasks:
+                kind = PLACE_ANIMAL if task == "PLACE" else task
+                planned.add((visit.coord, kind))
+    if not released:
+        return False
+    for x in range(grid.width):
+        for y in range(grid.height):
+            cell = grid[x][y]
+            if cell is None:
+                continue
+            if cell.coord not in released:
+                continue
+            for kind, task in cell.tasks.items():
+                if task.status != PENDING:
+                    continue
+                if kind in TILE_JOBS or kind in {HARVEST, FEED, CARE}:
+                    if (cell.coord, kind) not in planned:
+                        production = getattr(cell, "production_plan", None)
+                        if production is None:
+                            return True
+                        if production.kind == "crop":
+                            seeds = getattr(getattr(world.farm, "inventory", None), "seeds", {})
+                            if int(seeds.get(production.name, 0) or 0) > 0:
+                                return True
+                        elif production.kind == "animal":
+                            if _shed_animals(world).get(production.name, 0) > 0:
+                                return True
+    return False
+
+
 def _reopen_scheduled(grid: TaskGrid) -> None:
     """A scheduled job that the board has not confirmed can be planned again."""
 
@@ -760,10 +906,59 @@ def _region_origin(grid: TaskGrid) -> tuple[int, int]:
         return (0, 0)
     origin_x = min(coord[0] for coord in coords)
     origin_y = min(coord[1] for coord in coords)
-    return (
-        min(origin_x, max(0, grid.width - REGION_SIZE)),
-        min(origin_y, max(0, grid.height - REGION_SIZE)),
+    size = _planning_region_size(grid)
+    return (min(origin_x, max(0, grid.width - size)), min(origin_y, max(0, grid.height - size)))
+
+
+def _owned_tile_count(grid: TaskGrid) -> int:
+    return sum(
+        1
+        for x in range(grid.width)
+        for y in range(grid.height)
+        if grid[x][y] is not None
     )
+
+
+def _planning_region_size(grid: TaskGrid) -> int:
+    """Use the original 5×5 route until the first expansion is visible."""
+
+    return EXPANDED_REGION_SIZE if _owned_tile_count(grid) >= 50 else REGION_SIZE
+
+
+def _should_queue_land_purchase(
+    observation: dict[str, Any],
+    world: Any,
+    grid: TaskGrid,
+    state: dict[str, Any],
+) -> bool:
+    """Experimental fixed-day land order with a short-horizon cash gate."""
+
+    target = state.get("land_purchase_day")
+    if target is None or int(observation.get("day") or 0) != int(target):
+        return False
+    if state.get("land_ordered") or len(_unlocked_quadrants(observation)) > 1:
+        return False
+    price = next_land_cost(observation)
+    if price is None:
+        return False
+    queue = state.get("market_queue") or {}
+    hour0_slots, _leftover = _opening_market(observation, state.get("market_route"), grid)
+    if hour0_slots + len(queue.get(0, [])) >= MAX_MARKET_ORDERS:
+        return False
+    queued = [task for tasks in queue.values() for task in tasks]
+    hires = sum(task.operation == "HIRE" for task in queued)
+    spend = purchase_cost(queued) + _hire_cost_for_count(_already_hired(observation), hires)
+    # Keep a modest operating pad. This is deliberately a short-horizon gate:
+    # it does not require filling all 25 new tiles before buying land.
+    cash = int(world.money) - spend - int(price)
+    return cash >= 200
+
+
+def _unlocked_quadrants(observation: dict[str, Any]) -> list[str]:
+    player = int(observation.get("player") or 0)
+    farms = observation.get("farms") or []
+    farm = farms[player] if 0 <= player < len(farms) else {}
+    return [str(item) for item in (farm or {}).get("unlocked_quadrants") or []]
 
 
 def _plan_coords(grid: TaskGrid) -> list[tuple[int, int]]:
