@@ -2305,3 +2305,84 @@ seed=1、starter、720 steps 的实验结果（默认无扩地仍为 `70,298`）
 Day5/Day6 的现金闸门实际拒绝买地；不是订单失败，而是没有发出订单。Day10–Day24 均实际扩到 50 格。当前结果说明“越早买地越赚”尚未成立：Day10–12 因新增 50 格路线和每日 8 人雇佣成本过早吞噬现金，反而低于 25 格基线；Day24 只在已有大量现金、剩余生产线很少时略高于基线。这个结论仍是首轮路线实验，不代表最终扩地策略已经最优。
 
 尚存风险：扩地后的 8 人路线仍是有界启发式，PASS/move 显著增加，且新区生产短名单限制为 12 格；下一轮应在不改 SELL/照料规则的前提下，单独优化“扩地后每日雇工数量与可启动生产线”的边际评分，再复跑 Day10/11/12/24。
+
+## 2026-09-24：V45 与 region_phase1 扩地/规划差异只读审计
+
+本轮只读检查了冻结 `third_party/v45/main.py`、当前 `lab/region_phase1.py`，并用同一 `seed=1 / starter / 720 steps` 回放；没有修改策略代码。
+
+### V45 的实际买地方式
+
+- V45 不是每小时根据现金临时搜索买地，而是先从 `_R108_DATA` 解压出 719 步 action tape（`_ROUTES`），`_router` 在 step 144（第 6 天）按已开店前两个商店选择整条路线，step 648 切换终局路线。
+- route 0/117/2 的原始 tape 都把两次 `BUY_LAND` 预先写在 **step 150（Day6 Hour6）** 和 **step 265（Day11 Hour1）**。这是完整生产路线的一部分，不是单独的土地按钮。
+- 第一次投资订单同一市场回合绑定：`SELL WOOL 4 → BUY_PRODUCT WHEAT 2 → BUY_LAND → BUY_ANIMAL COW 2 → BUY_PRODUCT FERTILIZER 1`；第二次绑定约 5 个 `HIRE` 后的 `BUY_LAND → BUY_ANIMAL GOOSE 1 → BUY_PRODUCT FERTILIZER 1 → BUY_SEED STRAWBERRY 2`。
+- route 117 的静态承诺（step 144–648）约为：WHEAT 162、STRAWBERRY 33、CARROT 31、MELON 12；动物出生 COW 6、SHEEP 6、GOOSE 5；并配套 264 个 HIRE 订单。也就是说买地前已把未来的种子、动物、照料、收获和出售动作写进同一条 tape。
+
+### V45 的执行层
+
+- 原始 tape 之外有反应层：`hand_align`、`weed_repair`、销售提前/预留、输入补足（WHEAT/FERTILIZER）、仓库容量保护、溢出回收、终局清仓、少量动物替换。它们修补 observation 偏差，但不重算整季路线。
+- V45 的优势不只是“更早买地”：买地、雇工、买种/买畜、收获、卖货本来就是同一条长周期计划；土地订单前后还通过既定 SELL 和库存/容量保护维持可执行性。
+
+### 当前 region_phase1 的实际方式
+
+- 默认 `make_region_phase1_agent()` 的 `land_purchase_day=None`，因此当前基线根本不会发 `BUY_LAND`。实验入口只有在显式指定某一天时，才在 Hour0 把土地订单追加到当天 `market_queue`。
+- 每天 Hour0 才调用 `_choose_crew`，逐个候选雇工数重跑当天 `TaskGrid → RegionRoute → MarketQueue`；候选只覆盖当天已经物化的任务和当前可见的种子/动物/小麦，不会像 V45 那样提前承诺扩地后整季生产链。
+- 当前固定日实验结果：none/Day0/Day5/Day6 都没有发出买地；Day10/11/12/24 虽能扩到 50 格，但 final money 分别为 53,124 / 58,085 / 60,835 / 71,651，均未接近 V45。
+
+### 同 seed=1 实际回放对比
+
+| 指标 | V45 base | region_phase1 |
+|---|---:|---:|
+| final money | 146,016 | 70,298 |
+| 买地时点 | Day6 H6、Day11 H1 | 无 |
+| 最终土地 | 75 格（NW/NE/SW） | 25 格（NW） |
+| 最终动物 | GOOSE 5 / COW 6 / SHEEP 6 | GOOSE 0 / COW 1 / SHEEP 12 |
+| successful hires（订单累计） | 266 | 63 |
+| sell revenue | 175,225 | 86,891 |
+| total spend | 32,209 | 19,593 |
+| plant successes | 238 | 57 |
+| harvest successes | 472 | 115 |
+| failed unit actions | 14 | 0 |
+
+土地利用也直接体现了“是否提前承诺续接链”的差别：V45 在 Day6 扩到 50 格后，Day7 收盘空地降到 0；Day11 再扩到 75 格后，Day12 收盘空地降到 0。当前基线在 Day10 西瓜收获后出现 **17 个空格**，Day11 仍有 11 个，之后靠当天观察逐步补，赛季末仍有 10 个空格和 2 个 WEED。
+
+### 当前结论与下一道验证门
+
+V45 的关键差别是“长周期预计算生产/投资 tape + observation 修补”；当前实现是“按天局部重规划 + 默认不扩地”。不能把 V45 的 Day6/Day11 直接复制成固定日买地，因为当前 50 格路线尚未同时预留续种、动物、WHEAT、雇工和首笔收入。
+
+下一步若继续，应先做只读的 **扩地后整季承诺账**：在买地候选前一次性计算新区可启动的生产链、未来 FEED/CARE/WATER、雇工和首笔确定收入，再比较未来 SELL 覆盖后的现金缓冲；通过后才把动态买地闸门接入 `region_phase1`。暂不复制 V45 的对手竞价、front-run 或终局卖货层。
+
+## 0.4 2026-09-24：扩地整季承诺账已接入，默认不再为“只买得起土地”扩张
+
+用户本轮明确要求：买地前同时回答下一笔确定收入前的种子/WHEAT/肥料/工资、可用 hand 的完成时限、未来 SELL 覆盖投入并留现金缓冲，以及新区能否在一天内接上生产链。本轮已开始实施并完成本地验证。
+
+### 实现
+
+- `lab/region_phase1.py::_expanded_observation()` 新增只读虚拟扩区：把下一块 5×5 解锁为规划场景，不修改真实 observation；真实 TaskGrid 仍等引擎下一小时确认后才看到 50 格。
+- `lab/region_phase1.py::_evaluate_land_commitment()` 在虚拟 50 格上复用现有 `TaskGrid → RegionRoute → MarketQueue`，按最多 8 个总执行者重跑当天路线，读取实际需要的 BUY_SEED、BUY_PRODUCT WHEAT、BUY_ANIMAL、HIRE，以及 FERTILIZE/COLLECT_FERTILIZER 的容量关系。
+- 扩地账记录 `land_cost`、`seed_units`、`wheat_units`、`fertilizer_units`、`hire_spend`、`feed_reserve`、`startup_spend`、`cash_after_spend`、`next_income`、`new_line_revenue`、`finish_hour` 和新区域启动条数。新线收入使用 `own_supply_map + marginal_sale_revenue`，按官方市场曲线逐单位压价，现有未来供给先占位置。
+- 只有以下门全部通过才发真实 `BUY_LAND`：
+  1. 下一笔确定收入至少覆盖土地价；
+  2. 8 人路线全部完成且至少留 1 个时辰余量（`finish_hour <= 22`）；
+  3. 新区至少启动 2 条生产线；
+  4. 新线自身未来销售至少覆盖 2 倍启动账（土地、输入、雇工和首轮饲料预留），同时现金仍留 `CASH_BUFFER`；
+  5. 小麦和肥料容量、Hour0 订单槽均可执行。
+- 一旦通过，虚拟候选的种子、动物、WHEAT、HIRE 队列会和 `BUY_LAND` 一起写回真实早班市场队列；任务图本身不提前写入新区任务，避免工人提前走向未解锁土地。
+- 修正 `_virtual_animals()` 在 10×10 规划时扫描完整 50 格，避免新区已承诺动物未进入共享库存。
+
+### 验证
+
+- 全量 lab 单测：**311 tests OK**。
+- `seed=1 / starter / 720 steps / region_phase1`：`DONE`，final money **70,298**，land spend **0**，failed actions **0**，PASS **304**，move **775**；最终仍为 25 格，说明本轮不会因“现金够买地”而牺牲主农场。
+- 关键扩地审计（seed=1，最终版本）：
+  - Day7：候选 12 条新链、startup 1,283、next income 99，拒绝（`next_income_before_land_cost`）。
+  - Day8：候选 12 条新链、startup 1,273、next income 1,287、new-line revenue 2,190，但路线到 Hour23，拒绝（`no_route_slack`）。
+  - Day9/Day11：虚拟 50 格无法在一天内排完，拒绝（`no_one_day_route`）。
+  - Day10：next income 12,740，但候选仍到 Hour23，拒绝（`no_route_slack`）。
+  - Day12：现金余量足够，但候选仍到 Hour23，拒绝（`no_route_slack`）。
+- 合成高价/已有当日西瓜收获场景可通过承诺账：虚拟新区不改真实四象限；能启动 2 条以上生产线、路线在 Hour20 收工，`new_line_revenue=43,187`，并且 `BUY_LAND` 会携带所需 WHEAT/动物订单。这验证了通过时“土地+生产投入”不会脱节。
+
+### 尚存风险与下一步
+
+- 当前严格门在真实 seed=1 选择不扩地，因此没有证明 50 格一定能赢 25 格；它首先解决的是“买地后没有资源/路线接链”的明确错误，并保护基线现金。
+- `new_line_revenue` 是从当前 observation 到赛季末的新线边际销售估计，仍未把扩地后未来每日照料路线的全部机会成本完全纳入；后续若要提高分数，应在不放松生存任务的前提下，用成对实验校准这个门的安全倍数。
+- 下一道验证门：只在承诺账通过的候选上做一次真实 50 格 paired replay，逐日比较空地、首笔新收入、雇工、移动、PASS、FEED/CARE、最终现金；不要恢复固定日买地。

@@ -6,7 +6,14 @@ import unittest
 
 from kaggle_environments import make
 
-from lab.region_phase1 import make_region_phase1_agent
+from lab.region_phase1 import (
+    _evaluate_land_commitment,
+    _expanded_observation,
+    make_region_phase1_agent,
+)
+from lab.route14_phase1 import choose_day_route
+from lab.route14_state import parse_world
+from lab.task_grid import build_task_grid
 from lab.route14_phase1 import _reserved_wheat
 from lab.route14_state import COMPLETED, SCHEDULED
 from lab.test_route14_phase1 import _animal, _observation, _plant, _tiles
@@ -17,6 +24,85 @@ def _copy_tiles(tiles: list[list]) -> list[list]:
 
 
 class RegionPhase1Tests(unittest.TestCase):
+    def test_land_commitment_expands_only_in_memory_and_requires_a_complete_chain(self) -> None:
+        tiles = _tiles()
+        tiles[4][2] = _plant("MELON", planted_day=0, units=6)
+        observation = _observation(tiles, day=10, hour=0, money=100000, farmer=(4, 4))
+        observation["market"]["inventory"] = {}
+        observation["market"]["prices"] = {
+            "MELON": 500,
+            "WHEAT": 30,
+            "CARROT": 100,
+            "TOMATO": 200,
+            "STRAWBERRY": 250,
+            "WOOL": 300,
+            "MILK": 400,
+            "EGG": 200,
+        }
+        before = list(observation["farms"][0]["unlocked_quadrants"])
+        virtual, coords = _expanded_observation(observation)
+
+        self.assertEqual(before, ["NW"])
+        self.assertEqual(observation["farms"][0]["unlocked_quadrants"], ["NW"])
+        self.assertEqual(virtual["farms"][0]["unlocked_quadrants"], ["NW", "NE"])
+        self.assertEqual(len(coords), 25)
+
+        world = parse_world(observation)
+        grid = build_task_grid(world, observation=observation)
+        commitment = _evaluate_land_commitment(
+            observation,
+            world,
+            grid,
+            choose_day_route(observation),
+            1000,
+        )
+
+        self.assertTrue(commitment["feasible"])
+        self.assertGreaterEqual(commitment["new_lines"], 2)
+        self.assertGreaterEqual(commitment["seed_units"], 0)
+        self.assertGreaterEqual(commitment["wheat_units"], 0)
+        self.assertGreaterEqual(commitment["next_income"], 1000)
+        self.assertLessEqual(commitment["finish_hour"], 22)
+        self.assertGreaterEqual(commitment["new_line_revenue"], 2 * commitment["startup_spend"])
+
+    def test_empty_expansion_has_no_next_income_to_back_the_land_order(self) -> None:
+        observation = _observation(_tiles(), day=10, hour=0, money=100000)
+        world = parse_world(observation)
+        grid = build_task_grid(world, observation=observation)
+        commitment = _evaluate_land_commitment(
+            observation,
+            world,
+            grid,
+            choose_day_route(observation),
+            1000,
+        )
+        self.assertFalse(commitment["feasible"])
+        self.assertEqual(commitment["reason"], "next_income_before_land_cost")
+
+    def test_passed_expansion_carries_its_startup_orders_with_the_land_order(self) -> None:
+        tiles = _tiles()
+        tiles[4][2] = _plant("MELON", planted_day=0, units=6)
+        observation = _observation(tiles, day=10, hour=0, money=100000, farmer=(4, 4))
+        observation["market"]["inventory"] = {}
+        observation["market"]["prices"] = {
+            "MELON": 500,
+            "WHEAT": 30,
+            "CARROT": 100,
+            "TOMATO": 200,
+            "STRAWBERRY": 250,
+            "WOOL": 300,
+            "MILK": 400,
+            "EGG": 200,
+        }
+        agent = make_region_phase1_agent()
+        action = agent(observation)
+        self.assertIn(["BUY_LAND"], action["market"])
+        self.assertTrue(agent.telemetry["land_commitment"]["feasible"])
+        self.assertEqual(observation["farms"][0]["unlocked_quadrants"], ["NW"])
+        self.assertTrue(
+            any(order[0] in {"BUY_PRODUCT", "BUY_SEED", "BUY_ANIMAL", "HIRE"} for order in action["market"])
+        )
+
     def test_fixed_land_day_keeps_day5_and_day6_orders_out_when_cash_is_short(self) -> None:
         # These are deliberately morning-only checks: the experiment hook must
         # not emit an unaffordable BUY_LAND order just because a day was named.

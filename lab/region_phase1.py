@@ -9,6 +9,7 @@ real position does not match that prediction.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from copy import deepcopy
 from typing import Any
 
 from .market_queue import (
@@ -20,7 +21,16 @@ from .market_queue import (
     SupermarketTask,
 )
 from .region_route import RegionRoutePlan, RegionWorker, plan_region_routes
-from .route14_economy import fib_hire_cost, next_land_cost
+from .animal_forecast import future_units as _forecast_animal_units
+from .route14_economy import (
+    CASH_BUFFER,
+    future_crop_units,
+    fib_hire_cost,
+    marginal_sale_revenue,
+    market_inventory,
+    next_land_cost,
+    own_supply_map,
+)
 from .route14_phase1 import (
     MAX_MARKET_ORDERS,
     SALE_RANK,
@@ -97,6 +107,7 @@ def make_region_phase1_agent(land_purchase_day: int | None = None):
         "land_purchase_day": land_purchase_day,
         "land_ordered": False,
         "land_bought": False,
+        "land_commitment": None,
     }
 
     def agent(observation: dict[str, Any], configuration: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -188,6 +199,7 @@ def _reset_day(state: dict[str, Any], day: int) -> None:
     state["owned_tiles"] = None
     state["land_ordered"] = False
     state["land_bought"] = False
+    state["land_commitment"] = None
 
 
 def _hour_zero(observation: dict[str, Any], state: dict[str, Any]) -> dict[str, Any]:
@@ -214,6 +226,7 @@ def _hour_zero(observation: dict[str, Any], state: dict[str, Any]) -> dict[str, 
     state["expected_positions"] = {worker.id: worker.coord for worker in crew}
     state["market_queue"] = queue
     if _should_queue_land_purchase(observation, world, grid, state):
+        queue = state.get("market_queue") or queue
         queue.setdefault(0, []).append(SupermarketTask("BUY_LAND", deadline=0))
         state["market_queue"] = queue
         state["land_ordered"] = True
@@ -634,8 +647,9 @@ def _virtual_animals(
 
     stock = {name: int(real.get(name, 0) or 0) for name in ANIMAL_NAMES}
     x0, y0 = origin
-    for x in range(x0, x0 + REGION_SIZE):
-        for y in range(y0, y0 + REGION_SIZE):
+    size = _planning_region_size(grid)
+    for x in range(x0, x0 + size):
+        for y in range(y0, y0 + size):
             if not (0 <= x < grid.width and 0 <= y < grid.height):
                 continue
             cell = grid[x][y]
@@ -931,27 +945,300 @@ def _should_queue_land_purchase(
     grid: TaskGrid,
     state: dict[str, Any],
 ) -> bool:
-    """Experimental fixed-day land order with a short-horizon cash gate."""
+    """Queue land only after a full, one-day expansion commitment passes.
+
+    The old hook only compared cash with the land price.  That allowed a land
+    order to win while the next day had no seed, wheat, labour, or route time
+    left for the newly unlocked 25 tiles.  The commitment below is read-only:
+    it expands the observation in memory, runs the same 8-worker route and
+    market queue, and keeps the real task grid untouched until the engine
+    confirms the purchase on the next observation.
+    """
 
     target = state.get("land_purchase_day")
-    if target is None or int(observation.get("day") or 0) != int(target):
+    if target is not None and int(observation.get("day") or 0) != int(target):
+        return False
+    # Do not expand before the first complete operating day.  The engine
+    # applies BUY_LAND immediately at Hour0; waiting one day gives the farm a
+    # real observation of its opening cash flow and avoids committing the
+    # first route against a board that is about to change underneath it.
+    if int(observation.get("day") or 0) <= 0:
         return False
     if state.get("land_ordered") or len(_unlocked_quadrants(observation)) > 1:
         return False
     price = next_land_cost(observation)
     if price is None:
         return False
-    queue = state.get("market_queue") or {}
-    hour0_slots, _leftover = _opening_market(observation, state.get("market_route"), grid)
-    if hour0_slots + len(queue.get(0, [])) >= MAX_MARKET_ORDERS:
+    if int(world.money) < int(price) + CASH_BUFFER:
+        state["land_commitment"] = {
+            "feasible": False,
+            "reason": "cash_below_land_plus_buffer",
+            "land_cost": int(price),
+            "cash": int(world.money),
+        }
         return False
+
+    commitment = _evaluate_land_commitment(
+        observation,
+        world,
+        grid,
+        state.get("market_route"),
+        int(price),
+    )
+    state["land_commitment"] = commitment
+    if commitment.get("feasible") and commitment.get("market_queue"):
+        # Carry the virtual start-up orders into the real morning queue.  The
+        # new hands and inputs exist only after the engine accepts Hour0 BUY
+        # orders; the expanded task grid is still materialized from the next
+        # observation, never from this forecast.
+        state["market_queue"] = {
+            int(hour): list(tasks)
+            for hour, tasks in commitment["market_queue"].items()
+        }
+    return bool(commitment.get("feasible"))
+
+
+def _evaluate_land_commitment(
+    observation: dict[str, Any],
+    world: Any,
+    grid: TaskGrid,
+    day_route: Any,
+    land_cost: int,
+) -> dict[str, Any]:
+    """Evaluate one hypothetical next quadrant without mutating the real farm."""
+
+    virtual_observation, new_coords = _expanded_observation(observation)
+    if virtual_observation is None:
+        return {"feasible": False, "reason": "no_next_quadrant", "land_cost": land_cost}
+    virtual_world = parse_world(virtual_observation)
+    virtual_grid = build_task_grid(virtual_world, None, virtual_observation)
+    candidates: list[dict[str, Any]] = []
+    candidate, _summary = _choose_crew(
+        virtual_observation,
+        virtual_world,
+        virtual_grid,
+        day_route,
+    )
+    if candidate.plan is not None and candidate.feasible:
+        queue = candidate.market_queue
+        queued = [task for tasks in queue.values() for task in tasks]
+        hour0_slots, _leftover = _opening_market(virtual_observation, day_route, virtual_grid)
+        if (
+            hour0_slots + len(queue.get(0, [])) < MAX_MARKET_ORDERS
+            and candidate.new_hires == sum(task.operation == "HIRE" for task in queued)
+            and _count_new_startup_visits(candidate.plan, new_coords) > 0
+            and not candidate.mandatory_unfinished
+            and _fertilizer_capacity_ok(world, candidate.plan)
+        ):
+            candidates.append(
+                _land_candidate_book(
+                    observation,
+                    virtual_grid,
+                    candidate,
+                    new_coords,
+                    land_cost,
+                    day_route,
+                )
+            )
+
+    if not candidates:
+        return {
+            "feasible": False,
+            "reason": "no_one_day_route",
+            "land_cost": int(land_cost),
+            "new_area_tiles": len(new_coords),
+        }
+    candidates.sort(
+        key=lambda item: (
+            -int(item["new_lines"]),
+            -float(item["future_revenue"]),
+            -float(item["cash_after_spend"]),
+            int(item["new_hires"]),
+        )
+    )
+    best = candidates[0]
+    if not best["cash_after_spend"] >= CASH_BUFFER:
+        best["feasible"] = False
+        best["reason"] = "cash_buffer_after_startup"
+        return best
+    if int(best["next_income"]) < int(land_cost):
+        best["feasible"] = False
+        best["reason"] = "next_income_before_land_cost"
+        return best
+    # The new quadrant must pay for itself from its own future output.  The
+    # current crop/animal sales are only the bridge that keeps the old farm
+    # alive; they are not allowed to subsidize a speculative expansion.
+    if int(best["new_lines"]) < 2:
+        best["feasible"] = False
+        best["reason"] = "too_few_new_lines"
+        return best
+    if best["finish_hour"] is None or int(best["finish_hour"]) >= 23:
+        best["feasible"] = False
+        best["reason"] = "no_route_slack"
+        return best
+    if not best["new_line_revenue"] >= 2 * best["startup_spend"]:
+        best["feasible"] = False
+        best["reason"] = "new_lines_do_not_cover_startup_risk"
+        return best
+    best["feasible"] = True
+    best["reason"] = "one_day_route_and_cash_pass"
+    return best
+
+
+def _expanded_observation(
+    observation: dict[str, Any],
+) -> tuple[dict[str, Any] | None, set[tuple[int, int]]]:
+    """Return a planning-only observation with the next quadrant unlocked."""
+
+    virtual = deepcopy(observation)
+    player = int(virtual.get("player") or 0)
+    farms = virtual.get("farms") or []
+    if not (0 <= player < len(farms)):
+        return None, set()
+    farm = farms[player]
+    unlocked = [str(item) for item in (farm.get("unlocked_quadrants") or [])]
+    order = ("NW", "NE", "SW", "SE")
+    next_quad = next((quad for quad in order if quad not in unlocked), None)
+    if next_quad is None:
+        return None, set()
+    tiles = farm.get("tiles") or []
+    if len(tiles) < 10 or any(len(row) < 10 for row in tiles):
+        return None, set()
+    farm["unlocked_quadrants"] = [*unlocked, next_quad]
+    new_coords: set[tuple[int, int]] = set()
+    for y in range(10):
+        for x in range(10):
+            in_quad = (
+                (next_quad in {"NW", "SW"} and x < 5)
+                or (next_quad in {"NE", "SE"} and x >= 5)
+            ) and (
+                (next_quad in {"NW", "NE"} and y < 5)
+                or (next_quad in {"SW", "SE"} and y >= 5)
+            )
+            if not in_quad:
+                continue
+            if tiles[y][x] == "LOCKED":
+                tiles[y][x] = None
+            new_coords.add((x, y))
+    return virtual, new_coords
+
+
+def _land_candidate_book(
+    observation: dict[str, Any],
+    grid: TaskGrid,
+    candidate: CrewCandidate,
+    new_coords: set[tuple[int, int]],
+    land_cost: int,
+    day_route: Any,
+) -> dict[str, Any]:
+    queue = candidate.market_queue
     queued = [task for tasks in queue.values() for task in tasks]
     hires = sum(task.operation == "HIRE" for task in queued)
-    spend = purchase_cost(queued) + _hire_cost_for_count(_already_hired(observation), hires)
-    # Keep a modest operating pad. This is deliberately a short-horizon gate:
-    # it does not require filling all 25 new tiles before buying land.
-    cash = int(world.money) - spend - int(price)
-    return cash >= 200
+    purchase = purchase_cost(queued)
+    hire_cost = _hire_cost_for_count(_already_hired(observation), hires)
+    new_visits = [
+        visit
+        for route in candidate.plan.worker_routes
+        for visit in route.visits
+        if visit.coord in new_coords and visit.production_kind in {"crop", "animal"}
+    ]
+    new_lines = len(new_visits)
+    new_supply_revenue = _new_line_revenue(observation, grid, new_visits)
+    next_income = int(getattr(day_route, "revenue", 0) or 0)
+    feed_reserve = sum(
+        int(getattr(getattr(grid[x][y], "production_plan", None), "feed_reserve_cash", 0) or 0)
+        for x, y in new_coords
+        if 0 <= x < grid.width and 0 <= y < grid.height and grid[x][y] is not None
+        and any(visit.coord == (x, y) for visit in new_visits)
+    )
+    startup_spend = int(land_cost) + int(purchase) + int(hire_cost) + int(feed_reserve)
+    cash = int(observation.get("farms", [{}])[int(observation.get("player") or 0)].get("money") or 0)
+    return {
+        "feasible": False,
+        "land_cost": int(land_cost),
+        "new_area_tiles": len(new_coords),
+        "new_lines": new_lines,
+        "new_hires": hires,
+        "seed_units": sum(task.amount for task in queued if task.operation == "BUY_SEED"),
+        "wheat_units": sum(task.amount for task in queued if task.operation == "BUY_PRODUCT" and task.item == "WHEAT"),
+        "fertilizer_units": sum(
+            1
+            for route in candidate.plan.worker_routes
+            for visit in route.visits
+            if FERTILIZE in visit.tasks
+        ),
+        "purchase_spend": int(purchase),
+        "hire_spend": int(hire_cost),
+        "feed_reserve": int(feed_reserve),
+        "startup_spend": int(startup_spend),
+        "cash_after_spend": cash - startup_spend,
+        "next_income": next_income,
+        "current_route_value": float(next_income),
+        "new_line_revenue": float(new_supply_revenue),
+        "future_revenue": float(next_income + new_supply_revenue),
+        "total_move_count": int(candidate.total_move_count),
+        "finish_hour": candidate.finish_hour,
+        "market_queue": queue,
+    }
+
+
+def _count_new_startup_visits(plan: RegionRoutePlan, new_coords: set[tuple[int, int]]) -> int:
+    return sum(
+        1
+        for route in plan.worker_routes
+        for visit in route.visits
+        if visit.coord in new_coords and visit.production_kind in {"crop", "animal"}
+    )
+
+
+def _fertilizer_capacity_ok(world: Any, plan: RegionRoutePlan) -> bool:
+    needed = sum(
+        1
+        for route in plan.worker_routes
+        for visit in route.visits
+        if FERTILIZE in visit.tasks
+    )
+    collected = sum(
+        1
+        for route in plan.worker_routes
+        for visit in route.visits
+        if COLLECT_FERTILIZER in visit.tasks
+    )
+    return needed <= _shed_fertilizer(world) + collected
+
+
+def _new_line_revenue(
+    observation: dict[str, Any],
+    grid: TaskGrid,
+    visits: list[Any],
+) -> float:
+    """Price each committed new line after existing future supply, one unit at a time."""
+
+    day = int(observation.get("day") or 0)
+    supply = own_supply_map(observation)
+    total = 0.0
+    for visit in sorted(visits, key=lambda item: (item.coord[1], item.coord[0])):
+        cell = grid[visit.coord[0]][visit.coord[1]]
+        plan = getattr(cell, "production_plan", None)
+        if plan is None:
+            continue
+        if plan.kind == "crop":
+            units = future_crop_units(plan.name, day)
+            product = plan.product
+        else:
+            units = _forecast_animal_units(plan.name, day, day=day)
+            product = plan.product
+        if units <= 0:
+            continue
+        inventory = market_inventory(observation, product)
+        if inventory is None:
+            inventory = 0
+        value = marginal_sale_revenue(product, inventory, supply.get(product, 0), units)
+        if value is None:
+            continue
+        total += value
+        supply[product] = supply.get(product, 0) + units
+    return total
 
 
 def _unlocked_quadrants(observation: dict[str, Any]) -> list[str]:
