@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "skills": {
+    "arbor-agent-coordinator": {
+      "source": "RUC-NLPIR/Arbor",
+      "sourceType": "github",
+      "skillPath": "skills/arbor-agent-coordinator/SKILL.md",
+      "computedHash": "edf99cdc0e0e5eaaae9228776811b397b3597882b50335f346d4e0a45bb398e0"
+    },
+    "arbor-agent-orchestrator": {
+      "source": "RUC-NLPIR/Arbor",
+      "sourceType": "github",
+      "skillPath": "skills/arbor-agent-orchestrator/SKILL.md",
+      "computedHash": "396e17aae442be5d2533d4d990d8d22b4a72cd98b1f78036ca316079e9f77a70"
+    },
+    "arbor-agent-setup-intake": {
+      "source": "RUC-NLPIR/Arbor",
+      "sourceType": "github",
+      "skillPath": "skills/arbor-agent-setup-intake/SKILL.md",
+      "computedHash": "a3b811a1afdbcf1f1a5274f31aea395287295feb94669075b9336d2c24b25f7d"
+    },
+    "arbor-agent-tools": {
+      "source": "RUC-NLPIR/Arbor",
+      "sourceType": "github",
+      "skillPath": "skills/arbor-agent-tools/SKILL.md",
+      "computedHash": "9533ac58acd849d994422790a103c7b3dd98152381ca9d48324f561b6ec217e0"
+    }
+  }
+}
