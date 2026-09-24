@@ -2386,3 +2386,41 @@ V45 的关键差别是“长周期预计算生产/投资 tape + observation 修�
 - 当前严格门在真实 seed=1 选择不扩地，因此没有证明 50 格一定能赢 25 格；它首先解决的是“买地后没有资源/路线接链”的明确错误，并保护基线现金。
 - `new_line_revenue` 是从当前 observation 到赛季末的新线边际销售估计，仍未把扩地后未来每日照料路线的全部机会成本完全纳入；后续若要提高分数，应在不放松生存任务的前提下，用成对实验校准这个门的安全倍数。
 - 下一道验证门：只在承诺账通过的候选上做一次真实 50 格 paired replay，逐日比较空地、首笔新收入、雇工、移动、PASS、FEED/CARE、最终现金；不要恢复固定日买地。
+
+## 2026-09-24：扩地 hand 搜索、旧区任务保护与市场槽优先级
+
+本轮按“Day6 也评估，满足才开地；市场槽满时优先保证生产链”的方向完成实现。
+
+### 改动
+
+- `lab/region_phase1.py::_choose_crew()`：扩区后不再只试最大 hand 数，改为遍历所有可行新增 hand 数，再按未完成任务、生产净值、雇工成本和路线长度选择最小必要 crew。
+- `lab/region_phase1.py::_evaluate_land_commitment()`：
+  - 扣除土地价和 `CASH_BUFFER` 后再做虚拟启动账；
+  - 继承早班已排定的旧区任务，并重新打开 `SCHEDULED` 记录供虚拟路线重排；
+  - `_preserves_baseline_visits()` 强制保留旧区当天完整任务包，包括动物 `FEED + CARE`、既有 `HARVEST`、旧生产链；
+  - 新区只保留路线层排序后的前 4 条生产线，避免一次启动 11～12 条低边际作物；
+  - 现金跑道除现有动物 WHEAT 外，再预留两个低成本续生产机会；
+  - `BUY_LAND` 额外占用一个 Hour0 市场槽，并继续校验 WHEAT、动物、肥料、shed 和路线时限。
+- `lab/market_queue.py::schedule_market_queue()`：WHEAT、动物和种子先于临时 HIRE 占用订单槽；HIRE 无槽位时不破坏生产链，改由更小 crew 或下一天重排。
+- `lab/region_route.py::_add_production_plans()`：50 格新区候选上限由 12 降为 4，保持“可启动少量高边际线”而非填满新区。
+
+### 验证
+
+- 全量测试：`312 tests OK`。
+- Day6 seed=1：Hour0 现金 `446`，土地价 `1000`，承诺账为 `cash_below_land_plus_buffer`，不发送 `BUY_LAND`。
+- 默认 `region_phase1 / starter / seed=1 / 720 steps`：首笔 `BUY_LAND` 出现在 Day19；新区启动 4 条线、3 个临时 hand，`startup_spend=1,901`，`cash_after_runway=23,565`，无失败动作。
+- 默认最终结果：
+  - final money `71,941`；不扩地基线 `70,298`；提升 `1,643`；
+  - sell revenue `90,728`，total spend `21,787`，land spend `1,000`；
+  - animal units bought `14`，plant successes `62`，harvest successes `125`；
+  - successful hires `67`，moves `792`，PASS `316`，failed actions `0`；
+  - 销售：WHEAT `0`、CARROT `1,191`、MELON `23,823`、MILK `6,668`、WOOL `50,765`、FERTILIZER `8,281`。
+
+### 市场槽结论
+
+临时 HIRE 是按天失效、可重算的资源；WHEAT/动物/种子属于已经写入任务图的生产链输入。因此槽位不足时先保生产链，再减少或延后 HIRE。后续若出现“高价值收获窗口必须加 hand”的情况，需要由 crew 候选净收益重新证明 HIRE 值得占槽，不能固定把 HIRE 永远排在输入之前。
+
+### 尚存风险
+
+- 当前扩地承诺仍是一天级虚拟路线，不是整季精确回放；Day19 的收益改善已通过真实 seed=1 验证，但尚未证明所有 seed 都优于不扩地。
+- 新区候选上限 4 是保守质量门；如果后续全局路线能证明 8 人长期照料容量足够，可按 paired replay 逐步放宽到 5/6，而不是直接恢复 12。

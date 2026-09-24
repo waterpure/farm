@@ -62,9 +62,12 @@ def schedule_market_queue(
 ) -> tuple[dict[int, list[SupermarketTask]], list[SupermarketTask]]:
     """Place each purchase as late as it can, without passing its deadline.
 
-    Hires and animal buys are hour 0 only, and they take a free slot before
-    any seed does. A seed walks backward from its deadline. An order that
-    never finds a free slot is returned unplaced.
+    Survival/production inputs keep their slots before discretionary hires:
+    WHEAT, animals, and seeds are already part of the route's committed
+    chain, while a hand is a one-day resource that can be re-planned tomorrow.
+    Hires and animal buys are hour 0 only. A seed walks backward from its
+    deadline. An input that never finds a free slot is returned unplaced; a
+    hire that does not fit is simply deferred to a smaller crew/day.
     """
 
     queue: dict[int, list[SupermarketTask]] = {hour: [] for hour in range(24)}
@@ -81,10 +84,6 @@ def schedule_market_queue(
         (task for task in tasks if task.operation == "BUY_SEED"),
         key=lambda task: (task.deadline, task.item, task.source_coords),
     )
-    for task in hires:
-        if task.deadline == 0 and room(0) > 0:
-            queue[0].append(task)
-        # A hire that does not fit is simply not hired. It does not cancel field work.
     for task in land:
         if task.deadline == 0 and room(0) > 0:
             queue[0].append(task)
@@ -110,6 +109,13 @@ def schedule_market_queue(
                     break
         if not placed:
             failed.append(task)
+    # Hires consume whatever Hour0 slots remain after the route's required
+    # purchases.  They are intentionally not added to ``failed``: omitting a
+    # hire does not invalidate the field chain, and the caller can try a
+    # smaller crew or re-plan on the next day.
+    for task in hires:
+        if task.deadline == 0 and room(0) > 0:
+            queue[0].append(task)
     return queue, failed
 
 

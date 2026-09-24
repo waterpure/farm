@@ -65,7 +65,7 @@ class RegionPhase1Tests(unittest.TestCase):
         self.assertLessEqual(commitment["finish_hour"], 22)
         self.assertGreaterEqual(commitment["new_line_revenue"], 2 * commitment["startup_spend"])
 
-    def test_empty_expansion_has_no_next_income_to_back_the_land_order(self) -> None:
+    def test_empty_expansion_can_be_backed_by_future_startup_and_runway(self) -> None:
         observation = _observation(_tiles(), day=10, hour=0, money=100000)
         world = parse_world(observation)
         grid = build_task_grid(world, observation=observation)
@@ -76,8 +76,9 @@ class RegionPhase1Tests(unittest.TestCase):
             choose_day_route(observation),
             1000,
         )
-        self.assertFalse(commitment["feasible"])
-        self.assertEqual(commitment["reason"], "next_income_before_land_cost")
+        self.assertTrue(commitment["feasible"])
+        self.assertGreaterEqual(commitment["new_lines"], 2)
+        self.assertGreaterEqual(commitment["cash_after_runway"], commitment["continuation_reserve"])
 
     def test_passed_expansion_carries_its_startup_orders_with_the_land_order(self) -> None:
         tiles = _tiles()

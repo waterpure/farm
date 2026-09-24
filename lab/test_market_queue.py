@@ -231,17 +231,25 @@ class MarketQueueTests(unittest.TestCase):
         self.assertEqual(failed, [])
         self.assertEqual(queue[0], wheat)
 
-    def test_three_hires_are_three_orders_and_seeds_do_not_take_their_slots(self) -> None:
+    def test_required_inputs_keep_hour_zero_slots_before_discretionary_hires(self) -> None:
         hires = [SupermarketTask("HIRE", deadline=0) for _ in range(4)]
-        seeds = [SupermarketTask("BUY_SEED", f"SEED{index}", 1, 0, ((index, 0),)) for index in range(5)]
+        seeds = [SupermarketTask("BUY_SEED", f"SEED{index}", 1, 3, ((index, 0),)) for index in range(5)]
         animal = SupermarketTask("BUY_ANIMAL", "SHEEP", 1, 0, ((3, 4),))
         queue, failed = schedule_market_queue([*seeds, animal, *hires], {0: 6})
 
         placed = queue[0]
-        self.assertEqual([task.operation for task in placed], ["HIRE", "HIRE", "HIRE", "HIRE"])
-        self.assertEqual(len(failed), 6)
-        self.assertTrue(all(task.operation != "HIRE" for task in failed))
+        self.assertEqual([task.operation for task in placed], ["BUY_ANIMAL", "HIRE", "HIRE", "HIRE"])
+        self.assertEqual(failed, [])
+        self.assertEqual([task.operation for task in queue[3]], ["BUY_SEED"] * 5)
         self.assertLessEqual(len(placed), MAX_MARKET_ORDERS)
+
+    def test_wheat_is_kept_when_hire_slots_would_otherwise_fill_hour_zero(self) -> None:
+        wheat = SupermarketTask("BUY_PRODUCT", "WHEAT", 2, 0, cost=50)
+        hires = [SupermarketTask("HIRE", deadline=0) for _ in range(4)]
+        queue, failed = schedule_market_queue([*hires, wheat], {0: 6})
+
+        self.assertEqual([task.operation for task in queue[0]], ["BUY_PRODUCT", "HIRE", "HIRE", "HIRE"])
+        self.assertEqual(failed, [])
 
     def test_a_seed_waits_until_its_deadline_and_stops_at_ten_orders(self) -> None:
         seed = SupermarketTask("BUY_SEED", "STRAWBERRY", 1, 7, ((2, 3),))
@@ -342,22 +350,11 @@ class MarketQueueTests(unittest.TestCase):
             _route(target_hires=4, extra_hires=4, wages=99),
             3,
         )
-        self.assertTrue(chosen.feasible)
-        self.assertIsNotNone(chosen.plan)
-        assert chosen.plan is not None
-        self.assertEqual(sum(1 for task in chosen.market_queue[0] if task.operation == "HIRE"), 3)
-        bought = [task for tasks in chosen.market_queue.values() for task in tasks if task.operation == "BUY_ANIMAL"]
-        self.assertEqual(bought, [])
-        placed = [
-            action.coord
-            for route in chosen.plan.worker_routes
-            for action in route.actions_by_hour
-            if action.operation == "PLACE"
-        ]
-        self.assertEqual(placed, [])
-        self.assertTrue(
-            any(action.operation == WATER for route in chosen.plan.worker_routes for action in route.actions_by_hour)
-        )
+        # Required animal input wins the remaining Hour0 slots.  The three-
+        # hire candidate is therefore rejected and the caller must retry with
+        # a smaller crew instead of dropping the production chain.
+        self.assertFalse(chosen.feasible)
+        self.assertIsNone(chosen.plan)
 
     def test_cash_for_one_sheep_keeps_the_richer_pasture_only(self) -> None:
         grid = _grid(_animal_plan(1, 1, money=9), _animal_plan(1, 2, money=1))

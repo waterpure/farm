@@ -1230,13 +1230,16 @@ def _add_production_plans(
         for visit in _extract_production_visits(grid, region_size, origin, blocked, include_unpaid)
         if all(visit.coord not in {item.coord for item in route} for route in routes)
     ]
-    if region_size >= 10 and len(pending) > 12:
+    if region_size >= 10 and len(pending) > 4:
         # The first expanded-day implementation must remain bounded.  The
         # production ledger has already ranked the candidates globally; keep
-        # only the best short list here instead of evaluating every empty tile
-        # against every worker with a full route simulation.
+        # only the best few short-listed lines here instead of evaluating every
+        # empty tile against every worker with a full route simulation.  A
+        # newly bought quadrant need not be filled: low-margin lines would
+        # consume future FEED/CARE/harvest capacity and depress their product
+        # price before the portfolio has proved that the extra area pays.
         pending.sort(key=lambda visit: (-_production_money(grid, visit), visit.coord[1], visit.coord[0]))
-        pending = pending[:12]
+        pending = pending[:4]
     while pending:
         choice: tuple[tuple, int, int, list[TileVisit]] | None = None
         for index, visit in enumerate(pending):

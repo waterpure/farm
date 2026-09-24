@@ -243,7 +243,9 @@ class CrewSizeTests(unittest.TestCase):
     def test_the_old_hire_target_does_not_choose_the_crew(self) -> None:
         observation = _observation(_tiles(), money=5000, farmer=(4, 4))
         best, _summary = _choose_crew(observation, parse_world(observation), _grid(), _legacy(target_hires=3))
-        agent = make_region_phase1_agent()
+        # Keep this unit test focused on crew/queue agreement; do not let the
+        # dynamic land gate add a second market contract to the fixture.
+        agent = make_region_phase1_agent(land_purchase_day=1)
         morning = agent(observation)
 
         self.assertEqual(best.new_hires, 0)
@@ -263,7 +265,9 @@ class CrewSizeTests(unittest.TestCase):
         self.assertEqual(_hires(chosen), 3)
 
     def test_the_saved_hire_count_matches_the_morning_queue(self) -> None:
-        agent = make_region_phase1_agent()
+        # Keep this unit test focused on crew/queue agreement; do not let the
+        # dynamic land gate add a second market contract to the fixture.
+        agent = make_region_phase1_agent(land_purchase_day=1)
         morning = agent(_observation(_dry_square(), money=5000, farmer=(4, 4)))
         queued = _hires_in(agent.telemetry["market_queue"])
 
