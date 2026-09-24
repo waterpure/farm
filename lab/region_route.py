@@ -20,7 +20,7 @@ from .task_grid import CARE, COLLECT_FERTILIZER, FEED, FERTILIZE, HARVEST, PLACE
 
 
 EXACT_TILES = 10
-MUST_KINDS = (WATER, FEED, FERTILIZE, HARVEST)
+MUST_KINDS = (WATER, FEED, CARE, COLLECT_FERTILIZER, FERTILIZE, HARVEST)
 _KIND_RANK = {FERTILIZE: 0, WATER: 1, FEED: 2, CARE: 3, COLLECT_FERTILIZER: 4, HARVEST: 5}
 _MAX_ROUNDS = 24
 
@@ -198,7 +198,7 @@ def _extract_visits(
 def _is_must(task: object, kind: str) -> bool:
     if task is None or getattr(task, "status", None) != PENDING:
         return False
-    if kind in {WATER, FEED, HARVEST} and not getattr(task, "mandatory", False):
+    if kind in {WATER, FEED, CARE, COLLECT_FERTILIZER, HARVEST} and not getattr(task, "mandatory", False):
         return False
     return True
 
@@ -369,6 +369,7 @@ def _end_inventory(worker: RegionWorker, leg: _Leg) -> dict[str, int]:
         add(name, amount)
     for visit in leg.visits:
         add("WHEAT", -visit.tasks.count(FEED))
+        add("FERTILIZER", visit.tasks.count(COLLECT_FERTILIZER))
         add("FERTILIZER", -visit.tasks.count(FERTILIZE))
         if visit.harvest_product and visit.harvest_units > 0 and HARVEST in visit.tasks:
             add(visit.harvest_product, visit.harvest_units)
@@ -454,7 +455,18 @@ def _pickup_needed(worker: RegionWorker, visits: Sequence[TileVisit]) -> int:
 def _fertilizer_pickup_needed(worker: RegionWorker, visits: Sequence[TileVisit]) -> int:
     """Fertilizer this worker must take for the crop actions on this route."""
 
-    return max(0, _fertilize_count(visits) - _carried(worker, "FERTILIZER"))
+    # A manure pickup on an earlier animal visit can feed a later crop visit
+    # in the same route. Only the prefix deficit must come from the shed.
+    available = _carried(worker, "FERTILIZER")
+    pickup = 0
+    for visit in visits:
+        need = visit.tasks.count(FERTILIZE)
+        if need > available:
+            pickup += need - available
+            available = need
+        available -= need
+        available += visit.tasks.count(COLLECT_FERTILIZER)
+    return pickup
 
 
 def _wheat_draw(workers: Sequence[RegionWorker], routes: Sequence[Sequence[TileVisit]]) -> int:

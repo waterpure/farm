@@ -351,7 +351,7 @@ class RegionProductionTests(unittest.TestCase):
         agent = make_region_phase1_agent()
         opponent = {"farmer": ["PASS"], "hands": [], "market": []}
         played: list[list] = []
-        for _ in range(7):
+        for _ in range(8):
             current = environment.steps[-1][0].observation
             action = agent(current)
             played.append(_played(action))
@@ -365,6 +365,7 @@ class RegionProductionTests(unittest.TestCase):
         self.assertEqual(played[4], [BUILD_PASTURE])
         self.assertEqual(played[5], ["PLACE", "SHEEP"])
         self.assertEqual(played[6], ["FEED"])
+        self.assertEqual(played[7], ["CARE"])
         self.assertEqual(tile["animal"], "SHEEP")
         self.assertEqual(tile["kind"], "PASTURE")
 

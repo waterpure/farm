@@ -87,7 +87,7 @@ class ProductionPlanTests(unittest.TestCase):
         self.assertFalse(seedling_water_is_mandatory(plan, "PENDING"))
         self.assertTrue(seedling_water_is_mandatory(plan, COMPLETED))
 
-    def test_an_animal_plan_is_build_then_place(self) -> None:
+    def test_animal_plan_includes_first_feed_and_care(self) -> None:
         tiles = _tiles()
         _open(tiles, (4, 4))
         observation = _priced(
@@ -106,13 +106,19 @@ class ProductionPlanTests(unittest.TestCase):
         self.assertEqual(plan.startup_cash, 0)
         self.assertEqual(
             [(action.operation, action.subject) for action in plan.actions],
-            [(BUILD_PASTURE, ""), (PLACE_ANIMAL, "SHEEP"), ("FEED", "SHEEP")],
+            [
+                (BUILD_PASTURE, ""),
+                (PLACE_ANIMAL, "SHEEP"),
+                ("FEED", "SHEEP"),
+                ("CARE", "SHEEP"),
+            ],
         )
         self.assertEqual(grid[4][4].tasks[PLACE_ANIMAL].depends_on, BUILD_PASTURE)
         self.assertEqual(grid[4][4].tasks["FEED"].depends_on, PLACE_ANIMAL)
+        self.assertEqual(grid[4][4].tasks["CARE"].depends_on, "FEED")
         self.assertNotIn("PICKUP", grid[4][4].tasks)
-        self.assertFalse(can_start_production(plan, 3))
-        self.assertTrue(can_start_production(plan, 4))
+        self.assertFalse(can_start_production(plan, 4))
+        self.assertTrue(can_start_production(plan, 5))
 
     def test_one_seed_can_start_only_one_tile(self) -> None:
         tiles = _tiles()

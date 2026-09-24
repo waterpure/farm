@@ -214,6 +214,33 @@ class RegionRouteTests(unittest.TestCase):
             [("PICKUP", ("FERTILIZER", 1)), ("EAST", ()), ("SOUTH", ()), (FERTILIZE, ())],
         )
 
+    def test_ready_manure_can_feed_a_later_fertilize_same_day(self) -> None:
+        animal = TaskBucket((0, 0), "SHEEP")
+        animal.tasks[FEED] = FeedTask(FEED, PENDING, True)
+        animal.tasks[CARE] = CareTask(CARE, PENDING, True, bonus_gain=1)
+        animal.tasks[COLLECT_FERTILIZER] = CollectFertilizerTask(
+            COLLECT_FERTILIZER, PENDING, True, fertilizer_ready=True
+        )
+        crop = TaskBucket((1, 0), "TOMATO")
+        crop.tasks[FERTILIZE] = FertilizeTask(FERTILIZE, PENDING, False)
+        plan = plan_region_routes(
+            _grid(animal, crop),
+            [RegionWorker("Farmer", (0, 0), carrying_wheat=1)],
+            shed_coords=((0, 0),),
+            shed_fertilizer=0,
+        )
+
+        self.assertTrue(plan.feasible)
+        self.assertEqual(plan.unfinished_visits, ())
+        self.assertEqual(
+            [action.operation for action in plan.worker_routes[0].actions_by_hour],
+            [FEED, CARE, COLLECT_FERTILIZER, "EAST", FERTILIZE],
+        )
+        self.assertNotIn(
+            ("PICKUP", ("FERTILIZER", 1)),
+            [(action.operation, action.args) for action in plan.worker_routes[0].actions_by_hour],
+        )
+
     def test_feed_and_harvest_on_one_animal_stay_together(self) -> None:
         bucket = TaskBucket((3, 4), "SHEEP")
         bucket.tasks[FEED] = FeedTask(FEED, PENDING, True)

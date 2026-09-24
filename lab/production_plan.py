@@ -37,6 +37,7 @@ from .route14_state import COMPLETED, PENDING, SCHEDULED, WorldState, animal_whe
 from .task_grid import (
     BUILD_COOP,
     BUILD_PASTURE,
+    CARE,
     PLACE_ANIMAL,
     PLANT,
     WATER,
@@ -414,13 +415,16 @@ def _tile_actions(kind: str, name: str) -> tuple[PlannedAction, ...]:
     if kind == "crop":
         return (PlannedAction(PLANT, name), PlannedAction(WATER, name))
     structure = BUILD_COOP if ANIMAL_STRUCTURE[name] == "COOP" else BUILD_PASTURE
-    # A committed animal line owns its first feed as part of the same-day
-    # startup chain.  This is a strategy condition, not the engine's
-    # survival/must_feed flag: the animal does not exist until PLACE_ANIMAL.
+    # A committed animal line owns its first FEED and CARE as part of the
+    # same-day startup chain.  These are strategy conditions, not the
+    # engine's survival/must_feed flag: the animal does not exist until
+    # PLACE_ANIMAL, but the route can still perform both actions after it is
+    # placed and before the day ends.
     return (
         PlannedAction(structure),
         PlannedAction(PLACE_ANIMAL, name),
         PlannedAction("FEED", name),
+        PlannedAction(CARE, name),
     )
 
 
@@ -548,6 +552,8 @@ def _write_plan(cell: Any, plan: ProductionPlan) -> None:
             depends_on = plan.actions[0].operation
         elif action.operation == "FEED":
             depends_on = PLACE_ANIMAL
+        elif action.operation == CARE:
+            depends_on = "FEED"
         cell.tasks[action.operation] = TileTask(
             task_type=action.operation,
             status=PENDING,

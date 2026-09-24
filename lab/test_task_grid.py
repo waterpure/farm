@@ -277,6 +277,7 @@ class TaskGridTests(unittest.TestCase):
         self.assertEqual(feed.wheat_cost, 1)
         self.assertTrue(feed.mandatory)
         self.assertEqual(care.status, PENDING)
+        self.assertTrue(care.mandatory)
         self.assertFalse(care.cared_today)
         self.assertEqual(care.pending_care_bonus, 2)
         self.assertEqual(care.bonus_gain, 1)
@@ -289,6 +290,7 @@ class TaskGridTests(unittest.TestCase):
         # Daily feed is a production requirement even before the official
         # escape-risk counter reaches one missed day.
         self.assertTrue(grid[1][1].tasks[FEED].mandatory)
+        self.assertTrue(grid[1][1].tasks[CARE].mandatory)
         grid.schedule(1, 1, FEED, "Hand1", 6)
         grid.schedule(1, 1, CARE, "Hand2", 7)
         still = TaskGridBuilder().build(hour4, grid)
@@ -318,8 +320,19 @@ class TaskGridTests(unittest.TestCase):
         grid = TaskGridBuilder().build(parse_world(_observation(tiles, day=4)))
         task = grid[1][1].tasks[COLLECT_FERTILIZER]
         self.assertEqual(task.status, PENDING)
+        self.assertFalse(task.mandatory)
         self.assertTrue(task.fertilizer_ready)
         self.assertIsNone(task.assigned_worker)
+
+    def test_ready_manure_is_claimed_when_a_crop_needs_the_fresh_fertilizer(self) -> None:
+        tiles = _tiles()
+        tiles[3][2] = _plant("WHEAT", planted_day=0, units=1)
+        tiles[1][1] = _animal("SHEEP")
+        tiles[1][1]["fertilizer_available"] = True
+        grid = TaskGridBuilder().build(parse_world(_observation(tiles, day=2, shed={})))
+
+        self.assertIn(FERTILIZE, grid[2][3].tasks)
+        self.assertTrue(grid[1][1].tasks[COLLECT_FERTILIZER].mandatory)
 
     def test_animal_without_fertilizer_has_no_collect_task(self) -> None:
         tiles = _tiles()

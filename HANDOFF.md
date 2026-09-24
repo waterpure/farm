@@ -1905,3 +1905,29 @@ LLM 不适合、也不需要参与评测。`.pkl` 若使用，装的是小型策
 - 本轮没有放宽 FERTILIZE 判定，也没有改变作物选择，因此肥料“收得多、施得少”、持续作物为 0、晚买动物净收益仍未单独 A/B；当前新路线只在 day2 施肥 2 次，不能宣称肥料利用率已优化。
 - 每天 FEED 会增加小麦和移动需求；虽然本局资源闭环没有失败，但 439 份小麦和 730 移动小时说明需要下一轮固定动物/作物组合，比较“每天 FEED + CARE + 施肥”与“卖肥/少养畜”的机会成本。
 - 下一刀应先用同一 TaskGrid 计划做固定路线 A/B：记录每种动物的买入、每日小麦、CARE/FEED 工时、产出销售和移动回 shed 次数；再决定是否优化收肥同格访问、雇工人数和持续作物配比。不要把本轮 final money 直接归因于单一改动。
+
+## 2026-09-24：每日 FEED 与 CARE 配套、按施肥缺口领取 fresh manure
+
+本轮针对用户指出的“手喂完就走、CARE 没有进入每天的任务图”和“收肥很多但施肥很少”继续沿 TaskGrid 主线修正，没有改晚期动物购买、SELL 规则、价格/收益公式、作物选择或扩地。
+
+改动：
+
+- `lab/task_grid.py::_care_task`：真实 observation 中 `cared_today=False` 时发布 `mandatory=True` 的 CARE；下一次 observation 重新按真实状态结算。`_feed_task` 已是每日 mandatory FEED，因此两者现在是同一日生产维护对。
+- `lab/region_route.py`：CARE 加入 mandatory visit；同一 tile 的排序为 `FEED -> CARE`，不会出现只执行喂养后离开。`COLLECT_FERTILIZER` 也加入硬路线，但只对被当前施肥需求实际承诺的 ready manure 生效。
+- `lab/production_plan.py`：新动物启动链扩为 `BUILD -> PLACE -> FEED -> CARE`，CARE 依赖首日 FEED；不会把“官方当天不喂不会立即逃跑”误当成首日喂养的生存硬约束。
+- `lab/task_grid.py` / `lab/region_route.py`：规划层把 ready animal manure 作为 forecast；先发布真正能增加本季可售产量的 FERTILIZE，再只提升足够数量的 `COLLECT_FERTILIZER` 为 mandatory。路线按访问前缀复用动物格刚拣到的肥料，只有前缀不足才从 shed pickup；其余 ready manure 继续 optional，避免为卖肥而无效搬运。
+
+验证：
+
+- `./.venv/bin/python -m unittest discover -s lab -p 'test_*.py'`：**288 tests OK**。
+- `python -m py_compile lab/route14_state.py lab/task_grid.py`：通过；`git diff --check`：通过。
+- 定向测试覆盖：每日 CARE mandatory、生产链首日 FEED 后 CARE、同一动物格 FEED/CARE/收肥顺序、ready manure 供同日后续 crop FERTILIZE、无施肥缺口时不强制收全部 manure。
+- seed=1、starter、720 steps，当前代码独立复跑候选：`final money=88,545`、sell revenue `115,970`、spend `30,425`、`FEED=382`、`CARE=379`、`COLLECT_FERTILIZER=105`、`FERTILIZE=7`、move `784`、PASS `181`、failed unit/market actions `0`、现金对账误差 `0`。逐时记录：`experiments/region_phase1_care_fresh_fertilizer_seed1.jsonl`；汇总：`experiments/region_phase1_care_fresh_fertilizer_seed1_summary.json`。
+- 同一 seed 的三个对照：仅每日 FEED/CARE 前的旧肥料路线为 `31,598`；只增加每日 FEED 为 `36,568`；强制拣出所有 ready manure 为 `87,935`；每日 CARE + 条件化 fresh manure 为 `88,545`。全量拣肥比条件化版本少 `610` 现金，说明“收肥多”本身不是目标。
+- 条件化版本的 FERTILIZE 发生在 day2 hour18、day2 hour23、day6 hour18、day12 hour9/12/17、day26 hour21；相较旧版本 day5/day9/day13，能在观察到有效窗口时更早预留肥料，但次数仍由“施肥确实增加本季可售产量”决定。
+
+尚存风险与下一步：
+
+- `FEED=382` 与 `CARE=379` 的少量差异来自新动物落地/日终边界等路线可执行性，不代表 CARE 又退回 optional；现有测试和路线排序已保证已进入同一访问的 FEED 后 CARE。
+- 施肥次数仍不高的主要原因不是遗漏全部收肥：许多 ready manure 对当前作物已无有效增产窗口、作物已达上限、剩余产出不足以变现，或没有对应 FERTILIZE 需求。下一步应固定作物/动物组合做“施肥 vs 卖肥”的机会成本 A/B，并减少回 shed 与重复移动。
+- 当前 season_eval 复跑中 `region_phase1` 候选完成并得到 `88,545`；`starter` 对照工厂报 `TypeError: 'str' object is not callable`，属于评测 harness/对照注册问题，不影响候选局的动作与现金账；后续若需要成对统计，应先修正该独立 harness 问题。

@@ -157,11 +157,24 @@ class TaskGridBuilder:
     def build(self, world: WorldState, previous: TaskGrid | None = None) -> TaskGrid:
         grid = TaskGrid()
         farm = world.farm
+        existing_fertilizer = _existing_fertilizer(world)
+        fertilizer_forecast = _fertilizer_on_hand(world)
+        published_fertilize_count = 0
         occupied: set[tuple[int, int]] = set()
         for crop in farm.crops:
             occupied.add(crop.position)
-            grid.put(self._crop_bucket(world, crop, previous))
+            bucket = self._crop_bucket(world, crop, previous, fertilizer_forecast)
+            task = bucket.tasks.get(FERTILIZE)
+            if task is not None and task.status != COMPLETED:
+                fertilizer_forecast = max(0, fertilizer_forecast - 1)
+                published_fertilize_count += 1
+            grid.put(bucket)
         animals = {animal.position: animal for animal in farm.animals}
+        ready_positions = sorted(
+            animal.position for animal in farm.animals if animal.fertilizer_ready
+        )
+        fresh_fertilizer_needed = max(0, published_fertilize_count - existing_fertilizer)
+        mandatory_collect = set(ready_positions[:fresh_fertilizer_needed])
         for land in farm.lands:
             if land.position in occupied:
                 continue
@@ -192,14 +205,24 @@ class TaskGridBuilder:
             if animal is not None:
                 bucket.tasks[FEED] = _feed_task(animal, _previous_task(previous, building.position, FEED))
                 bucket.tasks[CARE] = _care_task(animal, _previous_task(previous, building.position, CARE))
-                collect = _collect_task(animal, _previous_task(previous, building.position, COLLECT_FERTILIZER))
+                collect = _collect_task(
+                    animal,
+                    _previous_task(previous, building.position, COLLECT_FERTILIZER),
+                    mandatory=building.position in mandatory_collect,
+                )
                 if collect is not None:
                     bucket.tasks[COLLECT_FERTILIZER] = collect
             _keep_tile_jobs(bucket, world, previous)
             grid.put(bucket)
         return grid
 
-    def _crop_bucket(self, world: WorldState, crop: CropState, previous: TaskGrid | None) -> TaskBucket:
+    def _crop_bucket(
+        self,
+        world: WorldState,
+        crop: CropState,
+        previous: TaskGrid | None,
+        fertilizer_forecast: int | None = None,
+    ) -> TaskBucket:
         bucket = TaskBucket(crop.position, crop.crop)
         water = _water_task(world, crop, _previous_task(previous, crop.position, WATER))
         if water is not None:
@@ -207,7 +230,12 @@ class TaskGridBuilder:
         harvest = _crop_harvest(crop, _previous_task(previous, crop.position, HARVEST))
         if harvest is not None:
             bucket.tasks[HARVEST] = harvest
-        fertilize = _fertilize_task(world, crop, _previous_task(previous, crop.position, FERTILIZE))
+        fertilize = _fertilize_task(
+            world,
+            crop,
+            _previous_task(previous, crop.position, FERTILIZE),
+            available_fertilizer=fertilizer_forecast,
+        )
         if fertilize is not None:
             bucket.tasks[FERTILIZE] = fertilize
         _keep_tile_jobs(bucket, world, previous)
@@ -419,14 +447,31 @@ def fertilizer_yield_gain(crop: CropState, state: WorldState | None = None) -> i
 def _fertilizer_on_hand(state: WorldState) -> int:
     inventory = state.farm.inventory
     if inventory is None:
-        return 0
-    return inventory.fertilizer
+        shed_and_carried = 0
+    else:
+        shed_and_carried = inventory.fertilizer
+    # A ready animal is a forecastable one-unit fertilizer source for this
+    # observation. Execution still needs a real COLLECT_FERTILIZER action;
+    # this only lets the crop task enter the graph early enough to share the
+    # same day's route.
+    ready = sum(1 for animal in state.farm.animals if animal.fertilizer_ready)
+    return shed_and_carried + ready
 
 
-def _collect_task(animal: AnimalState, prior: TaskState | None) -> CollectFertilizerTask | None:
+def _existing_fertilizer(state: WorldState) -> int:
+    inventory = state.farm.inventory
+    return 0 if inventory is None else int(inventory.fertilizer)
+
+
+def _collect_task(
+    animal: AnimalState,
+    prior: TaskState | None,
+    *,
+    mandatory: bool = False,
+) -> CollectFertilizerTask | None:
     if animal.fertilizer_ready:
         status, worker, hour = _carried(prior)
-        return CollectFertilizerTask(COLLECT_FERTILIZER, status, False, worker, hour, True)
+        return CollectFertilizerTask(COLLECT_FERTILIZER, status, mandatory, worker, hour, True)
     if prior is None or prior.status == COMPLETED:
         return None
     return CollectFertilizerTask(
@@ -439,7 +484,13 @@ def _collect_task(animal: AnimalState, prior: TaskState | None) -> CollectFertil
     )
 
 
-def _fertilize_task(world: WorldState, crop: CropState, prior: TaskState | None) -> FertilizeTask | None:
+def _fertilize_task(
+    world: WorldState,
+    crop: CropState,
+    prior: TaskState | None,
+    *,
+    available_fertilizer: int | None = None,
+) -> FertilizeTask | None:
     active = crop.fertilizer_days_left > 0 or crop.fertilized_today
     if active:
         if prior is None or prior.status == COMPLETED:
@@ -453,6 +504,8 @@ def _fertilize_task(world: WorldState, crop: CropState, prior: TaskState | None)
             crop.fertilized_today,
             crop.fertilizer_days_left,
         )
+    if available_fertilizer is not None and available_fertilizer <= 0:
+        return None
     if not should_fertilize(crop, world):
         return None
     status, worker, hour = _carried(prior)
@@ -561,7 +614,11 @@ def _care_task(animal: AnimalState, prior: TaskState | None) -> CareTask:
     return CareTask(
         CARE,
         status,
-        False,
+        # CARE is part of the same daily production maintenance as FEED.
+        # The official engine only consumes the bonus on a fed production
+        # refresh, so an unfed animal must not be used as a reason to skip the
+        # task; the route keeps FEED and CARE together on the same tile.
+        not animal.cared_today,
         worker,
         hour,
         animal.cared_today,
