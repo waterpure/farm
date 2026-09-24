@@ -143,6 +143,9 @@ def plan_region_routes(
             worker_index, ordered = placed
             routes[worker_index] = ordered
         scored = _search(crew, routes, leftover, start_hour, end_hour, pantry)
+        scored = _add_survival_fallbacks(
+            task_grid, crew, scored, start_hour, end_hour, pantry
+        )
         if include_optional:
             scored = _add_same_tile_optional_tasks(
                 task_grid, crew, scored, start_hour, end_hour, pantry
@@ -162,6 +165,89 @@ def plan_region_routes(
         include_unpaid_production,
     )
     return _materialize(crew, scored, start_hour, end_hour, pantry)
+
+
+def _add_survival_fallbacks(
+    grid: TaskGrid,
+    workers: Sequence[RegionWorker],
+    scored: "_Score",
+    start_hour: int,
+    end_hour: int,
+    pantry: _Pantry,
+) -> "_Score":
+    """Recover only the smallest survival action from an overflow visit.
+
+    A tile normally stays atomic: FEED/CARE/HARVEST travel together.  When a
+    crowded day cannot fit that whole visit, losing every action can turn a
+    one-day delay into an animal escape or a weed.  Keep a narrowly justified
+    fallback—FEED after at least one missed day, or a mature one-shot crop's
+    conditional WATER—and leave the other work in ``unfinished_visits``.
+    """
+
+    routes = [list(route) for route in scored.routes]
+    remaining: list[TileVisit] = []
+    for visit in scored.leftover:
+        fallback, remove_kind = _survival_fallback(grid, visit)
+        if fallback is None:
+            remaining.append(visit)
+            continue
+        placed = _best_insertion(workers, routes, fallback, start_hour, end_hour, pantry)
+        if placed is None:
+            remaining.append(visit)
+            continue
+        worker_index, ordered = placed
+        routes[worker_index] = ordered
+        if remove_kind is None:
+            # WATER is conditional and was not part of the original visit;
+            # the HARVEST remains explicitly unfinished.
+            remaining.append(visit)
+        else:
+            residual = _without_task(visit, remove_kind)
+            if residual is not None:
+                remaining.append(residual)
+    return _search(workers, routes, remaining, start_hour, end_hour, pantry)
+
+
+def _survival_fallback(
+    grid: TaskGrid, visit: TileVisit
+) -> tuple[TileVisit | None, str | None]:
+    cell = _cell_at(grid, visit.coord)
+    if cell is None:
+        return None, None
+    feed = cell.tasks.get(FEED)
+    if FEED in visit.tasks and getattr(feed, "status", None) == PENDING and int(
+        getattr(feed, "consecutive_unfed", 0) or 0
+    ) >= 1:
+        return TileVisit(visit.coord, (FEED,), 1, visit.tile_type), FEED
+    water = cell.tasks.get(WATER)
+    if (
+        HARVEST in visit.tasks
+        and getattr(water, "status", None) == PENDING
+        and bool(getattr(water, "harvest_fallback", False))
+    ):
+        return TileVisit(visit.coord, (WATER,), 1, visit.tile_type), None
+    return None, None
+
+
+def _without_task(visit: TileVisit, kind: str) -> TileVisit | None:
+    if kind not in visit.tasks:
+        return visit
+    kept = [task for task in visit.tasks if task != kind]
+    if not kept:
+        return None
+    args_by_kind = {task: args for task, args in zip(visit.tasks, visit.task_args)}
+    ordered = _task_order(visit.tile_type, kept)
+    return TileVisit(
+        visit.coord,
+        ordered,
+        len(ordered),
+        visit.tile_type,
+        visit.harvest_product if HARVEST in ordered else None,
+        visit.harvest_units if HARVEST in ordered else 0,
+        tuple(args_by_kind.get(task, ()) for task in ordered),
+        visit.production_kind,
+        visit.production_name,
+    )
 
 
 def _visit_sort(visit: TileVisit) -> tuple[int, int, tuple[str, ...]]:

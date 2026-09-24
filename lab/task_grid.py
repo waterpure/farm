@@ -59,6 +59,9 @@ class WaterTask(TaskState):
     needed: bool = False
     turns_until_weed: int = 0
     yield_gain: int = 0
+    # Conditional safety action for a mature one-shot crop whose harvest may
+    # be left out when the day's route or shed capacity is exhausted.
+    harvest_fallback: bool = False
 
 
 @dataclass
@@ -348,17 +351,43 @@ def _previous_task(previous: TaskGrid | None, position: tuple[int, int], task_ty
 
 def _water_task(world: WorldState, crop: CropState, prior: TaskState | None) -> WaterTask | None:
     gain = water_yield_gain(crop)
+    turns = _turns_until_weed(world.hour, crop.weed_countdown_days)
     # A one-shot plant disappears after today's harvest.  Once HARVEST is
     # available, finish the crop directly; do not spend a WATER stop on a
     # plant whose lifecycle ends in the same visit, even if watering could
-    # have added one more unit.
+    # have added one more unit.  Keep only a conditional safety fallback when
+    # the observation says it would become a weed tonight.
     if _harvesting_one_shot(crop):
+        if crop.watered_today and prior is not None:
+            return WaterTask(
+                task_type=WATER,
+                status=COMPLETED,
+                mandatory=False,
+                assigned_worker=prior.assigned_worker,
+                planned_hour=prior.planned_hour,
+                needed=False,
+                turns_until_weed=turns,
+                yield_gain=0,
+                harvest_fallback=True,
+            )
+        if not crop.watered_today and crop.weed_countdown_days == 0:
+            status, worker, hour = _carried(prior)
+            return WaterTask(
+                task_type=WATER,
+                status=status,
+                mandatory=False,
+                assigned_worker=worker,
+                planned_hour=hour,
+                needed=True,
+                turns_until_weed=turns,
+                yield_gain=0,
+                harvest_fallback=True,
+            )
         return None
     # Survival, production, and yield are separate decisions.  A crop can
     # need mandatory WATER even when it is already at its production cap, but
     # only while the plant remains or an ongoing production event is due.
     mandatory = crop.must_water
-    turns = _turns_until_weed(world.hour, crop.weed_countdown_days)
     if crop.watered_today:
         if prior is None:
             return None
@@ -416,6 +445,10 @@ def should_fertilize(crop: CropState, state: WorldState) -> bool:
     """True only when a fertilizer on hand would raise this crop's later yield."""
 
     if _fertilizer_on_hand(state) <= 0:
+        return False
+    # The plant disappears when today's one-shot HARVEST succeeds, so
+    # fertilizing it immediately beforehand cannot add a saleable unit.
+    if _harvesting_one_shot(crop):
         return False
     if crop.remaining_harvests <= 0:
         return False

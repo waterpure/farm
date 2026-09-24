@@ -1996,3 +1996,29 @@ LLM 不适合、也不需要参与评测。`.pkl` 若使用，装的是小型策
 第 1 关验证：4 个新增回归测试首先在旧代码上复现了两处失败，修复后通过；`./.venv/bin/python -m unittest discover -s lab -p 'test_*.py'` 为 **301 tests OK**，`git diff --check`、相关 `py_compile` 通过。seed=1、`region_phase1` vs `v45_base`、720 steps 的独立记录：`experiments/region_phase1_route_resource_stage1_seed1_v45_summary.json`。该局 `DONE`，final money **35,096**（同条件旧版 27,873，增加 7,223），卖货 42,863，支出 10,767，失败单位动作/市场单均 0，现金对账误差 0。Day13 的 0/1/2/3 名新增工人分别剩 **6/0/0/0** 个访问，选择雇 1 人、15 个不同格的访问全排完，原局四档都剩 7 个、选零雇工。整局作物变草 7→**2**、动物逃跑 2→**0**，HARVEST 92→117；结果会改变后续生产与市场，不可把 7,223 元差额全部归于 Day13 的单一动作。
 
 风险及接手要求：第 1 关只保证路线按真实动作顺序校验，不能承诺消灭全部枯死；新局仍有 2 格作物变草，Day22 还有 1 个 FERTILIZE 未排，整项调度计划远未完成。下一道验证门是用户审核此关结果；获得明确同意后，才按第 2 项处理当天收获前无效施肥与 FEED/WATER 兜底。勿为追单局分数私自改变 BUY_LAND、SELL、未来供给或杂草清理。
+
+## 2026-09-24：任务调度四阶段计划第 2 关——无效施肥与失守兜底
+
+用户明确开始第二关。本轮只处理任务图/区域路线的两个失守边界，没有改收益评分、雇工联合优化、杂草清理、CARE 策略、BUY_LAND、SELL、未来供给或其他经济逻辑。
+
+改动：
+
+- `lab/task_grid.py::WaterTask` 新增 `harvest_fallback` 标记。成熟的一次性作物当天若会因连续未浇在今晚变成 WEED，仍登记一个**非 mandatory 的条件 WATER**；正常路线优先只排 `HARVEST`，只有收获因路线/仓库容量排不下时才允许区域路线采用这个 WATER。浇水后的下一次 observation 会把该任务结算为 `COMPLETED`，而原 `HARVEST` 继续保留待处理。
+- `lab/task_grid.py::should_fertilize` 先排除 `_harvesting_one_shot(crop)`，因此当天会被收掉的一次性作物不再发布无收益 `FERTILIZE`；未成熟作物、持续作物和仍有真实可售增益的窗口保持原规则。
+- `lab/region_route.py::_add_survival_fallbacks` 在整格访问落入 `unfinished_visits` 后尝试最小兜底：只有 `consecutive_unfed >= 1` 的动物才保留单独 `FEED`；一次性作物只在 `harvest_fallback` 存在时保留单独 `WATER`。已执行的 FEED/WATER 不会把同格剩余 CARE/HARVEST 伪报成完成，剩余动作仍留在 `unfinished_visits`，下一个 observation 再重排。
+
+针对性测试：
+
+- 成熟/满产小麦有条件 WATER，但普通路线先收获、不发普通 WATER；收获成功后不执行 fallback，收获排不下时才执行 WATER；WATER 的状态要等 observation 真实显示浇过才完成。
+- 一次性作物当天收获不再施肥；未到收获日且施肥能增加产量的测试仍通过。
+- 满仓导致动物整格 FEED+CARE+HARVEST 排不下时，已连续断粮至少一天的动物仍保留 FEED，CARE/HARVEST 留在 `unfinished_visits`；没有逃跑风险的当天未喂动物不触发这个兜底。
+
+验证：
+
+- 全量 `./.venv/bin/python -m unittest discover -s lab -p 'test_*.py'`：**305 tests OK**。
+- `py_compile`（`task_grid.py`、`region_route.py`、`region_phase1.py`）和 `git diff --check`：通过。
+- seed=1、`region_phase1` vs `v45_base`、`starter` 对手、720 steps：两局 `DONE`，无失败动作，现金对账误差 0。独立记录：`experiments/region_phase1_taskgrid_stage2_seed1_v45_final.jsonl`，汇总：`experiments/region_phase1_taskgrid_stage2_seed1_v45_final_summary.json`。
+- 本轮候选 final money **70,074**；sell revenue **86,614**；total spend **19,540**；plant successes **60**；harvest successes **119**；seed units **60**；animal units **13**；FEED/CARE/FERTILIZE 等动作均由逐时记录保留，failed unit/market actions **0**；moves **750**、PASS **232**。对手 V45 final money **146,016**。
+- 为区分因果，临时只读关闭 `_add_survival_fallbacks` 重跑同一 seed/对手，候选 final money **34,875**；当前实现相对该对照 **+35,199**。这说明本关兜底确实救回了大量因整格容量限制而可能枯死/逃跑的生产资产，而不是测试或评测 harness 偶然变化。该对照没有写入正式记录。
+
+结论与剩余风险：本关解决的是“整格排不下时完全放弃导致的生存损失”，不保证所有收获、CARE 或新增生产链都能在当天完成；`unfinished_visits` 仍可能包含经济性动作。正式记录相较第一关的现金变化会同时受后续产量和市场路径影响，不能把全部差额直接归因于单个 WATER/FEED。下一关仍需用户审核后才能进入任务链边际净收益或生产/雇工联合比较；不要在未授权时顺手改经济逻辑。

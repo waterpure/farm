@@ -131,20 +131,34 @@ class TaskGridTests(unittest.TestCase):
         self.assertEqual(water_yield_gain(crop), 0)
         self.assertEqual(water_yield_gain(crop), _engine_oneshot_gain("WHEAT", 4, 0, 6, 4))
         self.assertIn(HARVEST, bucket.tasks)
-        self.assertNotIn(WATER, bucket.tasks)
+        self.assertIn(WATER, bucket.tasks)
+        self.assertFalse(bucket.tasks[WATER].mandatory)
+        self.assertTrue(bucket.tasks[WATER].harvest_fallback)
 
     def test_ripe_wheat_is_harvested_without_water_when_the_plant_ends(self) -> None:
         world = _world("WHEAT", day=2, units=4, dry=1)
         bucket = TaskGridBuilder().build(world)[2][3]
         self.assertIn(HARVEST, bucket.tasks)
         self.assertEqual(bucket.tasks[HARVEST].yield_amount, 4)
-        self.assertNotIn(WATER, bucket.tasks)
+        self.assertTrue(bucket.tasks[WATER].harvest_fallback)
 
     def test_maxed_wheat_is_harvested_without_survival_water(self) -> None:
         world = _world("WHEAT", day=4, units=6, dry=1, shed={"FERTILIZER": 1})
         tasks = TaskGridBuilder().build(world)[2][3].tasks
-        self.assertNotIn(WATER, tasks)
+        self.assertIn(WATER, tasks)
+        self.assertTrue(tasks[WATER].harvest_fallback)
         self.assertNotIn(FERTILIZE, tasks)
+
+    def test_harvest_fallback_water_completes_only_after_the_crop_shows_it(self) -> None:
+        before = _world("WHEAT", day=4, units=6, dry=1)
+        prior = TaskGridBuilder().build(before)
+        prior.schedule(2, 3, WATER, "Farmer", 4)
+        still = TaskGridBuilder().build(before, prior)
+        self.assertEqual(still[2][3].tasks[WATER].status, SCHEDULED)
+        after = _world("WHEAT", day=4, units=6, dry=1, watered=True)
+        done = TaskGridBuilder().build(after, still)
+        self.assertEqual(done[2][3].tasks[WATER].status, COMPLETED)
+        self.assertIn(HARVEST, done[2][3].tasks)
 
     def test_one_cell_holds_water_and_harvest(self) -> None:
         tiles = _tiles()
@@ -329,7 +343,7 @@ class TaskGridTests(unittest.TestCase):
         tiles[3][2] = _plant("WHEAT", planted_day=0, units=1)
         tiles[1][1] = _animal("SHEEP")
         tiles[1][1]["fertilizer_available"] = True
-        grid = TaskGridBuilder().build(parse_world(_observation(tiles, day=2, shed={})))
+        grid = TaskGridBuilder().build(parse_world(_observation(tiles, day=1, shed={})))
 
         self.assertIn(FERTILIZE, grid[2][3].tasks)
         self.assertTrue(grid[1][1].tasks[COLLECT_FERTILIZER].mandatory)
@@ -368,13 +382,22 @@ class TaskGridTests(unittest.TestCase):
         self.assertEqual(task.assigned_worker, "Hand1")
 
     def test_fertilize_when_it_increases_yield(self) -> None:
-        world = _world("WHEAT", day=2, units=1, shed={"FERTILIZER": 1})
+        world = _world("WHEAT", day=1, units=1, shed={"FERTILIZER": 1})
         crop = world.farm.crops[0]
         self.assertTrue(should_fertilize(crop, world))
         task = TaskGridBuilder().build(world)[2][3].tasks[FERTILIZE]
         self.assertEqual(task.status, PENDING)
         self.assertFalse(task.fertilized_today)
         self.assertEqual(task.fertilizer_days_left, 0)
+
+    def test_one_shot_crop_being_harvested_today_never_gets_fertilized(self) -> None:
+        world = _world("WHEAT", day=2, units=1, shed={"FERTILIZER": 1})
+        crop = world.farm.crops[0]
+        self.assertTrue(crop.must_harvest)
+        self.assertFalse(should_fertilize(crop, world))
+        tasks = TaskGridBuilder().build(world)[2][3].tasks
+        self.assertIn(HARVEST, tasks)
+        self.assertNotIn(FERTILIZE, tasks)
 
     def test_no_fertilize_without_fertilizer_on_hand(self) -> None:
         world = _world("WHEAT", day=2, units=1)
@@ -397,13 +420,13 @@ class TaskGridTests(unittest.TestCase):
     def test_fertilize_completes_only_after_the_crop_shows_it(self) -> None:
         tiles = _tiles()
         tiles[3][2] = _plant("WHEAT", units=1)
-        hour2 = parse_world(_observation(tiles, day=2, hour=2, shed={"FERTILIZER": 1}))
+        hour2 = parse_world(_observation(tiles, day=1, hour=2, shed={"FERTILIZER": 1}))
         grid = TaskGridBuilder().build(hour2)
         grid.schedule(2, 3, FERTILIZE, "Farmer", 3)
         still = TaskGridBuilder().build(hour2, grid)
         self.assertEqual(still[2][3].tasks[FERTILIZE].status, SCHEDULED)
-        tiles[3][2]["fertilized_until_day"] = 4
-        done = TaskGridBuilder().build(parse_world(_observation(tiles, day=2, hour=3, shed={"FERTILIZER": 0})), still)
+        tiles[3][2]["fertilized_until_day"] = 3
+        done = TaskGridBuilder().build(parse_world(_observation(tiles, day=1, hour=3, shed={"FERTILIZER": 0})), still)
         task = done[2][3].tasks[FERTILIZE]
         self.assertEqual(task.status, COMPLETED)
         self.assertTrue(task.fertilized_today)
@@ -440,12 +463,12 @@ class TaskGridTests(unittest.TestCase):
         self.assertEqual(after[FERTILIZE].status, PENDING)
 
     def test_one_shot_crop_has_no_growth_task_after_harvest(self) -> None:
-        prior = TaskGridBuilder().build(_world("WHEAT", day=2, units=1, shed={"FERTILIZER": 1}))
+        prior = TaskGridBuilder().build(_world("WHEAT", day=1, units=1, shed={"FERTILIZER": 1}))
         prior.schedule(2, 3, FERTILIZE, "Farmer", 3)
         tiles = _tiles()
         tiles[3][2] = None
         after = TaskGridBuilder().build(
-            parse_world(_observation(tiles, day=3, hour=4, shed={"FERTILIZER": 1})),
+            parse_world(_observation(tiles, day=2, hour=4, shed={"FERTILIZER": 1})),
             prior,
         )
         self.assertNotIn(FERTILIZE, after[2][3].tasks)

@@ -213,12 +213,58 @@ class RegionRouteTests(unittest.TestCase):
     def test_wheat_at_max_yield_is_harvested_without_survival_water_when_dry(self) -> None:
         world = _world("WHEAT", day=4, units=6, dry=1, fertilized_until=4)
         grid = TaskGridBuilder().build(world)
-        self.assertNotIn(WATER, grid[2][3].tasks)
+        self.assertTrue(grid[2][3].tasks[WATER].harvest_fallback)
         self.assertEqual(grid[2][3].tasks[HARVEST].yield_amount, 6)
         plan = plan_region_routes(grid, [RegionWorker("Farmer", (2, 3))])
         operations = [action.operation for action in plan.worker_routes[0].actions_by_hour]
+        self.assertEqual(plan.worker_routes[0].visits[0].tasks, (HARVEST,))
         self.assertEqual(operations[0], HARVEST)
         self.assertEqual(plan.worker_routes[0].actions_by_hour[-1].args, ("WHEAT", 6))
+
+    def test_full_shed_keeps_harvest_fallback_water_but_not_the_harvest(self) -> None:
+        bucket = TaskBucket((4, 4), "WHEAT")
+        bucket.tasks[HARVEST] = HarvestTask(HARVEST, PENDING, True, yield_amount=1)
+        bucket.tasks[WATER] = WaterTask(
+            WATER,
+            PENDING,
+            False,
+            needed=True,
+            turns_until_weed=0,
+            yield_gain=0,
+            harvest_fallback=True,
+        )
+        plan = plan_region_routes(
+            _grid(bucket),
+            [RegionWorker("Farmer", (4, 4))],
+            shed_total=100,
+        )
+
+        self.assertFalse(plan.feasible)
+        self.assertEqual(
+            [action.operation for action in plan.worker_routes[0].actions_by_hour],
+            [WATER],
+        )
+        self.assertEqual(plan.unfinished_visits[0].coord, (4, 4))
+        self.assertEqual(plan.unfinished_visits[0].tasks, (HARVEST,))
+
+    def test_escape_risk_keeps_feed_when_the_rest_of_the_animal_visit_does_not_fit(self) -> None:
+        bucket = TaskBucket((4, 4), "SHEEP")
+        bucket.tasks[FEED] = FeedTask(FEED, PENDING, True, consecutive_unfed=1)
+        bucket.tasks[CARE] = CareTask(CARE, PENDING, True, bonus_gain=1)
+        bucket.tasks[HARVEST] = HarvestTask(HARVEST, PENDING, True, yield_amount=1)
+        plan = plan_region_routes(
+            _grid(bucket),
+            [RegionWorker("Farmer", (4, 4), carrying_wheat=1)],
+            shed_total=100,
+            end_hour=1,
+        )
+
+        self.assertFalse(plan.feasible)
+        self.assertEqual(
+            [action.operation for action in plan.worker_routes[0].actions_by_hour],
+            [FEED],
+        )
+        self.assertEqual(plan.unfinished_visits[0].tasks, (CARE, HARVEST))
 
     def test_one_shot_visit_waters_before_it_harvests(self) -> None:
         self.assertEqual(_task_order("WHEAT", [HARVEST, WATER]), (WATER, HARVEST))
