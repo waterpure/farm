@@ -9,13 +9,16 @@ from lab.region_route import (
     RegionWorker,
     TileVisit,
     _Pantry,
+    _Score,
     _best_insertion,
     _Leg,
     _end_day_capacity_safe,
     _end_inventory,
     _fit_leg,
+    _crew_can_carry,
     _extract_visits,
     _insertion_extra,
+    _materialize,
     _path_moves,
     _project_end_shed,
     _reorder,
@@ -100,6 +103,73 @@ def _owners(plan) -> dict[tuple[int, int], str]:
 
 
 class RegionRouteTests(unittest.TestCase):
+    def test_reordered_manure_requires_real_fertilizer_pickup(self) -> None:
+        worker = RegionWorker("Farmer", (4, 4))
+        manure = TileVisit((1, 3), (COLLECT_FERTILIZER,), 1, "SHEEP")
+        crop = TileVisit((2, 3), (FERTILIZE,), 1, "WHEAT")
+
+        leg = _fit_leg(worker, [manure, crop], shed_doors(10), 1, 23)
+
+        self.assertIsNotNone(leg)
+        self.assertEqual(leg.visits[0].coord, crop.coord)
+        self.assertIn(("FERTILIZER", 1), leg.item_pickups)
+        self.assertFalse(_crew_can_carry([worker], [[manure, crop]], _Pantry(0, shed_doors(10)), 1, 23))
+
+    def test_reordered_fertilizer_cannot_block_an_idle_workers_harvest(self) -> None:
+        workers = [RegionWorker(name, (4, 4)) for name in ("Farmer", "Hand1", "Hand2")]
+        first = [
+            TileVisit((4, 2), (FERTILIZE,), 1, "WHEAT"),
+            TileVisit((0, 2), (COLLECT_FERTILIZER,), 1, "SHEEP"),
+            TileVisit((0, 3), (FERTILIZE,), 1, "CARROT"),
+        ]
+        second = [TileVisit((1, 3), (COLLECT_FERTILIZER,), 1, "COW")]
+        routes = [first, second, []]
+        pantry = _Pantry(0, shed_doors(10), shed_total=14, fertilizer=1)
+        additional_fertilize = TileVisit((2, 3), (FERTILIZE,), 1, "CARROT")
+
+        self.assertIsNone(_best_insertion(workers, routes, additional_fertilize, 1, 23, pantry))
+        harvest = TileVisit((3, 4), (HARVEST,), 1, "WHEAT", "WHEAT", 1)
+        placed = _best_insertion(workers, routes, harvest, 1, 23, pantry)
+        self.assertIsNotNone(placed)
+        routes[placed[0]] = placed[1]
+        self.assertTrue(_crew_can_carry(workers, routes, pantry, 1, 23))
+
+    def test_manure_first_route_does_not_visit_the_shed_without_a_pickup(self) -> None:
+        worker = RegionWorker("Farmer", (4, 4))
+        manure = TileVisit((1, 3), (COLLECT_FERTILIZER,), 1, "SHEEP")
+        crop = TileVisit((2, 3), (FERTILIZE,), 1, "WHEAT")
+
+        leg = _fit_leg(worker, [manure, crop], ((0, 4),), 1, 23)
+
+        self.assertIsNotNone(leg)
+        self.assertEqual([visit.coord for visit in leg.visits], [manure.coord, crop.coord])
+        self.assertIsNone(leg.door)
+        self.assertEqual(leg.item_pickups, ())
+
+    def test_final_route_repairs_an_overdraw_without_losing_unrelated_harvest(self) -> None:
+        workers = [RegionWorker(name, (4, 4)) for name in ("Farmer", "Hand1", "Hand2")]
+        first = (
+            TileVisit((4, 2), (FERTILIZE,), 1, "WHEAT"),
+            TileVisit((0, 2), (COLLECT_FERTILIZER,), 1, "SHEEP"),
+            TileVisit((0, 3), (FERTILIZE,), 1, "CARROT"),
+        )
+        second = (
+            TileVisit((2, 3), (FERTILIZE,), 1, "CARROT"),
+            TileVisit((1, 3), (COLLECT_FERTILIZER,), 1, "COW"),
+        )
+        harvest = TileVisit((3, 4), (HARVEST,), 1, "WHEAT", "WHEAT", 1)
+        pantry = _Pantry(0, shed_doors(10), shed_total=14, fertilizer=1)
+        plan = _materialize(workers, _Score((first, second, (harvest,)), (), 0, None), 1, 23, pantry)
+
+        picked = sum(
+            action.args[1]
+            for action in _pickups(plan)
+            if action.args[0] == "FERTILIZER"
+        )
+        self.assertLessEqual(picked, 1)
+        self.assertIn(harvest.coord, _owners(plan))
+        self.assertIn((2, 3), [visit.coord for visit in plan.unfinished_visits])
+
     def test_a_line_is_walked_one_step_at_a_time(self) -> None:
         grid = _grid(_harvest(0, 0), _harvest(1, 0), _harvest(2, 0))
         plan = plan_region_routes(grid, [RegionWorker("Farmer", (0, 0))])

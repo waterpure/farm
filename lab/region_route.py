@@ -504,24 +504,31 @@ def _layout(worker: RegionWorker, visits: Sequence[TileVisit], doors: Sequence[t
     """
 
     items = list(visits)
-    pickup = _pickup_needed(worker, items)
-    animals = _item_pickups(worker, items)
-    fertilizer = _fertilizer_pickup_needed(worker, items)
+    ordered = _reorder(worker.coord, items)
+    pickup = _pickup_needed(worker, ordered)
+    animals = _item_pickups(worker, ordered)
+    fertilizer = _fertilizer_pickup_needed(worker, ordered)
     item_pickups = animals + (("FERTILIZER", fertilizer),) if fertilizer > 0 else animals
     if not items or (pickup <= 0 and not item_pickups):
-        ordered = _reorder(worker.coord, items)
         travel = _path_moves(worker.coord, [visit.coord for visit in ordered])
         return _with_return(None, 0, ordered, travel, doors)
-    best: tuple[tuple[int, int, int, tuple[int, int]], _Leg] | None = None
+    best: tuple[tuple[int, int, tuple[int, int]], _Leg] | None = None
     for door in doors:
         ordered = _reorder(door, items)
-        travel = _manhattan(worker.coord, door) + _path_moves(door, [visit.coord for visit in ordered])
-        leg = _with_return(door, pickup, ordered, travel, doors, item_pickups)
+        pickup = _pickup_needed(worker, ordered)
+        animals = _item_pickups(worker, ordered)
+        fertilizer = _fertilizer_pickup_needed(worker, ordered)
+        door_pickups = animals + (("FERTILIZER", fertilizer),) if fertilizer > 0 else animals
+        if pickup or door_pickups:
+            travel = _manhattan(worker.coord, door) + _path_moves(door, [visit.coord for visit in ordered])
+            leg = _with_return(door, pickup, ordered, travel, doors, door_pickups)
+        else:
+            travel = _path_moves(worker.coord, [visit.coord for visit in ordered])
+            leg = _with_return(None, 0, ordered, travel, doors)
         key = (leg.action_total, leg.travel + leg.return_travel, door)
         if best is None or key < best[0]:
             best = (key, leg)
     if best is None:
-        ordered = _reorder(worker.coord, items)
         return _with_return(None, pickup, ordered, 10**9, doors, item_pickups)
     return best[1]
 
@@ -672,12 +679,8 @@ def _best_insertion(
         if new is None:
             continue
         trial_routes = [list(route) for route in routes]
-        trial_routes[worker_index] = trial
-        if not _within_animals(workers, trial_routes, pantry) or not _within_fertilizer(workers, trial_routes, pantry):
-            continue
-        if not _end_day_capacity_safe(
-            workers, trial_routes, pantry, pantry.shed_total, start_hour, end_hour
-        ):
+        trial_routes[worker_index] = list(new.visits)
+        if not _crew_can_carry(workers, trial_routes, pantry, start_hour, end_hour):
             continue
         old = _fit_leg(worker, current, pantry.doors, start_hour, end_hour)
         extra = _added_cost(old, new)
@@ -744,9 +747,7 @@ def _improve_once(
                 continue
             remaining = [item for item in current.leftover if item.coord != visit.coord]
             scored = _score(workers, trial, remaining, start_hour, end_hour, pantry)
-            if not _end_day_capacity_safe(
-                workers, scored.routes, pantry, pantry.shed_total, start_hour, end_hour
-            ):
+            if not _crew_can_carry(workers, scored.routes, pantry, start_hour, end_hour):
                 continue
             if len(scored.leftover) < len(current.leftover):
                 return scored
@@ -759,7 +760,7 @@ def _improve_once(
                 if not _crew_can_carry(workers, trial, pantry, start_hour, end_hour):
                     continue
                 scored = _score(workers, trial, list(current.leftover), start_hour, end_hour, pantry)
-                if scored.key < current.key:
+                if _crew_can_carry(workers, scored.routes, pantry, start_hour, end_hour) and scored.key < current.key:
                     return scored
     for left in range(len(workers)):
         for right in range(left + 1, len(workers)):
@@ -769,7 +770,7 @@ def _improve_once(
                     if not _crew_can_carry(workers, trial, pantry, start_hour, end_hour):
                         continue
                     scored = _score(workers, trial, list(current.leftover), start_hour, end_hour, pantry)
-                    if scored.key < current.key:
+                    if _crew_can_carry(workers, scored.routes, pantry, start_hour, end_hour) and scored.key < current.key:
                         return scored
     return None
 
@@ -781,13 +782,25 @@ def _crew_can_carry(
     start_hour: int,
     end_hour: int,
 ) -> bool:
-    """Wheat, animals, and the day-end shed all still fit."""
+    """Check actual ordered walks and pickups against one shared pantry."""
 
-    if (
-        not _within_wheat(workers, routes, pantry)
-        or not _within_animals(workers, routes, pantry)
-        or not _within_fertilizer(workers, routes, pantry)
-    ):
+    legs = [
+        _fit_leg(worker, route, pantry.doors, start_hour, end_hour)
+        for worker, route in zip(workers, routes)
+    ]
+    if any(leg is None for leg in legs):
+        return False
+    if sum(leg.pickup for leg in legs if leg is not None) > pantry.wheat:
+        return False
+    drawn: dict[str, int] = {}
+    for leg in legs:
+        if leg is None:
+            continue
+        for name, amount in leg.item_pickups:
+            drawn[name] = drawn.get(name, 0) + amount
+    if drawn.get("FERTILIZER", 0) > pantry.fertilizer:
+        return False
+    if any(drawn.get(name, 0) > _shed_animal_count(pantry, name) for name in ANIMAL_NAMES):
         return False
     return _end_day_capacity_safe(workers, routes, pantry, pantry.shed_total, start_hour, end_hour)
 
@@ -932,14 +945,12 @@ def _add_same_tile_optional_tasks(
             end_hour,
         ):
             continue
-        if not _end_day_capacity_safe(workers, trial, pantry, pantry.shed_total, start_hour, end_hour):
+        if not _crew_can_carry(workers, trial, pantry, start_hour, end_hour):
             continue
         updated = _score(workers, trial, list(current.leftover), start_hour, end_hour, pantry)
         if {visit.coord for visit in updated.leftover} != {visit.coord for visit in current.leftover}:
             continue
-        if not _end_day_capacity_safe(
-            workers, updated.routes, pantry, pantry.shed_total, start_hour, end_hour
-        ):
+        if not _crew_can_carry(workers, updated.routes, pantry, start_hour, end_hour):
             continue
         routes = [list(route) for route in updated.routes]
         current = updated
@@ -1130,19 +1141,12 @@ def _add_production_plans(
             for worker_index, worker in enumerate(workers):
                 trial = [list(route) for route in routes]
                 trial[worker_index] = trial[worker_index] + [visit]
-                if (
-                    not _within_wheat(workers, trial, pantry)
-                    or not _within_animals(workers, trial, pantry)
-                    or not _within_fertilizer(workers, trial, pantry)
-                ):
-                    continue
                 old = _fit_leg(worker, routes[worker_index], pantry.doors, start_hour, end_hour)
                 new = _fit_leg(worker, trial[worker_index], pantry.doors, start_hour, end_hour)
                 if new is None or not _production_fits(worker, new, start_hour, end_hour):
                     continue
-                if not _end_day_capacity_safe(
-                    workers, trial, pantry, pantry.shed_total, start_hour, end_hour
-                ):
+                trial[worker_index] = list(new.visits)
+                if not _crew_can_carry(workers, trial, pantry, start_hour, end_hour):
                     continue
                 extra = _added_cost(old, new)
                 key = (extra, -money, visit.coord[1], visit.coord[0], worker.id)
@@ -1288,6 +1292,21 @@ def _materialize(
     end_hour: int,
     pantry: _Pantry,
 ) -> RegionRoutePlan:
+    # A partial replan may reach here after the workers' actual inventories or
+    # positions changed. Never turn an overdrawn forecast into PICKUP actions:
+    # replay the existing visits through the same admission check, preserving
+    # as many executable stops as the real pantry permits.
+    if not _crew_can_carry(workers, scored.routes, pantry, start_hour, end_hour):
+        safe_routes: list[list[TileVisit]] = [[] for _ in workers]
+        unassigned = list(scored.leftover)
+        for route in scored.routes:
+            for visit in route:
+                placed = _best_insertion(workers, safe_routes, visit, start_hour, end_hour, pantry)
+                if placed is None:
+                    unassigned.append(visit)
+                else:
+                    safe_routes[placed[0]] = placed[1]
+        scored = _score(workers, safe_routes, unassigned, start_hour, end_hour, pantry)
     plans: list[WorkerRoutePlan] = []
     unfinished: list[TileVisit] = list(scored.leftover)
     total_moves = 0
