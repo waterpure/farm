@@ -12,21 +12,21 @@ from dataclasses import dataclass, field, replace
 from math import ceil
 from typing import Any
 
+from .animal_forecast import future_units as _forecast_animal_units
 from .route14_economy import (
     ANIMAL_FIRST_YIELD_DAYS,
     ANIMAL_STRUCTURE,
     CASH_BUFFER,
     CROP_OCCUPY_DAYS,
-    CROP_YIELD,
     JOBS_PER_WORKER,
     SHOP_ANIMAL,
     SHOP_CROPS,
     animal_labor_turns,
     animal_line_money_per_day,
-    animal_yield_units,
     crop_finishes_in_season,
     crop_labor_turns,
     crop_money_per_day,
+    future_crop_units,
     fib_hire_cost,
     line_startup_cost,
     own_supply_map,
@@ -334,7 +334,8 @@ def _animal_candidate(
 ) -> ProductionCandidate:
     supply = _effective_supply(observation, ledger)
     per_day = animal_line_money_per_day(observation, name, days_left, prices, supply)
-    feasible = animal_yield_units(name, days_left) > 0 and per_day is not None
+    day = int(observation.get("day") or 0)
+    feasible = _forecast_animal_units(name, day, day=day) > 0 and per_day is not None
     owned_animal = ledger.animals.get(name, 0) > 0
     startup = 0 if owned_animal else line_startup_cost("animal", name)
     money = 0.0 if per_day is None else float(per_day)
@@ -472,12 +473,18 @@ def _account(ledger: _Ledger, observation: dict[str, Any], plan: ProductionPlan,
     ledger.reserved_hire_cash = _hire_cash(observation, ledger.planned_daily_jobs)
     if plan.kind == "crop":
         ledger.planned_crop_tiles[plan.name] = ledger.planned_crop_tiles.get(plan.name, 0) + 1
-        ledger.planned_supply[plan.product] = ledger.planned_supply.get(plan.product, 0) + CROP_YIELD.get(plan.name, 0)
+        day = int(observation.get("day") or 0)
+        ledger.planned_supply[plan.product] = ledger.planned_supply.get(plan.product, 0) + future_crop_units(
+            plan.name,
+            day,
+        )
     else:
-        days_left = remaining_days(observation)
         ledger.planned_animal_heads[plan.name] = ledger.planned_animal_heads.get(plan.name, 0) + 1
-        ledger.planned_supply[plan.product] = ledger.planned_supply.get(plan.product, 0) + animal_yield_units(
-            plan.name, days_left
+        day = int(observation.get("day") or 0)
+        ledger.planned_supply[plan.product] = ledger.planned_supply.get(plan.product, 0) + _forecast_animal_units(
+            plan.name,
+            day,
+            day=day,
         )
 
 

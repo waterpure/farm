@@ -10,6 +10,7 @@ from functools import lru_cache
 from math import ceil
 from typing import Any
 
+from .animal_forecast import future_units as _forecast_animal_units
 from .portfolio_model import ANIMAL_OUTPUT, PRODUCTS, shop_demand_per_day
 
 SEASON_DAYS = 30
@@ -85,16 +86,113 @@ def market_inventory(observation: dict[str, Any], item: str) -> int | None:
     return _int(stock[item]) if item in stock else None
 
 
-def own_supply_map(observation: dict[str, Any]) -> dict[str, int]:
-    """Units of each product we already owe the market, in one pass over the farm.
+def marginal_sale_revenue(item: str, inventory: int, existing_supply: int, units: int) -> float | None:
+    """Revenue added by ``units`` after all existing supply is sold first.
 
-    Counts the standing field plus anything sitting unsold, because those hit the
-    market first and set the price the next tile will actually get.
+    The subtraction is intentional: it makes the candidate valuation an actual
+    before/after marginal value, while ``batch_sale_revenue`` keeps the official
+    per-unit glut curve in the calculation.
+    """
+
+    if _market_price is None:
+        return None
+    existing = max(0, int(existing_supply))
+    before = batch_sale_revenue(item, inventory, existing)
+    after = batch_sale_revenue(item, inventory, existing + max(0, int(units)))
+    if before is None or after is None:
+        return None
+    return after - before
+
+
+def _future_crop_units(tile: dict[str, Any], day: int) -> int:
+    """New crop units expected after this observation, under daily tending.
+
+    One-shot crops can still add watering bonus up to their cap. Ongoing crops
+    add one production unit per remaining official refresh, or two while an
+    already-active fertilizer window is in force. Current ``yield_units`` is
+    deliberately excluded from this return value.
+    """
+
+    crop = str(tile.get("crop") or "")
+    if crop not in CROP_MAX_YIELD:
+        return 0
+    held = max(0, _int(tile.get("yield_units")))
+    planted_day = _int(tile.get("planted_day"), day)
+    age = day - planted_day
+    cap = CROP_MAX_YIELD[crop]
+    if not CROP_ONGOING.get(crop, False):
+        if day + CROP_FIRST_YIELD_DAY[crop] >= SEASON_DAYS:
+            return 0
+        if age < CROP_FIRST_YIELD_DAY[crop] or age <= CROP_MAX_YIELD_DAY[crop]:
+            return max(0, cap - held)
+        return 0
+
+    interval = max(1, _engine_crop_interval(crop))
+    first = CROP_FIRST_YIELD_DAY[crop]
+    future = 0
+    fertilized_until = _int(tile.get("fertilized_until_day"), -1)
+    for next_day in range(day + 1, SEASON_DAYS):
+        since_first = next_day - planted_day - first
+        if since_first < 0 or since_first % interval != 0:
+            continue
+        production_count = since_first // interval + 1
+        if production_count > cap:
+            break
+        refresh_day = next_day - 1
+        future += 2 if fertilized_until >= refresh_day else 1
+    return max(0, future)
+
+
+def future_crop_units(crop: str, day: int) -> int:
+    """Officially reachable output for a crop planted on ``day``.
+
+    This is the same state transition used for standing crops, with no units
+    currently held.  Keeping the candidate and standing-asset forecasts on one
+    helper prevents a new line from being valued with a different horizon.
+    """
+
+    return _future_crop_units(
+        {"crop": crop, "planted_day": int(day), "yield_units": 0},
+        int(day),
+    )
+
+
+def _engine_crop_interval(crop: str) -> int:
+    """Return the official interval without duplicating the engine table."""
+
+    try:
+        from kaggle_environments.envs.kaggriculture.kaggriculture import CROPS as _ENGINE_CROPS
+    except ImportError:  # pragma: no cover - local fallback for pure imports
+        return 1
+    return max(1, _int(_ENGINE_CROPS[crop].get("interval"), 1))
+
+
+def _animal_future_units(tile: dict[str, Any], day: int) -> int:
+    animal = str(tile.get("animal") or "")
+    if animal not in ANIMAL_OUTPUT:
+        return 0
+    return _forecast_animal_units(
+        animal,
+        _int(tile.get("placed_day"), day),
+        day=day,
+        held=max(0, _int(tile.get("yield_units"))),
+        pending_care=max(0, _int(tile.get("pending_care_bonus"))),
+    )
+
+
+def future_supply_map(observation: dict[str, Any]) -> dict[str, int]:
+    """Unified farm-wide supply, including future output of standing assets.
+
+    Market inventory is kept separate and added by the caller because it is
+    shared by both players. This map contains our shed/worker stock, standing
+    crop units plus their remaining output, and each existing animal's current
+    held units plus its future FEED+CARE production through the season horizon.
     """
 
     player = _int(observation.get("player"))
     farms = list(observation.get("farms") or [])
     farm = farms[player] if 0 <= player < len(farms) else {}
+    day = _int(observation.get("day"))
     units: dict[str, int] = {}
     for row in farm.get("tiles") or []:
         for tile in row:
@@ -102,13 +200,15 @@ def own_supply_map(observation: dict[str, Any]) -> dict[str, int]:
                 continue
             crop = tile.get("crop")
             if crop:
-                units[str(crop)] = units.get(str(crop), 0) + CROP_YIELD.get(str(crop), 0)
+                name = str(crop)
+                current = max(0, _int(tile.get("yield_units")))
+                units[name] = units.get(name, 0) + current + _future_crop_units(tile, day)
                 continue
             animal = tile.get("animal")
             if animal:
                 product = next((item for item, kind in SHOP_ANIMAL.items() if kind == animal), None)
                 if product:
-                    units[product] = units.get(product, 0) + _int(tile.get("yield_units"))
+                    units[product] = units.get(product, 0) + _animal_future_units(tile, day)
     private = dict(observation.get("private") or {})
     for name, qty in dict(private.get("shed") or {}).items():
         units[str(name)] = units.get(str(name), 0) + _int(qty)
@@ -116,6 +216,12 @@ def own_supply_map(observation: dict[str, Any]) -> dict[str, int]:
         for name, qty in dict(inventory or {}).items():
             units[str(name)] = units.get(str(name), 0) + _int(qty)
     return units
+
+
+def own_supply_map(observation: dict[str, Any]) -> dict[str, int]:
+    """Compatibility alias for the unified farm-wide future supply map."""
+
+    return future_supply_map(observation)
 
 
 def own_supply_units(observation: dict[str, Any], item: str) -> int:
@@ -634,6 +740,7 @@ def money_per_day(
     inventory: int | None = None,
     own_units: int = 0,
     labor_price: float = 0.0,
+    units: int | None = None,
 ) -> float | None:
     """(what one more tile really fetches − seed − the care it costs) / occupy days.
 
@@ -645,12 +752,14 @@ def money_per_day(
     occupy = CROP_OCCUPY_DAYS.get(crop, 99)
     if occupy > days_left or occupy <= 0:
         return None
-    units = CROP_YIELD[crop]
+    output_units = CROP_YIELD[crop] if units is None else max(0, int(units))
+    if output_units <= 0:
+        return None
     revenue = None
     if inventory is not None:
-        revenue = batch_sale_revenue(crop, inventory + max(0, own_units), units)
+        revenue = marginal_sale_revenue(crop, inventory, own_units, output_units)
     if revenue is None:
-        revenue = float(prices.get(crop) or 0) * units
+        revenue = float(prices.get(crop) or 0) * output_units
     labor = crop_labor_turns(crop, days_left) * labor_price
     return (revenue - SEED_COST[crop] - labor) / occupy
 
@@ -720,21 +829,22 @@ def animal_money_per_day(
     inventory: int | None = None,
     own_units: int = 0,
     labor_price: float = 0.0,
+    units: int | None = None,
 ) -> float | None:
     """Same yardstick as a crop tile, with livestock's own costs: the head itself,
     a ration every remaining day, and the daily feed-and-care turns it demands.
     """
 
-    units = animal_yield_units(animal, days_left)
-    if units <= 0:
+    output_units = animal_yield_units(animal, days_left) if units is None else max(0, int(units))
+    if output_units <= 0:
         return None
     product = next(name for name, kind in SHOP_ANIMAL.items() if kind == animal)
     feed = days_left * float(prices.get("WHEAT") or 0)
     revenue = None
     if inventory is not None:
-        revenue = batch_sale_revenue(product, inventory + max(0, own_units), units)
+        revenue = marginal_sale_revenue(product, inventory, own_units, output_units)
     if revenue is None:
-        revenue = units * float(prices.get(product) or 0)
+        revenue = output_units * float(prices.get(product) or 0)
     labor = animal_labor_turns(animal, days_left) * labor_price
     return (revenue - ANIMAL_COST[animal] - feed - labor) / days_left
 
@@ -761,6 +871,7 @@ def crop_money_per_day(
         market_inventory(observation, crop),
         supply.get(crop, 0),
         labor_price_per_turn(observation),
+        future_crop_units(crop, _int(observation.get("day"))),
     )
 
 
@@ -774,6 +885,8 @@ def animal_line_money_per_day(
     if supply is None:
         supply = own_supply_map(observation)
     product = next(name for name, kind in SHOP_ANIMAL.items() if kind == animal)
+    day = _int(observation.get("day"))
+    candidate_units = _forecast_animal_units(animal, day, day=day)
     return animal_money_per_day(
         animal,
         prices,
@@ -781,6 +894,7 @@ def animal_line_money_per_day(
         market_inventory(observation, product),
         supply.get(product, 0),
         labor_price_per_turn(observation),
+        candidate_units,
     )
 
 
@@ -1145,16 +1259,36 @@ def line_season_value(
         if occupy > days_left:
             return 0.0
         cycles = max(1, days_left // occupy)
+        candidate_units = future_crop_units(name, _int(observation.get("day")))
         total = 0.0
         for index in range(tiles):
-            value = money_per_day(name, prices, days_left, inventory, supply + index * CROP_YIELD[name] * cycles)
+            value = money_per_day(
+                name,
+                prices,
+                days_left,
+                inventory,
+                supply + index * candidate_units * cycles,
+                units=candidate_units,
+            )
             if value is None:
                 return 0.0
             total += cycles * value * occupy
         return total
     total = 0.0
+    candidate_units = (
+        _forecast_animal_units(name, _int(observation.get("day")), day=_int(observation.get("day")))
+        if observation is not None
+        else animal_yield_units(name, days_left)
+    )
     for index in range(tiles):
-        value = animal_money_per_day(name, prices, days_left, inventory, supply + index * animal_yield_units(name, days_left))
+        value = animal_money_per_day(
+            name,
+            prices,
+            days_left,
+            inventory,
+            supply + index * candidate_units,
+            units=candidate_units,
+        )
         if value is None:
             return 0.0
         total += value * days_left

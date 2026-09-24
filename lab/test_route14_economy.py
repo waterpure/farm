@@ -5,7 +5,8 @@ from __future__ import annotations
 import unittest
 from typing import Any
 
-from lab.route14_economy import animal_labor_turns, batch_sale_revenue, choose_next_animal, choose_next_crop, choose_next_line, crop_labor_turns, crop_ready_to_harvest, door_distance, empty_slot_plan, may_harvest_melon_at, labor_price_per_turn, melon_harvest_cutoff, money_per_day, pack_market_orders, place_arrival_units, place_plan_by_value, plan_fill, planting_allowed, plantable_today, quota_tile_cap, rank_crop_lines, rank_lines, seed_fill_plan, sell_quantity, shed_place_target, should_buy_land, wheat_feed_order
+from kaggle_environments.envs.kaggriculture.kaggriculture import market_price
+from lab.route14_economy import animal_labor_turns, batch_sale_revenue, choose_next_animal, choose_next_crop, choose_next_line, crop_labor_turns, crop_ready_to_harvest, door_distance, empty_slot_plan, future_crop_units, future_supply_map, labor_price_per_turn, marginal_sale_revenue, may_harvest_melon_at, melon_harvest_cutoff, money_per_day, pack_market_orders, place_arrival_units, place_plan_by_value, plan_fill, planting_allowed, plantable_today, quota_tile_cap, rank_crop_lines, rank_lines, seed_fill_plan, sell_quantity, shed_place_target, should_buy_land, wheat_feed_order
 from lab.route14_hub import hub_plan
 from lab.route14_capacity import day_schedule, future_care_hires, proposed_crop_slots
 from lab.route14_agent import make_route14_agent
@@ -32,6 +33,32 @@ def full_first_quadrant(crop: str = "MELON") -> list[list[object]]:
 
 
 class Route14EconomyTests(unittest.TestCase):
+    def _sheep_observation(self, count: int = 0, *, held: int = 0) -> dict[str, Any]:
+        tiles: list[list[object]] = [[None] * 5 for _ in range(5)]
+        positions = [(x, y) for y in range(5) for x in range(5)]
+        for index in range(count):
+            x, y = positions[index]
+            tiles[y][x] = {
+                "kind": "PASTURE",
+                "animal": "SHEEP",
+                "placed_day": 0,
+                "yield_units": held,
+                "pending_care_bonus": 0,
+                "fed_today": False,
+                "cared_today": False,
+            }
+        return {
+            "player": 0,
+            "day": 0,
+            "farms": [{"money": 50000, "tiles": tiles, "hands": [], "hires_today": 0}],
+            "market": {
+                "inventory": {item: 10000 for item in PRICES},
+                "prices": dict(PRICES),
+            },
+            "town": {"unlocked_shops": []},
+            "private": {"shed": {"WHEAT": 100}, "inventories": [{}], "seeds": {}},
+        }
+
     def test_land_quota_is_seventy_percent_of_tiles(self) -> None:
         self.assertEqual(quota_tile_cap(10), 7)
         self.assertEqual(quota_tile_cap(25), 17)
@@ -515,6 +542,65 @@ class Route14EconomyTests(unittest.TestCase):
                     batch_sale_revenue(item, stock, units),
                     sum(market_price(item, stock + offset) for offset in range(units)),
                 )
+
+    def test_candidate_revenue_is_priced_after_existing_future_supply(self) -> None:
+        expected = sum(market_price("WOOL", 150 + offset) for offset in range(20))
+        self.assertEqual(marginal_sale_revenue("WOOL", 100, 50, 20), expected)
+
+    def test_existing_animals_future_output_enters_supply_without_double_counting(self) -> None:
+        observation = self._sheep_observation(count=1, held=4)
+        supply = future_supply_map(observation)
+        from lab.animal_forecast import future_units
+
+        expected = future_units("SHEEP", 0, day=0, held=4)
+        self.assertEqual(supply["WOOL"], expected)
+        self.assertEqual(supply["WOOL"], 4 + future_units("SHEEP", 0, day=0))
+
+    def test_more_existing_sheep_reduces_new_sheep_marginal_value(self) -> None:
+        empty = self._sheep_observation(count=0)
+        crowded = self._sheep_observation(count=20)
+        from lab.animal_forecast import future_units
+
+        new_units = future_units("SHEEP", 0, day=0)
+        empty_value = marginal_sale_revenue("WOOL", 10000, future_supply_map(empty).get("WOOL", 0), new_units)
+        crowded_value = marginal_sale_revenue("WOOL", 10000, future_supply_map(crowded).get("WOOL", 0), new_units)
+        assert empty_value is not None and crowded_value is not None
+        self.assertGreater(empty_value, crowded_value)
+
+    def test_wool_saturation_switches_the_best_line_to_melon(self) -> None:
+        from lab.production_plan import production_candidates
+
+        open_field = self._sheep_observation(count=0)
+        crowded = self._sheep_observation(count=1)
+        empty_candidates = {candidate.name: candidate for candidate in production_candidates(open_field, (4, 4))}
+        crowded_candidates = {candidate.name: candidate for candidate in production_candidates(crowded, (4, 4))}
+        self.assertGreater(empty_candidates["SHEEP"].net_value, empty_candidates["MELON"].net_value)
+        self.assertGreater(crowded_candidates["MELON"].net_value, crowded_candidates["SHEEP"].net_value)
+
+    def test_planned_supply_is_shared_across_multiple_candidates(self) -> None:
+        from lab.production_plan import _account, _commit, _ledger, production_candidates
+
+        observation = self._sheep_observation(count=0)
+        ledger = _ledger(observation)
+        first = next(candidate for candidate in production_candidates(observation, (0, 0), ledger) if candidate.name == "SHEEP")
+        _account(ledger, observation, _commit(first), pay=True)
+        second = next(candidate for candidate in production_candidates(observation, (1, 0), ledger) if candidate.name == "SHEEP")
+        self.assertEqual(ledger.planned_supply["WOOL"], 34)
+        self.assertLess(second.money_per_day, first.money_per_day)
+
+    def test_wool_supply_does_not_change_milk_or_melon_value(self) -> None:
+        from lab.production_plan import production_candidates
+
+        base = {candidate.name: candidate for candidate in production_candidates(self._sheep_observation(0), (4, 4))}
+        wool = {candidate.name: candidate for candidate in production_candidates(self._sheep_observation(20), (4, 4))}
+        self.assertEqual(wool["COW"].money_per_day, base["COW"].money_per_day)
+        self.assertEqual(wool["MELON"].money_per_day, base["MELON"].money_per_day)
+
+    def test_crop_future_supply_uses_the_same_season_horizon(self) -> None:
+        self.assertEqual(future_crop_units("WHEAT", 0), 6)
+        self.assertEqual(future_crop_units("STRAWBERRY", 27), 0)
+        self.assertEqual(future_crop_units("WHEAT", 27), 6)
+        self.assertEqual(future_crop_units("WHEAT", 28), 0)
 
     def test_flooding_one_crop_hands_the_next_tile_to_another(self) -> None:
         def field(melon_tiles: int) -> dict[str, Any]:

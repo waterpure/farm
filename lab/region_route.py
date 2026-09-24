@@ -1289,11 +1289,22 @@ def _materialize(
     pantry: _Pantry,
 ) -> RegionRoutePlan:
     plans: list[WorkerRoutePlan] = []
+    unfinished: list[TileVisit] = list(scored.leftover)
+    total_moves = 0
+    finish_hour: int | None = None
     for worker, visits in zip(workers, scored.routes):
         leg, pending = _prepare(worker, visits, pantry.doors, start_hour, end_hour)
         actions, moves, finish, blocked = _expand(worker.coord, leg, start_hour, end_hour)
-        if pending or blocked:
-            raise RuntimeError("a stored route does not fit in the day")
+        # ``_score`` normally stores only visits that fit.  A replan can still
+        # arrive here with a route whose final walk became too long after the
+        # worker's real position or carried stock changed.  Materialize the
+        # executable prefix and carry the rest forward instead of turning a
+        # recoverable partial day into a fatal episode error.
+        unfinished.extend(pending)
+        unfinished.extend(blocked)
+        total_moves += moves
+        if finish is not None:
+            finish_hour = finish if finish_hour is None else max(finish_hour, finish)
         plans.append(
             WorkerRoutePlan(
                 worker.id,
@@ -1305,14 +1316,32 @@ def _materialize(
             )
         )
     if not _end_day_capacity_safe(workers, scored.routes, pantry, pantry.shed_total, start_hour, end_hour):
-        raise RuntimeError("a stored route would overflow the shed")
-    feasible = not scored.leftover
+        # Keep the already materialized work; the next observation will rebuild
+        # the route with the updated shed contents.  This mirrors the partial
+        # route contract above and avoids rejecting a valid prefix.
+        unfinished.extend(
+            visit
+            for route in scored.routes
+            for visit in route
+            if visit not in unfinished and not any(
+                planned.coord == visit.coord for plan in plans for planned in plan.visits
+            )
+        )
+    seen: set[tuple[int, int]] = set()
+    remaining_list: list[TileVisit] = []
+    for visit in unfinished:
+        if visit.coord in seen:
+            continue
+        seen.add(visit.coord)
+        remaining_list.append(visit)
+    remaining = tuple(remaining_list)
+    feasible = not remaining
     return RegionRoutePlan(
         feasible,
         tuple(plans),
-        scored.moves,
-        scored.finish,
-        scored.leftover,
+        total_moves,
+        finish_hour,
+        remaining,
     )
 
 

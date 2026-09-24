@@ -1947,3 +1947,27 @@ LLM 不适合、也不需要参与评测。`.pkl` 若使用，装的是小型策
 - `py_compile lab/runner.py lab/season_eval.py`、`git diff --check`：通过。
 - 完整成对复跑：`region_phase1` vs `route14_phase1`，共同对手 `starter`，seed=1、720 steps；两局均 `DONE`，候选 `88,545`，baseline `3,000`，无失败动作、现金对账误差 0。记录：`experiments/region_phase1_vs_route14_starter_seed1.jsonl` 和 `_summary.json`。
 - 额外直接统计 `starter` 右位调用：**719 次有效回合调用**（720 步 episode 的首个 observation 不产生动作），两位最终状态均 `DONE`，奖励为候选 `88,545`、starter `3,575`；因此对手确实参与了整局，不是空对手。
+
+## 2026-09-24：region_phase1 统一 future_supply 与逐单位边际估值
+
+本轮只改生产线经济估值，目标是新增动物/作物前先把全农场未来可售供给统一纳入，再按官方市场价格曲线计算加入前后的真实边际收入。没有改 BUY_LAND、FEED、CARE、FERTILIZE、SELL 时机、对手预测或多 region。
+
+改动：
+
+- `lab/route14_economy.py`：新增 `future_supply_map()` 和 `marginal_sale_revenue()`；`own_supply_map()` 保留为兼容别名。供给包含 shed/worker 当前存货、田间当前产量、现有作物剩余赛季产量、现有动物当前产量与剩余赛季产量。动物未来量复用 `lab.animal_forecast.future_units()`，按 `placed_day`、当前 day、held units 和 pending care 计算，不重复计算当前 `yield_units`。
+- 候选收入统一用 `batch_sale_revenue()` 的逐单位官方价格曲线，并以加入前后收入差作为 marginal revenue。`planned_supply` 在连续规划中共享；现有 WOOL 越多，后续 SHEEP 的估值越低，WOOL 不会改变 MILK/MELON 价格。
+- 新作物候选也复用 `future_crop_units()`，并修正 day 28/29 已无法达到首产日时的零供给边界；站立作物和新作物候选使用同一赛季 horizon。
+- `lab/region_route.py::_materialize()` 增加最小恢复保护：若动态重排后只剩部分访问能在当天执行，保留可执行前缀、把余下访问放回 `unfinished_visits`，下一 observation 再排，不把可恢复的 partial route 直接抛成异常。该保护不改变路线选择或任务优先级。
+- 测试新增官方逐件压价、现有动物未来产量、无 double count、羊群拥挤后边际下降、连续 planned supply、不同商品独立、作物赛季末边界等覆盖。
+
+验证：
+
+- `./.venv/bin/python -m unittest discover -s lab -p 'test_*.py'`：**297 tests OK**；`git diff --check` 与相关 `py_compile` 通过。
+- synthetic 估值（market inventory=10000，单只新羊未来 34 WOOL）：已有 0/1/10/20 只羊时，新增羊的 WOOL marginal revenue 约为 **6073 / 1864 / 34 / 34**；10 只以后已触及价格下限。空场时 SHEEP 高于 MELON，已有羊后 MELON 高于新增 SHEEP；COW/MILK 和 MELON 不受 WOOL supply 直接影响。
+- seed=1、`region_phase1` vs `v45_base`、720 steps：两位均 `DONE`，候选 final money **27,873**，对手 V45 final money **170,820**；候选 sell revenue **34,017**，total spend **9,144**；seed **72**、animal **7**、sell units **220**、harvest **92**、FEED **107**、CARE **107**、FERTILIZE **41**、COLLECT_FERTILIZER **86**、moves **546**、PASS **235**、replans **8**、failed unit actions **0**、failed market orders **0**、cash reconciliation error **0**。候选最终动物为 **COW 4、SHEEP 1、GOOSE 0**，终局田间作物 **0**；收入：WHEAT 291、CARROT 1,021、MELON 10,593、MILK 16,035、WOOL 3,189、FERTILIZER 2,888（TOMATO/STRAWBERRY/EGG 为 0）。同一场对手最终为 GOOSE 3、COW 8、SHEEP 6。
+
+解释与风险：
+
+- 相对旧基准 `0a1aeeb` 报告的 **88,545**，本轮为 **27,873（下降 60,672）**。主要原因是估值不再把新增羊/作物当成第一份货来卖：现有动物未来产量先占用全场价格曲线，后续 SHEEP、持续作物的边际收入快速下降，规划组合转为较少动物和 MELON/MILK；不是市场规则或 SELL 规则改变。
+- 这次单局验证还暴露了旧路由评分与 materialize 对 partial route 的一致性问题，已用恢复保护保证完整 DONE；8 次重排来自真实位置/资源变化，未出现失败动作。若继续优化，应先做固定组合的机会成本 A/B，不要把本轮下降误判成 `future_supply` 计算错误，也不要在本轮范围外改路线策略。
+- 记录文件需保留为本轮独立评测；提交前确认 JSONL/summary 已替换为本次成功结果。下一位不要回退到只计当前 `yield_units` 或固定 spot price 的估值。

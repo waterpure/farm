@@ -1,0 +1,24 @@
+{
+  "candidate": "region_phase1",
+  "opponent": "v45_base",
+  "seed": 1,
+  "steps": 720,
+  "status": "DONE",
+  "final_money": 27873,
+  "opponent_final_money_same_match": 170820,
+  "baseline_reference_money": 88545,
+  "delta_vs_baseline_reference": -60672,
+  "sell_revenue": 34017,
+  "total_spend": 9144,
+  "failed_unit_actions": 0,
+  "failed_market_orders": 0,
+  "cash_reconciliation_error": 0,
+  "actions": {"FEED": 107, "CARE": 107, "FERTILIZE": 41, "COLLECT_FERTILIZER": 86},
+  "final_animals": {"GOOSE": 0, "COW": 4, "SHEEP": 1},
+  "final_crops": {},
+  "opponent_final_animals": {"GOOSE": 3, "COW": 8, "SHEEP": 6},
+  "notes": [
+    "The opponent final money is from the same successful candidate-vs-V45 match.",
+    "The 88545 value is the user-provided pre-change reference at HEAD 0a1aeeb."
+  ]
+}

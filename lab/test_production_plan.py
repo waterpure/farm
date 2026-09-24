@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import unittest
 
+from lab.animal_forecast import future_units
 from lab.production_plan import (
     _account,
     _commit,
@@ -15,7 +16,7 @@ from lab.production_plan import (
     production_candidates,
     seedling_water_is_mandatory,
 )
-from lab.route14_economy import CASH_BUFFER, animal_yield_units, wheat_buy_price
+from lab.route14_economy import CASH_BUFFER, wheat_buy_price
 from lab.route14_state import COMPLETED, parse_world
 from lab.task_grid import (
     BUILD_PASTURE,
@@ -302,7 +303,7 @@ class ProductionPlanTests(unittest.TestCase):
         second = next(item for item in production_candidates(observation, (4, 4), books) if item.name == "SHEEP")
 
         self.assertGreater(books.planned_supply["WOOL"], 0)
-        self.assertEqual(books.planned_supply["WOOL"], animal_yield_units("SHEEP", 30))
+        self.assertEqual(books.planned_supply["WOOL"], future_units("SHEEP", 0, day=0))
         self.assertLess(second.money_per_day, first.money_per_day)
 
     def test_the_second_tile_can_switch_off_sheep(self) -> None:
