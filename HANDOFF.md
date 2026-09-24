@@ -1930,4 +1930,20 @@ LLM 不适合、也不需要参与评测。`.pkl` 若使用，装的是小型策
 
 - `FEED=382` 与 `CARE=379` 的少量差异来自新动物落地/日终边界等路线可执行性，不代表 CARE 又退回 optional；现有测试和路线排序已保证已进入同一访问的 FEED 后 CARE。
 - 施肥次数仍不高的主要原因不是遗漏全部收肥：许多 ready manure 对当前作物已无有效增产窗口、作物已达上限、剩余产出不足以变现，或没有对应 FERTILIZE 需求。下一步应固定作物/动物组合做“施肥 vs 卖肥”的机会成本 A/B，并减少回 shed 与重复移动。
-- 当前 season_eval 复跑中 `region_phase1` 候选完成并得到 `88,545`；`starter` 对照工厂报 `TypeError: 'str' object is not callable`，属于评测 harness/对照注册问题，不影响候选局的动作与现金账；后续若需要成对统计，应先修正该独立 harness 问题。
+- 当时 season_eval 复跑中 `region_phase1` 候选完成并得到 `88,545`，但 `starter` 被评测为 seated baseline 时触发 `TypeError: 'str' object is not callable`；该 harness 问题已在后续 section 修复，并通过 290 个测试和完整成对复跑确认。
+
+## 2026-09-24：修复 season_eval 将内置 starter 当字符串调用
+
+用户追问上一轮复跑中的 `TypeError: 'str' object is not callable`。根因在 `lab/season_eval.py::run_season`：当要评估的 seated agent 本身就是字符串 `"starter"` 时，`_resolve_agent("starter")` 原本返回字符串，随后 `_watch` 把它当函数执行；因此“baseline 自身为 starter”的那半局无效。候选作为左位、starter 作为环境对手的那一局仍能由 Kaggle 环境按内置名称正常运行，但整组对照不能算完整配对。
+
+修复：
+
+- `lab/runner.py::_resolve_agent` 现在把内置 `pass` / `random` / `starter` 解析为可调用适配器，并兼容 `_watch` 传入的可选 configuration 参数；外部 baseline 和项目 agent 的解析路径不变。
+- `lab/test_season_eval.py` 新增：内置 starter 可解析为 callable、starter 可以作为被评估 baseline 且短局无异常。
+
+验证：
+
+- 全量测试：**290 tests OK**。
+- `py_compile lab/runner.py lab/season_eval.py`、`git diff --check`：通过。
+- 完整成对复跑：`region_phase1` vs `route14_phase1`，共同对手 `starter`，seed=1、720 steps；两局均 `DONE`，候选 `88,545`，baseline `3,000`，无失败动作、现金对账误差 0。记录：`experiments/region_phase1_vs_route14_starter_seed1.jsonl` 和 `_summary.json`。
+- 额外直接统计 `starter` 右位调用：**719 次有效回合调用**（720 步 episode 的首个 observation 不产生动作），两位最终状态均 `DONE`，奖励为候选 `88,545`、starter `3,575`；因此对手确实参与了整局，不是空对手。

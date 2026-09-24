@@ -6,7 +6,7 @@ import unittest
 
 from kaggle_environments.envs.kaggriculture import kaggriculture as game
 
-from lab.runner import run_match
+from lab.runner import _resolve_agent, run_match
 from lab.season_eval import SeasonResult, evaluate_seasons, run_season, summarize
 
 
@@ -41,6 +41,18 @@ def crash_agent(observation: dict, configuration: dict | None = None) -> dict:
 
 
 class SeasonEvalTest(unittest.TestCase):
+    def test_builtin_starter_resolves_to_callable_for_seated_runs(self) -> None:
+        agent = _resolve_agent("starter")
+        self.assertTrue(callable(agent))
+        action = agent({"farms": [], "player": 0, "private": {}}, {"episodeSteps": 6})
+        self.assertEqual(action["farmer"], ["PASS"])
+
+    def test_builtin_starter_can_be_the_evaluated_baseline(self) -> None:
+        result = run_season("starter", "starter", seed=1, steps=6)
+        self.assertEqual(result.status, "DONE")
+        self.assertIsNone(result.exception)
+        self.assertEqual(result.opponent, "starter")
+
     def test_short_season_returns_a_result(self) -> None:
         result = run_season("region_phase1", "starter", seed=1, steps=6)
         self.assertIsInstance(result, SeasonResult)

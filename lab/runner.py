@@ -9,6 +9,7 @@ from collections.abc import Callable
 from typing import Any
 
 from kaggle_environments import make
+from kaggle_environments.envs.kaggriculture import kaggriculture as game
 
 from .baselines import EXTERNAL_BASELINES, load_external_agent, load_v45_base_agent
 from .agents import (
@@ -52,6 +53,19 @@ def _resolve_agent(candidate: AgentSpec) -> Agent:
         return candidate
     if candidate not in AGENTS:
         raise ValueError(f"Agents must be chosen from: {', '.join(sorted(AGENTS))}")
+    if candidate in {"pass", "random", "starter"}:
+        # The environment accepts these names directly, but season_eval wraps
+        # the seated agent to record the ledger and calls it with an optional
+        # configuration argument.  Resolve the built-in here and adapt its
+        # one-argument signature so both paths use a real callable.
+        builtin = getattr(game, f"{candidate}_agent")
+
+        def wrapped(observation: dict[str, Any], configuration: dict[str, Any] | None = None) -> dict[str, Any]:
+            del configuration
+            return builtin(observation)
+
+        wrapped.__name__ = f"{candidate}_agent"
+        return wrapped
     if candidate in {"v45", "v45_base"}:
         return load_v45_base_agent()
     if candidate == "portfolio_executor":
